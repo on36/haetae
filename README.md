@@ -11,3 +11,7 @@ Thanks for https://github.com/lantunes/fixd
 3, support spring 4.x or above
 
 4, software loadbalance
+
+# Author
+
+ contact me freely("mailto:say_hello_plz@qq.com")
