@@ -1,6 +1,8 @@
 # Haetae
 This is a incompete lightweight micro service framework 
 
+Thanks for https://github.com/lantunes/fixd
+
 # TODO LIST
 1, online upgrade and hotswap
 
