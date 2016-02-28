@@ -1,5 +1,5 @@
 # Haetae
-This is a incompete lightweight micro service framework 
+This is a incomplete lightweight micro service framework 
 
 Thanks for https://github.com/lantunes/fixd
 
