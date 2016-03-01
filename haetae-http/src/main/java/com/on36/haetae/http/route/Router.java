@@ -16,4 +16,7 @@ public interface Router {
      *  @return the matching route, or null if none is found
      */
     Route route(String path);
+    
+    
+    void remove(String path);
 }

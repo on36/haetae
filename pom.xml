@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.on36.haetae</groupId>
 	<artifactId>haetae</artifactId>
@@ -10,13 +11,15 @@
 		<module>haetae-server</module>
 		<module>haetae-interpolatd</module>
 		<module>haetae-api</module>
-    <module>haetae-test</module>
-  </modules>
+		<module>haetae-hotswap</module>
+		<module>haetae-test</module>
+	</modules>
 
 	<properties>
 		<java.version>1.8</java.version>
 		<junit.version>4.11</junit.version>
 		<netty.version>4.0.34.Final</netty.version>
+		<typesafe.version>1.3.0</typesafe.version>
 		<gson.version>2.6.2</gson.version>
 
 		<aether.version>1.13.1</aether.version>
@@ -30,6 +33,7 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
+				<scope>test</scope>
 				<version>${junit.version}</version>
 			</dependency>
 			<dependency>
@@ -41,6 +45,11 @@
 				<groupId>io.netty</groupId>
 				<artifactId>netty-all</artifactId>
 				<version>${netty.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.typesafe</groupId>
+				<artifactId>config</artifactId>
+				<version>${typesafe.version}</version>
 			</dependency>
 
 			<dependency>

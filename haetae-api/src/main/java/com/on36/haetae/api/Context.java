@@ -5,7 +5,9 @@ import java.util.Set;
 import com.on36.haetae.api.http.Session;
 
 public interface Context {
-
+	
+	long getStartHandleTime();
+	
 	String getPath();
 	
 	String getRequestParameter(String param);

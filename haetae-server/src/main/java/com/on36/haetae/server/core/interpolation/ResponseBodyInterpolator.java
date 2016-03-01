@@ -3,7 +3,7 @@ package com.on36.haetae.server.core.interpolation;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.interpolatd.Interpolator;
 import com.on36.haetae.interpolatd.Substitutor;
-import com.on36.haetae.server.request.impl.SimpleContext;
+import com.on36.haetae.server.core.SimpleContext;
 
 public class ResponseBodyInterpolator {
 

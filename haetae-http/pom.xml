@@ -18,6 +18,11 @@
 			<artifactId>netty-all</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>com.typesafe</groupId>
+			<artifactId>config</artifactId>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-api</artifactId>
 			<version>${project.version}</version>

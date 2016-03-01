@@ -5,7 +5,7 @@ import java.lang.annotation.Target;
 
 import com.on36.haetae.api.http.MediaType;
 
-@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
 public @interface Produces {
 
 	MediaType[] value();

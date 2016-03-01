@@ -3,6 +3,7 @@ package com.on36.haetae.server.utils;
 import java.beans.XMLEncoder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import com.google.gson.Gson;
 
@@ -15,7 +16,7 @@ public class FormatorUtils {
         return gson.toJson(src);
 	}
 
-	public static String toXML(Object src, String charsetName) throws Exception {
+	public static String toXML(Object src) {
 		ByteArrayOutputStream out = null;
 		try {
 			out = new ByteArrayOutputStream();
@@ -33,6 +34,6 @@ public class FormatorUtils {
 			}
 		}
 
-		return new String(out.toByteArray(), charsetName);
+		return new String(out.toByteArray(), Charset.defaultCharset());
 	}
 }

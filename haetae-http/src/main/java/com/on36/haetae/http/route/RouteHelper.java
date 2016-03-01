@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 public class RouteHelper {
 
     public static final String PATH_ELEMENT_SEPARATOR = "/";
+    public static final String PATH_ELEMENT_ROOT = "/services";
     public static final String PARAM_PREFIX = ":";
     public static final char CUSTOM_REGEX_START = '<';
     public static final char CUSTOM_REGEX_END = '>';

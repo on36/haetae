@@ -36,13 +36,14 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, HttpRequest request) {
 
+		long start = System.currentTimeMillis();
 		if (HttpHeaders.is100ContinueExpected(request)) {
 			ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
 		}
 		InetSocketAddress remoteAddress = (InetSocketAddress) ctx.channel().remoteAddress();
 		boolean keepAlive = HttpHeaders.isKeepAlive(request);
 		FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,NOT_FOUND, Unpooled.directBuffer());
-		HttpRequestExt httpRequestExt = new HttpRequestExt(request, remoteAddress);
+		HttpRequestExt httpRequestExt = new HttpRequestExt(request, remoteAddress, start);
 		if (container != null)
 			container.handle(httpRequestExt, response);
 

@@ -1,15 +1,11 @@
 package com.on36.haetae.server.core;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
-import io.netty.util.CharsetUtil;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,33 +14,38 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.core.CustomHandler;
 import com.on36.haetae.http.RequestHandler;
+import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.request.HttpRequestExt;
+import com.on36.haetae.server.core.auth.impl.BlackListAuthentication;
+import com.on36.haetae.server.core.auth.impl.RequestFlowAuthentication;
+import com.on36.haetae.server.core.auth.impl.WhiteListAuthentication;
 import com.on36.haetae.server.core.body.EntityResonseBody;
 import com.on36.haetae.server.core.body.InterpolatedResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
+import com.on36.haetae.server.core.stats.Statistics;
 
 public class RequestHandlerImpl implements RequestHandler {
 
 	private int statusCode = -1;
 	private String contentType;
 	private String body;
-	private long delay = -1;
-	private TimeUnit delayUnit;
-	private long period = -1;
-	private TimeUnit periodUnit;
-	private int periodTimes = -1;
-	private long timeout = -1;
-	private TimeUnit timeoutUnit;
 	private boolean hasSession = false;
+
+	private AtomicLong minElapsedTime = new AtomicLong(0);
+	private AtomicLong avgElapsedTime = new AtomicLong(0);
+	private AtomicLong maxElapsedTime = new AtomicLong(0);
+
+	private AtomicInteger maxConcurrent = new AtomicInteger(0);;
+	private AtomicInteger successHandlTimes = new AtomicInteger(0);;
+	private AtomicInteger failHandlTimes = new AtomicInteger(0);;
 
 	private Set<SimpleImmutableEntry<String, String>> headers = new HashSet<SimpleImmutableEntry<String, String>>();
 
-	private AtomicLong firstTime = new AtomicLong(0L);
-	private AtomicInteger curTimes = new AtomicInteger(0);
-
 	private CustomHandler<?> httpHandler;
-	private String[] blackList;
-	private String[] whiteList;
+	private BlackListAuthentication blackList = new BlackListAuthentication();
+	private WhiteListAuthentication whiteList = new WhiteListAuthentication();
+	private RequestFlowAuthentication requestFlow = new RequestFlowAuthentication();
+	private boolean auth = true;
 
 	public RequestHandler with(int statusCode, String contentType, String body) {
 
@@ -54,21 +55,44 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
+	public RequestHandler with(String contentType, String body) {
+
+		return with(200, contentType, body);
+	}
+
+	public RequestHandler with(String body) {
+
+		return with(200, null, body);
+	}
+
 	public RequestHandler with(CustomHandler<?> customHandler) {
 
 		this.httpHandler = customHandler;
 		return this;
 	}
 
+	public RequestHandler auth(boolean authentication) {
+
+		this.auth = authentication;
+		return this;
+	}
+
 	public RequestHandler ban(String... blackips) {
 
-		this.blackList = blackips;
+		blackList.ban(blackips);
 		return this;
 	}
 
 	public RequestHandler permit(String... whiteips) {
 
-		this.whiteList = whiteips;
+		for (String ip : whiteips)
+			whiteList.permit(ip);
+		return this;
+	}
+
+	public RequestHandler permit(String ip, ServiceLevel level) {
+		
+		whiteList.permit(ip, level);
 		return this;
 	}
 
@@ -86,16 +110,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public RequestHandler every(long period, TimeUnit periodUnit, int times) {
 
-		this.periodTimes = times;
-		this.period = period;
-		this.periodUnit = periodUnit;
-		return this;
-	}
-
-	public RequestHandler withTimeout(long timeout, TimeUnit timeoutUnit) {
-
-		this.timeout = timeout;
-		this.timeoutUnit = timeoutUnit;
+		requestFlow.every(period, periodUnit, times);
 		return this;
 	}
 
@@ -116,11 +131,33 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public ResponseBody body(Context context) {
 
-		if (getCustomHandler() != null) {
+		if (getCustomHandler() != null)
 			return new EntityResonseBody(getCustomHandler().handle(context));
-		}
 
 		return new InterpolatedResponseBody(body, context);
+	}
+
+	public void stats(HttpResponse response, long elapsedTime) {
+
+		// total times
+		int totalTimes = successHandlTimes.intValue()
+				+ failHandlTimes.intValue();
+		// total time(ms)
+		long totalTime = totalTimes * avgElapsedTime.longValue() + elapsedTime;
+
+		if (HttpResponseStatus.OK.equals(response.getStatus()))
+			successHandlTimes.incrementAndGet();
+		else
+			failHandlTimes.incrementAndGet();
+
+		// elapsed time
+		if (minElapsedTime.get() == 0 || minElapsedTime.get() > elapsedTime)
+			minElapsedTime.set(elapsedTime);
+		if (maxElapsedTime.get() == 0 || maxElapsedTime.get() < elapsedTime)
+			maxElapsedTime.set(elapsedTime);
+
+		long avgTime = totalTime / (totalTimes + 1);
+		avgElapsedTime.set(avgTime);
 	}
 
 	public int statusCode() {
@@ -129,38 +166,6 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public String contentType() {
 		return contentType;
-	}
-
-	public long delay() {
-		return delay;
-	}
-
-	public TimeUnit delayUnit() {
-		return delayUnit;
-	}
-
-	public long period() {
-		return period;
-	}
-
-	public TimeUnit periodUnit() {
-		return periodUnit;
-	}
-
-	public int periodTimes() {
-		return periodTimes;
-	}
-
-	public boolean hasTimeout() {
-		return timeout != -1;
-	}
-
-	public long timeout() {
-		return timeout;
-	}
-
-	public TimeUnit timeoutUnit() {
-		return timeoutUnit;
 	}
 
 	public Set<SimpleImmutableEntry<String, String>> headers() {
@@ -181,67 +186,24 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public boolean validation(HttpRequestExt request, HttpResponse response) {
 
-		/* validation black list */
-		if (blackList != null) {
-
-			List<String> blackips = Arrays.asList(blackList);
-			String remoteIp = request.getRemoteAddress().getAddress()
-					.getHostAddress();
-			if (blackips.contains(remoteIp)) {
-
-				send(response, "Your ip is at black list");
-				return false;
-			}
+		if (auth) {
+			boolean result = blackList.auth(request, response);
+			if (!result)
+				return result;
+			result = whiteList.auth(request, response);
+			if (!result)
+				return result;
+			result = requestFlow.auth(request, response);
+			if (!result)
+				return result;
 		}
-
-		/* validation white list */
-		if (whiteList != null) {
-
-			List<String> whiteips = Arrays.asList(whiteList);
-			String remoteIp = request.getRemoteAddress().getAddress()
-					.getHostAddress();
-			if (!whiteips.contains(remoteIp)) {
-
-				send(response, "Your ip is not at white list");
-				return false;
-			}
-		}
-
-		/* validation request times */
-		if (period > -1) {
-
-			long current = System.currentTimeMillis();
-			long last = firstTime.get();
-			if (last == 0) {
-				firstTime.set(current);
-				curTimes.incrementAndGet();
-			} else {
-				long periodInMillis = periodUnit.toMillis(period);
-				if ((current - last) < periodInMillis) {
-					if (curTimes.get() < periodTimes) {
-						curTimes.incrementAndGet();
-					} else {
-
-						send(response, "Reached max request times");
-						return false;
-					}
-				} else {
-					firstTime.set(current);
-					curTimes.set(1);
-				}
-			}
-		}
-
 		return true;
 	}
 
-	private void send(HttpResponse response,String message) {
-		if (response instanceof HttpContent) {
-			HttpContent httpContent = (HttpContent) response;
-			ByteBuf content = httpContent.content();
-			if (message != null) {
-				content.writeBytes(message.getBytes(CharsetUtil.UTF_8));
-			}
-		}
+	public Statistics getStatistics() {
+		return new Statistics(successHandlTimes.intValue(),
+				failHandlTimes.intValue(), minElapsedTime.longValue(),
+				avgElapsedTime.longValue(), maxElapsedTime.longValue(),
+				maxConcurrent.intValue());
 	}
 }

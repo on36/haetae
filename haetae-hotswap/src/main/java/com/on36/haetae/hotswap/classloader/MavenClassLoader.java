@@ -1,4 +1,4 @@
-package com.on36.haetae.server.hotswap;
+package com.on36.haetae.hotswap.classloader;
 
 import java.io.File;
 import java.net.URL;
@@ -46,17 +46,17 @@ public final class MavenClassLoader {
 					"Must specify at least one remote repository.");
 
 			this.repositories = ImmutableList.copyOf(repositories);
-			this.localRepositoryDirectory = new File(LOCALREPOSITORYDIR + "/.m2/repository");
+			this.localRepositoryDirectory = new File(LOCALREPOSITORYDIR
+					+ "/.m2/repository");
 		}
 
-		public URLClassLoader forGAV(String gav) {
+		public URLClassLoader forGAVS(String... gavs) {
 			try {
-				CollectRequest collectRequest = createCollectRequestForGAV(gav);
+				CollectRequest collectRequest = createCollectRequestForGAV(gavs);
 				List<Artifact> artifacts = collectDependenciesIntoArtifacts(collectRequest);
 				List<URL> urls = Lists.newLinkedList();
 				for (Artifact artifact : artifacts) {
-					System.out.println(artifact.getArtifactId() + ":"
-							+ artifact.getVersion());
+					System.out.println(artifact.getFile().toURI().toURL());
 					urls.add(artifact.getFile().toURI().toURL());
 				}
 				return new URLClassLoader(urls.toArray(new URL[urls.size()]),
@@ -66,12 +66,17 @@ public final class MavenClassLoader {
 			}
 		}
 
-		private CollectRequest createCollectRequestForGAV(String gav) {
-			Dependency dependency = new Dependency(new DefaultArtifact(gav),
-					COMPILE_SCOPE);
+		private CollectRequest createCollectRequestForGAV(String... gavs) {
+
+			List<Dependency> deps = Lists.newLinkedList();
+			for (String gav : gavs) {
+				Dependency dependency = new Dependency(
+						new DefaultArtifact(gav), COMPILE_SCOPE);
+				deps.add(dependency);
+			}
 
 			CollectRequest collectRequest = new CollectRequest();
-			collectRequest.setRoot(dependency);
+			collectRequest.setDependencies(deps);
 			for (RemoteRepository repository : repositories) {
 				collectRequest.addRepository(repository);
 			}
@@ -113,8 +118,8 @@ public final class MavenClassLoader {
 		}
 	}
 
-	public static URLClassLoader forGAV(String gav) {
-		return usingCentralRepo().forGAV(Preconditions.checkNotNull(gav));
+	public static URLClassLoader forGAVS(String... gavs) {
+		return usingCentralRepo().forGAVS(Preconditions.checkNotNull(gavs));
 	}
 
 	public static ClassLoaderBuilder usingCentralRepo() {

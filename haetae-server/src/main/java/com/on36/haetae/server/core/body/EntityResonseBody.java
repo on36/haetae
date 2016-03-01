@@ -1,8 +1,13 @@
 package com.on36.haetae.server.core.body;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+
+import com.on36.haetae.server.utils.FormatorUtils;
 
 public class EntityResonseBody extends ResponseBody {
 
@@ -45,12 +50,12 @@ public class EntityResonseBody extends ResponseBody {
 
 		addStandardHeaders(response, contentType);
 
-//		if (response instanceof HttpContent) {
-//			HttpContent httpContent = (HttpContent) response;
-//			ByteBuf content = httpContent.content();
-//			if (hasContent()) {
-//				content.writeBytes(body.getBytes(CharsetUtil.UTF_8));
-//			}
-//		}
+		if (response instanceof HttpContent) {
+			HttpContent httpContent = (HttpContent) response;
+			ByteBuf content = httpContent.content();
+			if (hasContent()) {
+				content.writeBytes(FormatorUtils.toJson(entity).getBytes(Charset.defaultCharset()));
+			}
+		}
 	}
 }

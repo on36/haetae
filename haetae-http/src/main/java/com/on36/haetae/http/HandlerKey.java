@@ -6,20 +6,31 @@ public class HandlerKey {
 
     private final String method;
     private final Route route;
-    private final String contentType;
+    private String contentType;
     
-    public HandlerKey(String method, Route route, String contentType) {
+    public HandlerKey(String method, Route route) {
         
         this.method = method;
         this.route = route;
-        this.contentType = contentType;
     }
     
     public String contentType() {
         return contentType;
     }
     
-    @Override
+    public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+    
+	public String getMethod() {
+		return method;
+	}
+
+	public Route getRoute() {
+		return route;
+	}
+
+	@Override
     public int hashCode() {
         
         int hash = 1;
@@ -38,8 +49,6 @@ public class HandlerKey {
         HandlerKey that = (HandlerKey)o;
         return 
                 this.method.equals(that.method) && 
-                this.route.equals(that.route) && 
-                (this.contentType == null ? that.contentType == null : 
-                    this.contentType.equals(that.contentType));
+                this.route.equals(that.route);
     }
 }

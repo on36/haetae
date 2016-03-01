@@ -1,13 +1,14 @@
 package com.on36.haetae.server.core.container;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
-import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.List;
 import java.util.Set;
 
 import com.on36.haetae.api.Context;
@@ -16,17 +17,20 @@ import com.on36.haetae.http.Container;
 import com.on36.haetae.http.HandlerKey;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.request.HttpRequestExt;
+import com.on36.haetae.server.core.RequestHandlerImpl;
+import com.on36.haetae.server.core.SimpleContext;
 import com.on36.haetae.server.core.body.ResponseBody;
 import com.on36.haetae.server.core.body.StringResponseBody;
-import com.on36.haetae.server.request.impl.SimpleContext;
 
 public class HaetaeContainer implements Container {
 
-	private final RequestResolver requestResolver = new RequestResolver();
+	private final RequestResolver requestResolver = new RequestResolver(this);
 
 	private final SessionManager sessionManager = new SessionManager();
 
 	public void handle(HttpRequestExt request, HttpResponse response) {
+
+		RequestHandlerImpl handler = null;
 		try {
 			String responseContentType = "text/plain";
 			ResponseBody responseBody = new StringResponseBody("");
@@ -40,10 +44,12 @@ public class HaetaeContainer implements Container {
 						responseBody);
 				return;
 			}
+			handler = resolved.handler;
+
 			/* validatetion information */
-			boolean isValid = resolved.handler.validation(request, response);
+			boolean isValid = handler.validation(request, response);
 			if (!isValid) {
-				response.setStatus(NOT_FOUND);
+				response.setStatus(SERVICE_UNAVAILABLE);
 				sendAndCommitResponse(response, responseContentType,
 						responseBody);
 				return;
@@ -51,7 +57,7 @@ public class HaetaeContainer implements Container {
 
 			/* create a new session if required */
 			Session session = sessionManager.getSessionIfExists(request);
-			boolean hasSession = resolved.handler.hasSession();
+			boolean hasSession = handler.hasSession();
 			if (hasSession && session == null) {
 				session = sessionManager.newSession(response);
 			}
@@ -61,18 +67,18 @@ public class HaetaeContainer implements Container {
 					session);
 
 			/* set the response body */
-			ResponseBody handlerBody = resolved.handler.body(context);
+			ResponseBody handlerBody = handler.body(context);
 			if (handlerBody != null && handlerBody.hasContent()) {
 				responseBody = handlerBody;
 			}
 
-			int responseStatus = resolved.handler.statusCode();
+			int responseStatus = handler.statusCode();
 			if (responseStatus > -1)
 				handlerStatusCode = HttpResponseStatus.valueOf(resolved.handler
 						.statusCode());
 
 			/* set the content type */
-			String handlerContentType = resolved.key.contentType();
+			String handlerContentType = handler.contentType();
 			if (handlerContentType != null
 					&& handlerContentType.trim().length() != 0) {
 				responseContentType = handlerContentType;
@@ -85,7 +91,7 @@ public class HaetaeContainer implements Container {
 			response.setStatus(handlerStatusCode);
 
 			/* set any headers */
-			Set<SimpleImmutableEntry<String, String>> headers = resolved.handler
+			Set<SimpleImmutableEntry<String, String>> headers = handler
 					.headers();
 			for (SimpleImmutableEntry<String, String> header : headers) {
 				response.headers().set(header.getKey(), header.getValue());
@@ -97,6 +103,11 @@ public class HaetaeContainer implements Container {
 			response.setStatus(INTERNAL_SERVER_ERROR);
 			sendAndCommitResponse(response, "text/plain",
 					new StringResponseBody(e.getMessage()));
+		} finally {
+			long end = System.currentTimeMillis();
+			long elapsedTime = end - request.getStartHandleTime();
+			if (handler != null)
+				handler.stats(response, elapsedTime);
 		}
 	}
 
@@ -106,13 +117,16 @@ public class HaetaeContainer implements Container {
 	}
 
 	public HandlerKey addHandler(RequestHandler handler, HttpMethod method,
-			String resource, String contentType) {
-		return requestResolver.addHandler(handler, method, resource,
-				contentType);
+			String resource) {
+		return requestResolver.addHandler(handler, method, resource);
 	}
 
-	public HandlerKey addHandler(RequestHandler handler, HttpMethod method,
-			String resource) {
-		return addHandler(handler, method, resource, null);
+	public HandlerKey addHandler(RequestHandler handler, String resource) {
+		return addHandler(handler, HttpMethod.GET, resource);
+	}
+
+	@Override
+	public List<?> getStatistics(String contentType) {
+		return requestResolver.getStatistics();
 	}
 }

@@ -71,28 +71,20 @@ public class HaetaeServer {
 		return handler;
 	}
 
-	public RequestHandler handle(HttpMethod method, String resource,
-			String contentType) {
-
-		RequestHandlerImpl handler = new RequestHandlerImpl();
-		container.addHandler(handler, method, resource, contentType);
-		return handler;
-	}
-
 	public static void main(String[] args) {
 		HaetaeServer server = new HaetaeServer(8080);
-		server.handle(HttpMethod.GET, "/").with(200, "text/plain", "Hello");
 		server.handle(HttpMethod.GET, "/hello")
 				.with(200, "text/plain", "Hello xiongdi!").session(true);
-		server.handle(HttpMethod.GET, "/name/:name<[A-Za-z]+>").with(200,
+		server.handle(HttpMethod.GET, "name/:name<[A-Za-z]+>").with(200,
 				"text/plain", "Hello :name");
-		server.handle(HttpMethod.GET, "/multi/*/*").with(200, "text/plain",
+		server.handle(HttpMethod.GET, "/multi").with(200, "text/plain",
 				"Hello *[0] *[1]");
 		server.handle(HttpMethod.GET, "/greeting").with(200, "text/plain",
 				"Hello [request?name] at [request$User-Agent]");
 		server.handle(HttpMethod.GET, "/redis")
 				.with(200, "text/plain", "Hello redis!")
 				.every(30, TimeUnit.SECONDS, 10);
+		server.handle(HttpMethod.GET, "/skip").withRedirect("http://www.baidu.com");
 		server.handle(HttpMethod.GET, "/black")
 				.with(200, "text/plain", "Hello black!").ban("172.31.25.40");
 		server.handle(HttpMethod.GET, "/white")

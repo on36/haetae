@@ -14,11 +14,18 @@ public class HttpRequestExt implements HttpRequest,HttpContent{
 	
 	private final HttpRequest request;
 	
+	private final long startHandleTime;
+	
 	private final InetSocketAddress remoteAddress;
 	
-	public HttpRequestExt(HttpRequest request, InetSocketAddress remoteAddress) {
+	public HttpRequestExt(HttpRequest request, InetSocketAddress remoteAddress, long startHandleTime) {
 		this.request = request;
 		this.remoteAddress = remoteAddress;
+		this.startHandleTime = startHandleTime;
+	}
+	
+	public long getStartHandleTime() {
+		return startHandleTime;
 	}
 
 	public HttpVersion getProtocolVersion() {

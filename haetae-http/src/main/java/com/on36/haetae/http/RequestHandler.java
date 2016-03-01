@@ -6,7 +6,11 @@ import com.on36.haetae.api.core.CustomHandler;
 
 public interface RequestHandler {
 
-    RequestHandler with(int statusCode, String contentType, String body);
+	RequestHandler with(int statusCode, String contentType, String body);
+	
+    RequestHandler with(String contentType, String body);
+    
+    RequestHandler with(String body);
     
     RequestHandler with(CustomHandler<?> customHandler);
 
@@ -14,11 +18,13 @@ public interface RequestHandler {
     
     RequestHandler every(long period, TimeUnit periodUnit, int times);
     
+    RequestHandler auth(boolean authentication);
+    
     RequestHandler ban(String...blackips);
     
     RequestHandler permit(String...whiteips);
     
-    RequestHandler withTimeout(long timeout, TimeUnit timeoutUnit);
+    RequestHandler permit(String ip, ServiceLevel level);
     
     RequestHandler withRedirect(String location);
     
