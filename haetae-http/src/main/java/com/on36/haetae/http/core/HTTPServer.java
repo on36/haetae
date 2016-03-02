@@ -1,6 +1,7 @@
 package com.on36.haetae.http.core;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -36,10 +37,6 @@ public class HTTPServer implements Server {
 		this(port, 0, ssl);
 	}
 
-	public HTTPServer(int port, int threadPoolSize) {
-		this(port, threadPoolSize, false);
-	}
-
 	public HTTPServer(int port, int threadPoolSize, boolean ssl) {
 		this.socketAddress = new InetSocketAddress(port);
 		this.threadPoolSize = threadPoolSize;
@@ -72,20 +69,24 @@ public class HTTPServer implements Server {
 			try {
 				ServerBootstrap b = new ServerBootstrap();
 				b.option(ChannelOption.SO_BACKLOG, 1024);
+				b.option(ChannelOption.SO_REUSEADDR, true);
+	            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS,5000);
+	            b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+	            b.childOption(ChannelOption.AUTO_READ, false);
 				b.group(bossGroup, workerGroup)
 						.channel(NioServerSocketChannel.class)
 						.handler(new LoggingHandler(LogLevel.DEBUG))
 						.childHandler(new HttpServerInitializer(sslCtx, container));
 
 				channel = b.bind(socketAddress).sync().channel();
-				System.out.println("Server is running at " + socketAddress);
+				System.out.println("Server is running at [" + socketAddress +"]");
 				channel.closeFuture().sync();
 			} finally {
 				bossGroup.shutdownGracefully();
 				workerGroup.shutdownGracefully();
 			}
 		} else {
-			System.out.println("Server is running at " + socketAddress);
+			System.out.println("Server is already running at [" + socketAddress +"], startup abort!");
 		}
 	}
 
