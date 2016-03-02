@@ -14,15 +14,7 @@ import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.container.HaetaeContainer;
 
 /**
- * 
- * 功能说明:
- *
  * @author zhanghr
- *
- * @Date 2016年2月28日 上午1:15:13
- *
- *
- * 版本号  |   作者   |  修改时间   |   修改内容
  *
  */
 public class HaetaeServer {
