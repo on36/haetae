@@ -16,7 +16,7 @@ public class ClassPathAnnotationScanner {
      * Run the scan - search path for files containing annotation.
      *
      * @param classLoader classloader to resolve path
-     * @param path        path to scan {@link org.hotswap.agent.util.scanner.Scanner#scan(ClassLoader, String, ScannerVisitor)}
+     * @param path
      * @return list of class names containing the annotation
      * @throws IOException scan exception.
      */
