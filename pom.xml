@@ -24,7 +24,7 @@
 
 		<aether.version>1.13.1</aether.version>
 		<maven.version>3.0.4</maven.version>
-		<wagon.version>2.2</wagon.version>
+		<wagon.version>2.10</wagon.version>
 		<guava.version>18.0</guava.version>
 	</properties>
 

@@ -27,7 +27,6 @@ import com.on36.haetae.server.core.stats.Statistics;
 public class RequestHandlerImpl implements RequestHandler {
 
 	private int statusCode = -1;
-	private String contentType;
 	private String body;
 	private boolean hasSession = false;
 
@@ -47,22 +46,10 @@ public class RequestHandlerImpl implements RequestHandler {
 	private RequestFlowAuthentication requestFlow = new RequestFlowAuthentication();
 	private boolean auth = true;
 
-	public RequestHandler with(int statusCode, String contentType, String body) {
-
-		this.statusCode = statusCode;
-		this.contentType = contentType;
-		this.body = body;
-		return this;
-	}
-
-	public RequestHandler with(String contentType, String body) {
-
-		return with(200, contentType, body);
-	}
-
 	public RequestHandler with(String body) {
 
-		return with(200, null, body);
+		this.body = body;
+		return this;
 	}
 
 	public RequestHandler with(CustomHandler<?> customHandler) {
@@ -77,21 +64,32 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
+	public RequestHandler unban(String... blackips) {
+
+		blackList.unban(blackips);
+		return this;
+	}
+
 	public RequestHandler ban(String... blackips) {
 
 		blackList.ban(blackips);
 		return this;
 	}
 
+	public RequestHandler unpermit(String... whiteips) {
+
+		whiteList.unpermit(whiteips);
+		return this;
+	}
+
 	public RequestHandler permit(String... whiteips) {
 
-		for (String ip : whiteips)
-			whiteList.permit(ip);
+		whiteList.permit(whiteips);
 		return this;
 	}
 
 	public RequestHandler permit(String ip, ServiceLevel level) {
-		
+
 		whiteList.permit(ip, level);
 		return this;
 	}
@@ -114,15 +112,14 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
-	public RequestHandler withRedirect(String location) {
+	public RequestHandler every(int times) {
 
-		return withRedirect(location, FOUND.code());
+		return every(1, TimeUnit.SECONDS, times);
 	}
 
-	public RequestHandler withRedirect(String location, int statusCode) {
+	public RequestHandler withRedirect(String location) {
 
-		this.statusCode = statusCode;
-		this.contentType = "text/plain";
+		this.statusCode = FOUND.code();
 		this.body = "";
 		withHeader("Location", location);
 		withHeader("Connection", "close");
@@ -151,9 +148,11 @@ public class RequestHandlerImpl implements RequestHandler {
 			failHandlTimes.incrementAndGet();
 
 		// elapsed time
-		if (minElapsedTime.get() == 0 || minElapsedTime.get() > elapsedTime)
+		if (minElapsedTime.longValue() == 0
+				|| minElapsedTime.longValue() > elapsedTime)
 			minElapsedTime.set(elapsedTime);
-		if (maxElapsedTime.get() == 0 || maxElapsedTime.get() < elapsedTime)
+		if (maxElapsedTime.longValue() == 0
+				|| maxElapsedTime.longValue() < elapsedTime)
 			maxElapsedTime.set(elapsedTime);
 
 		long avgTime = totalTime / (totalTimes + 1);
@@ -164,20 +163,12 @@ public class RequestHandlerImpl implements RequestHandler {
 		return statusCode;
 	}
 
-	public String contentType() {
-		return contentType;
-	}
-
 	public Set<SimpleImmutableEntry<String, String>> headers() {
 		return new HashSet<SimpleImmutableEntry<String, String>>(headers);
 	}
 
 	public CustomHandler<?> getCustomHandler() {
 		return httpHandler;
-	}
-
-	public boolean hasContentType() {
-		return contentType != null;
 	}
 
 	public boolean hasSession() {

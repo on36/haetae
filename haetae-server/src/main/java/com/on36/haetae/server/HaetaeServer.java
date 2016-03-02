@@ -16,7 +16,7 @@ import com.on36.haetae.server.core.container.HaetaeContainer;
 /**
  * 
  * @author zhanghr
- * @date 2016年2月29日 
+ * @date 2016年2月29日
  */
 public class HaetaeServer {
 
@@ -30,8 +30,8 @@ public class HaetaeServer {
 	public HaetaeServer(int port, boolean ssl) {
 		this(port, 0, ssl);
 	}
-	
-	public HaetaeServer( int port, int threadPoolSize, boolean ssl) {
+
+	public HaetaeServer(int port, int threadPoolSize, boolean ssl) {
 		server = new HTTPServer(port, threadPoolSize, ssl);
 		container = new HaetaeContainer();
 		server.setContainer(container);
@@ -53,39 +53,46 @@ public class HaetaeServer {
 		server.stop();
 	}
 
-	public RequestHandler handle(HttpMethod method, String resource) {
+	public RequestHandler register(String resource, HttpMethod method) {
 
 		RequestHandlerImpl handler = new RequestHandlerImpl();
 		container.addHandler(handler, method, resource);
 		return handler;
 	}
 
+	public RequestHandler register(String resource) {
+
+		return register(resource, HttpMethod.GET);
+	}
+	
+	public boolean unregister(String resource) {
+		
+		return container.removeHandler(resource);
+	}
+	
+	public RequestHandler find(String resource) {
+		
+		return container.findHandler(resource);
+	}
+
 	public static void main(String[] args) {
 		HaetaeServer server = new HaetaeServer(8080);
-		server.handle(HttpMethod.GET, "/hello")
-				.with(200, "text/plain", "Hello xiongdi!").session(true);
-		server.handle(HttpMethod.GET, "name/:name<[A-Za-z]+>").with(200,
-				"text/plain", "Hello :name");
-		server.handle(HttpMethod.GET, "/multi").with(200, "text/plain",
-				"Hello *[0] *[1]");
-		server.handle(HttpMethod.GET, "/greeting").with(200, "text/plain",
+		server.register("/hello").with("Hello xiongdi!").session(true);
+		server.register("name/:name<[A-Za-z]+>").with("Hello :name");
+		server.register("/multi").with("Hello *[0] *[1]");
+		server.register("/greeting").with(
 				"Hello [request?name] at [request$User-Agent]");
-		server.handle(HttpMethod.GET, "/redis")
-				.with(200, "text/plain", "Hello redis!")
+		server.register("/redis").with("Hello redis!")
 				.every(30, TimeUnit.SECONDS, 10);
-		server.handle(HttpMethod.GET, "/skip").withRedirect("http://www.baidu.com");
-		server.handle(HttpMethod.GET, "/black")
-				.with(200, "text/plain", "Hello black!").ban("172.31.25.40");
-		server.handle(HttpMethod.GET, "/white")
-				.with(200, "text/plain", "Hello white!").permit("172.31.25.40");
-		server.handle(HttpMethod.GET, "/custom").with(
-				new CustomHandler<String>() {
+		server.register("/skip").withRedirect("http://www.baidu.com");
+		server.register("/black").with("Hello black!").ban("172.31.25.40");
+		server.register("/white").with("Hello white!").permit("172.31.25.40");
+		server.register("/custom").with(new CustomHandler<String>() {
 
-					public String handle(Context context) {
-						return "custom handler";
-					}
-				});
-
+			public String handle(Context context) {
+				return "custom handler";
+			}
+		});
 		server.start();
 	}
 }

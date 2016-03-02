@@ -2,6 +2,9 @@ package com.on36.haetae.server.core.stats;
 
 public class Statistics {
 
+	private String path;
+	private String method;
+	
 	private int success;
 	private int failure;
 
@@ -10,9 +13,6 @@ public class Statistics {
 	private long maxElapsedTime;
 
 	private int maxConcurrent;
-
-	private String resourcePath;
-	private String method;
 
 	public Statistics(int success, int failure, long minElapsedTime,
 			long avgElapsedTime, long maxElapsedTime, int maxConcurrent) {
@@ -36,12 +36,12 @@ public class Statistics {
 		this.method = method;
 	}
 
-	public String getResourcePath() {
-		return resourcePath;
+	public String getPath() {
+		return path;
 	}
 
-	public void setResourcePath(String resourcePath) {
-		this.resourcePath = resourcePath;
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	public void setMaxConcurrent(int maxConcurrent) {
@@ -91,7 +91,7 @@ public class Statistics {
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer("{");
-		sb.append("path:" + resourcePath + ", ");
+		sb.append("path:" + path + ", ");
 		sb.append("method:" + method + ", ");
 		sb.append("success:" + success + ", ");
 		sb.append("failure:" + failure + ", ");

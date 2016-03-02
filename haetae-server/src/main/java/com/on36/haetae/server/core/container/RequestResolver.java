@@ -41,7 +41,7 @@ public class RequestResolver {
 		rootHandler.with(new StatisticsHandler(container));
 	}
 
-	public HandlerKey addHandler(RequestHandler handler, HttpMethod method,
+	public boolean addHandler(RequestHandler handler, HttpMethod method,
 			String resource) {
 		if (handler == null || method == null) {
 			throw new IllegalArgumentException(
@@ -50,12 +50,18 @@ public class RequestResolver {
 		if (resource == null || "".equals(resource)) {
 			throw new IllegalArgumentException("resource cannot be null");
 		}
+		if (PATH_ELEMENT_SEPARATOR.equals(resource)
+				|| PATH_ELEMENT_ROOT.equals(resource)) {
+			throw new IllegalArgumentException(
+					"resource cannot be '/' or '/services'");
+		}
 
 		String path = resource;
 		if (!resource.startsWith(PATH_ELEMENT_ROOT))
 			path = PATH_ELEMENT_ROOT
 					+ (resource.startsWith(PATH_ELEMENT_SEPARATOR) ? resource
 							: (PATH_ELEMENT_SEPARATOR + resource));
+
 		Route route = router.route(path);
 		if (route != null) {
 			throw new IllegalArgumentException("There is already the route["
@@ -65,16 +71,39 @@ public class RequestResolver {
 		HandlerKey key = new HandlerKey(method.name(), route);
 		handlerMap.put(key, (RequestHandlerImpl) handler);
 		router.add(route);
-		return key;
+
+		return true;
 	}
 
-	public void removeHandler(String resource) {
+	public RequestHandlerImpl findHandler(String resource) {
+		Route route = router.route(resource);
+		if (route != null) {
+			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
+			RequestHandlerImpl handler = handlerMap.get(key);
+			if (handler == null) {
+				key = new HandlerKey(HttpMethod.POST.name(), route);
+				return handlerMap.get(key);
+			}
+		}
+		return null;
+	}
+
+	public boolean removeHandler(String resource) {
 		String path = resource;
 		if (!resource.startsWith(PATH_ELEMENT_ROOT))
 			path = PATH_ELEMENT_ROOT
 					+ (resource.startsWith(PATH_ELEMENT_SEPARATOR) ? resource
 							: (PATH_ELEMENT_SEPARATOR + resource));
-		router.remove(path);
+		Route route = router.route(path);
+		if (route != null) {
+			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
+			handlerMap.remove(key);
+			key = new HandlerKey(HttpMethod.POST.name(), route);
+			handlerMap.remove(key);
+			router.remove(path);
+		}
+
+		return true;
 	}
 
 	public ResolvedRequest resolve(HttpRequestExt request) throws Exception {
@@ -83,6 +112,9 @@ public class RequestResolver {
 		String method = request.getMethod().name();
 		String path = new URI(request.getUri()).getPath();
 		String contentType = request.headers().get(CONTENT_TYPE);
+
+		if (path.endsWith(PATH_ELEMENT_SEPARATOR))
+			path = path.substring(0, (path.length() - 1));
 
 		Route route = router.route(path);
 		if (route == null) {
@@ -116,8 +148,10 @@ public class RequestResolver {
 
 		for (Map.Entry<HandlerKey, RequestHandlerImpl> entry : handlerMap
 				.entrySet()) {
+			String resourcePath = entry.getKey().getRoute().getResourcePath();
 			Statistics stat = entry.getValue().getStatistics();
-			stat.setResourcePath(entry.getKey().getRoute().getResourcePath());
+			stat.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT) ? resourcePath
+					.replace(PATH_ELEMENT_ROOT, "") : resourcePath);
 			stat.setMethod(entry.getKey().getMethod());
 			stats.add(stat);
 		}

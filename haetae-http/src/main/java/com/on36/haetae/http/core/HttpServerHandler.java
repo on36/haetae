@@ -5,9 +5,7 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-
-import java.net.InetSocketAddress;
-
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,6 +15,16 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders.Values;
 import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.multipart.DiskFileUpload;
+import io.netty.handler.codec.http.multipart.FileUpload;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
+import io.netty.handler.codec.http.multipart.MemoryAttribute;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.request.HttpRequestExt;
@@ -44,6 +52,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 		boolean keepAlive = HttpHeaders.isKeepAlive(request);
 		FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,NOT_FOUND, Unpooled.directBuffer());
 		HttpRequestExt httpRequestExt = new HttpRequestExt(request, remoteAddress, start);
+		//HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
 		if (container != null)
 			container.handle(httpRequestExt, response);
 
@@ -58,6 +67,25 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 		}
 	}
 
+	private ByteBuf writeHttpData(InterfaceHttpData data) throws IOException {
+        if (data.getHttpDataType() == HttpDataType.FileUpload) {
+            FileUpload fileUpload = (FileUpload) data;
+            if (fileUpload.isCompleted()) {
+                  
+                StringBuffer fileNameBuf = new StringBuffer();
+                fileNameBuf.append(DiskFileUpload.baseDirectory);
+  
+                fileUpload.renameTo(new File(fileNameBuf.toString()));
+                
+                return fileUpload.content();
+            }
+        } else if (data.getHttpDataType() == HttpDataType.Attribute) {
+            MemoryAttribute attribute = (MemoryAttribute) data;
+            return attribute.content();
+        }
+        return null;
+    }  
+	
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 		cause.printStackTrace();

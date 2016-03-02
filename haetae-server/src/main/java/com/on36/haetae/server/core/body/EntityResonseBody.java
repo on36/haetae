@@ -54,7 +54,13 @@ public class EntityResonseBody extends ResponseBody {
 			HttpContent httpContent = (HttpContent) response;
 			ByteBuf content = httpContent.content();
 			if (hasContent()) {
-				content.writeBytes(FormatorUtils.toJson(entity).getBytes(Charset.defaultCharset()));
+				if (entity instanceof String) {
+                    String body = (String) entity; 
+					content.writeBytes(body.getBytes(
+							Charset.defaultCharset()));
+				} else
+					content.writeBytes(FormatorUtils.toJson(entity).getBytes(
+							Charset.defaultCharset()));
 			}
 		}
 	}

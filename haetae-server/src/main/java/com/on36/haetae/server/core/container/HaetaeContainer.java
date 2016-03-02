@@ -1,8 +1,8 @@
 package com.on36.haetae.server.core.container;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
-import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -14,7 +14,6 @@ import java.util.Set;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.http.Session;
 import com.on36.haetae.http.Container;
-import com.on36.haetae.http.HandlerKey;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.server.core.RequestHandlerImpl;
@@ -77,12 +76,6 @@ public class HaetaeContainer implements Container {
 				handlerStatusCode = HttpResponseStatus.valueOf(resolved.handler
 						.statusCode());
 
-			/* set the content type */
-			String handlerContentType = handler.contentType();
-			if (handlerContentType != null
-					&& handlerContentType.trim().length() != 0) {
-				responseContentType = handlerContentType;
-			}
 			/* set the response status code */
 			if (handlerStatusCode.code() == -1) {
 				throw new RuntimeException(
@@ -115,13 +108,21 @@ public class HaetaeContainer implements Container {
 			String responseContentType, ResponseBody responseBody) {
 		responseBody.sendAndCommit(response, responseContentType);
 	}
+	
+	public RequestHandler findHandler(String resource) {
+		return requestResolver.findHandler(resource);
+	}
+	
+	public boolean removeHandler(String resource) {
+		return requestResolver.removeHandler(resource);
+	}
 
-	public HandlerKey addHandler(RequestHandler handler, HttpMethod method,
+	public boolean addHandler(RequestHandler handler, HttpMethod method,
 			String resource) {
 		return requestResolver.addHandler(handler, method, resource);
 	}
 
-	public HandlerKey addHandler(RequestHandler handler, String resource) {
+	public boolean addHandler(RequestHandler handler, String resource) {
 		return addHandler(handler, HttpMethod.GET, resource);
 	}
 

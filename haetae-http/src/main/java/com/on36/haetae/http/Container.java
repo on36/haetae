@@ -11,9 +11,13 @@ public interface Container {
 
 	void handle(HttpRequestExt request, HttpResponse response);
 
-	HandlerKey addHandler(RequestHandler handler, String resource);
+	RequestHandler findHandler(String resource);
 	
-	HandlerKey addHandler(RequestHandler handler, HttpMethod method, String resource);
+	boolean removeHandler(String resource);
+	
+	boolean addHandler(RequestHandler handler, String resource);
+	
+	boolean addHandler(RequestHandler handler, HttpMethod method, String resource);
 	
 	List<?> getStatistics(String contentType);
 }
