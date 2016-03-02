@@ -12,14 +12,14 @@ public class FormatorUtils {
 	private static Gson gson = new Gson();
 
 	public static String toJson(Object src) {
-		
-        return gson.toJson(src);
+
+		return gson.toJson(src);
 	}
 
 	public static String toXML(Object src) {
-		ByteArrayOutputStream out = null;
+		
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		try {
-			out = new ByteArrayOutputStream();
 			XMLEncoder xmlEncoder = new XMLEncoder(out);
 			xmlEncoder.writeObject(src);
 			xmlEncoder.close();
@@ -27,8 +27,8 @@ public class FormatorUtils {
 			e.printStackTrace();
 		} finally {
 			try {
-				if(out != null)
-				    out.close();
+				if (out != null)
+					out.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
