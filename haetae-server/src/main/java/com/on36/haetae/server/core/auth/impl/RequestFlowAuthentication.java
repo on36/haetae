@@ -50,7 +50,7 @@ public class RequestFlowAuthentication implements IAuthentication {
 				}
 			}
 		}
-		return false;
+		return true;
 	}
 
 }
