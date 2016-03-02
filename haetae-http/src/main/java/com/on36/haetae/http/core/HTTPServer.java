@@ -72,7 +72,7 @@ public class HTTPServer implements Server {
 				b.option(ChannelOption.SO_REUSEADDR, true);
 	            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS,5000);
 	            b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-	            b.childOption(ChannelOption.AUTO_READ, false);
+//	            b.childOption(ChannelOption.AUTO_READ, false);
 				b.group(bossGroup, workerGroup)
 						.channel(NioServerSocketChannel.class)
 						.handler(new LoggingHandler(LogLevel.DEBUG))
