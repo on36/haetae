@@ -14,8 +14,9 @@ import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.container.HaetaeContainer;
 
 /**
+ * 
  * @author zhanghr
- *
+ * @date 2016年2月29日 
  */
 public class HaetaeServer {
 
@@ -23,18 +24,14 @@ public class HaetaeServer {
 	private Server server;
 
 	public HaetaeServer(int port) {
-		this(port, 0, false);
+		this(port, false);
 	}
 
 	public HaetaeServer(int port, boolean ssl) {
 		this(port, 0, ssl);
 	}
-
-	public HaetaeServer(int port, int threadPoolSize) {
-		this(port, threadPoolSize, false);
-	}
-
-	public HaetaeServer(int port, int threadPoolSize, boolean ssl) {
+	
+	public HaetaeServer( int port, int threadPoolSize, boolean ssl) {
 		server = new HTTPServer(port, threadPoolSize, ssl);
 		container = new HaetaeContainer();
 		server.setContainer(container);
