@@ -14,7 +14,7 @@ import com.on36.haetae.server.core.auth.IAuthentication;
 
 public class WhiteListAuthentication implements IAuthentication {
 
-	private final Map<String, ServiceLevel> whiteMap = new ConcurrentHashMap<String, ServiceLevel>();
+	private final Map<String, Integer> whiteMap = new ConcurrentHashMap<String, Integer>();
 	private final Map<String, AtomicInteger> whiteStatsMap = new ConcurrentHashMap<String, AtomicInteger>();
 
 	private final Map<String, AtomicLong> whiteFirstTime = new ConcurrentHashMap<String, AtomicLong>();
@@ -23,17 +23,23 @@ public class WhiteListAuthentication implements IAuthentication {
 
 	public void permit(String ip, ServiceLevel level, long period,
 			TimeUnit periodUnit) {
-		permit(ip, level);
-		whitePeriodTime.put(ip, new AtomicLong(period));
-		whiteTimeUnit.put(ip, periodUnit);
+		permit(ip, level.value(), period, periodUnit);
 	}
 
 	public void permit(String ip, ServiceLevel level) {
-		whiteMap.put(ip, level);
+		permit(ip, level, 1, TimeUnit.SECONDS);
+	}
+
+	public void permit(String ip, int times) {
+		permit(ip, times, 1, TimeUnit.SECONDS);
+	}
+
+	public void permit(String ip, int times, long period, TimeUnit periodUnit) {
+		whiteMap.put(ip, times);
 		whiteStatsMap.put(ip, new AtomicInteger(0));
 		whiteFirstTime.put(ip, new AtomicLong(0));
-		whitePeriodTime.put(ip, new AtomicLong(1));
-		whiteTimeUnit.put(ip, TimeUnit.SECONDS);
+		whitePeriodTime.put(ip, new AtomicLong(period));
+		whiteTimeUnit.put(ip, periodUnit);
 	}
 
 	public void unpermit(String... ips) {
@@ -59,8 +65,8 @@ public class WhiteListAuthentication implements IAuthentication {
 
 			String remoteIp = request.getRemoteAddress().getAddress()
 					.getHostAddress();
-			ServiceLevel level = whiteMap.get(remoteIp);
-			if (level == null || level == ServiceLevel.LEVELS)
+			Integer level = whiteMap.get(remoteIp);
+			if (level == null)
 				return true;
 
 			long current = System.currentTimeMillis();
@@ -72,7 +78,8 @@ public class WhiteListAuthentication implements IAuthentication {
 				long periodInMillis = whiteTimeUnit.get(remoteIp).toMillis(
 						whitePeriodTime.get(remoteIp).longValue());
 				if ((current - last) < periodInMillis) {
-					if (whiteStatsMap.get(remoteIp).longValue() < level.value())
+					if (whiteStatsMap.get(remoteIp).longValue() < level
+							.longValue())
 						whiteStatsMap.get(remoteIp).incrementAndGet();
 					else
 						return false;

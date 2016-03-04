@@ -28,6 +28,12 @@ public interface RequestHandler {
     
     RequestHandler permit(String ip, ServiceLevel level);
     
+    RequestHandler permit(String ip, int times);
+    
+    RequestHandler permit(String ip, ServiceLevel level, long period, TimeUnit periodUnit);
+    
+    RequestHandler permit(String ip, int times, long period, TimeUnit periodUnit);
+    
     RequestHandler withRedirect(String location);
     
     RequestHandler session(boolean has);

@@ -94,6 +94,26 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
+	public RequestHandler permit(String ip, int times) {
+
+		whiteList.permit(ip, times);
+		return this;
+	}
+
+	public RequestHandler permit(String ip, ServiceLevel level, long period,
+			TimeUnit periodUnit) {
+
+		whiteList.permit(ip, level, period, periodUnit);
+		return this;
+	}
+
+	public RequestHandler permit(String ip, int times, long period,
+			TimeUnit periodUnit) {
+
+		whiteList.permit(ip, times, period, periodUnit);
+		return this;
+	}
+
 	public RequestHandler withHeader(String name, String value) {
 
 		headers.add(new SimpleImmutableEntry<String, String>(name, value));
@@ -197,4 +217,5 @@ public class RequestHandlerImpl implements RequestHandler {
 				avgElapsedTime.longValue(), maxElapsedTime.longValue(),
 				maxConcurrent.intValue());
 	}
+
 }
