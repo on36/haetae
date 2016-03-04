@@ -1,11 +1,13 @@
-package com.on36.hotswap;
+package com.on36.haetae.hotswap;
 
 import static org.junit.Assert.assertNotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLClassLoader;
 
 import com.on36.haetae.hotswap.classloader.MavenClassLoader;
+import com.on36.haetae.hotswap.scan.ClassPathAnnotationScanner;
 
 public class MavenClassLoaderTest {
 	private static String gav = "joda-time:joda-time:[1.6,)";
@@ -41,5 +43,10 @@ public class MavenClassLoaderTest {
 		MavenClassLoaderTest.setup();
 		MavenClassLoaderTest.findClass();
 		MavenClassLoaderTest.mkdirClass();
+		
+		URLClassLoader myloader = MavenClassLoader.forGAVS("com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT","com.ideal.shcrm:shcrm-order-domain:1.0-SNAPSHOT");
+		System.out.println(ClassPathAnnotationScanner.scan(myloader, "com.i.crm.cust.domain"));
+		Class<?> clazz = myloader.loadClass("com.ideal.crm.cust.domain.entity.ProdInst");
+		clazz.newInstance();
 	}
 }
