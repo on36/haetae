@@ -42,6 +42,19 @@ public class WhiteListAuthentication implements IAuthentication {
 		whiteTimeUnit.put(ip, periodUnit);
 	}
 
+	public void permit(String... ips) {
+		for (String ip : ips)
+			permit(ip, ServiceLevel.LEVELS);
+	}
+
+	public void unpermitAll() {
+		whiteMap.clear();
+		whiteStatsMap.clear();
+		whiteFirstTime.clear();
+		whitePeriodTime.clear();
+		whiteTimeUnit.clear();
+	}
+
 	public void unpermit(String... ips) {
 		for (String ip : ips) {
 			whiteMap.remove(ip);
@@ -50,11 +63,6 @@ public class WhiteListAuthentication implements IAuthentication {
 			whitePeriodTime.remove(ip);
 			whiteTimeUnit.remove(ip);
 		}
-	}
-
-	public void permit(String... ips) {
-		for (String ip : ips)
-			permit(ip, ServiceLevel.LEVELS);
 	}
 
 	@Override

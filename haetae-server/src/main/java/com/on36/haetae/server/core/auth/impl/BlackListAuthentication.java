@@ -27,6 +27,11 @@ public class BlackListAuthentication implements IAuthentication {
 		if (blackList != null)
 			this.blackList.removeAll(newBlack);
 	}
+	public void unbanAll() {
+		
+		if (blackList != null)
+			this.blackList.clear();
+	}
 
 	@Override
 	public boolean auth(HttpRequestExt request, HttpResponse response) {

@@ -29,6 +29,9 @@ class SessionManager {
 		ServerCookieDecoder cookieDecoder = ServerCookieDecoder.STRICT;
 		Set<Cookie> cookies = cookieDecoder.decode(value);
 
+		// check invalid session and remove it
+		checkSession();
+
 		for (Cookie cookie : cookies) {
 			if (SESSION_COOKIE_NAME.equals(cookie.name())) {
 				String sessionId = cookie.value();
@@ -49,12 +52,22 @@ class SessionManager {
 
 		Session session = new Session();
 		sessions.put(session.getSessionId(), session);
-		
-		Cookie cookie = new DefaultCookie(SESSION_COOKIE_NAME, session.getSessionId());
+
+		Cookie cookie = new DefaultCookie(SESSION_COOKIE_NAME,
+				session.getSessionId());
 		ServerCookieEncoder cookieEncoder = ServerCookieEncoder.STRICT;
 		response.headers().add(HttpHeaders.Names.SET_COOKIE,
 				cookieEncoder.encode(cookie));
-		
+
 		return session;
+	}
+
+	private void checkSession() {
+		for (Map.Entry<String, Session> entry : sessions.entrySet()) {
+			Session session = entry.getValue();
+			if (!session.valid()) {
+				sessions.remove(entry.getKey());
+			}
+		}
 	}
 }

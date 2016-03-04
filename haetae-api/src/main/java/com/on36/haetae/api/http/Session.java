@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public class Session {
 
-	private static final int MAX_INACTIVE_INTERVAL = 60 * 1000;// max inactive interval
+	private static final int MAX_INACTIVE_INTERVAL = 5 * 60 * 1000;// max inactive interval
 	
 	private final String sessionId;
 	private final long time;

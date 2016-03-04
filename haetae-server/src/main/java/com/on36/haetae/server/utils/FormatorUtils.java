@@ -1,9 +1,10 @@
 package com.on36.haetae.server.utils;
 
+import io.netty.util.CharsetUtil;
+
 import java.beans.XMLEncoder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import com.google.gson.Gson;
 
@@ -34,6 +35,6 @@ public class FormatorUtils {
 			}
 		}
 
-		return new String(out.toByteArray(), Charset.defaultCharset());
+		return new String(out.toByteArray(), CharsetUtil.UTF_8);
 	}
 }

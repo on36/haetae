@@ -30,7 +30,7 @@ public class ClassPathAnnotationScanner {
 			public void visit(String filePath) {
 				if (filePath.indexOf("/") > -1 && filePath.indexOf("$") == -1) {
 					filePath = filePath.replace("/", ".");
-					filePath = filePath.substring(0, (filePath.indexOf(".class") - 1));
+					filePath = filePath.substring(0, (filePath.indexOf(".class")));
 					files.add(filePath);
 				}
 			}

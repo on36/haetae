@@ -1,11 +1,12 @@
 package com.on36.haetae.server.core;
 
-import io.netty.handler.codec.http.HttpContent;
+import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.util.CharsetUtil;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -31,7 +32,7 @@ public class SimpleContext implements Context {
 	private Map<String, String> parmMap = new HashMap<String, String>();
 
 	private String path;
-	
+
 	public SimpleContext(HttpRequestExt request, Route route, Session session) {
 
 		this.request = request;
@@ -62,17 +63,18 @@ public class SimpleContext implements Context {
 	private Map<String, String> parse() throws Exception {
 		HttpMethod method = request.getMethod();
 
-			QueryStringDecoder queryDecoder = new QueryStringDecoder(
-					request.getUri());
-			Set<Entry<String, List<String>>> sets = queryDecoder.parameters()
-					.entrySet();
-			for (Entry<String, List<String>> entry : sets) {
-				parmMap.put(entry.getKey(), entry.getValue().get(0));
-			}
-			
+		QueryStringDecoder queryDecoder = new QueryStringDecoder(
+				request.getUri());
+		Set<Entry<String, List<String>>> sets = queryDecoder.parameters()
+				.entrySet();
+		for (Entry<String, List<String>> entry : sets) {
+			parmMap.put(entry.getKey(), entry.getValue().get(0));
+		}
+
 		if (HttpMethod.POST == method) {
-			HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request.getRequest());
-			decoder.offer((HttpContent) request.getRequest());
+			HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(
+					request.getRequest());
+			decoder.offer(request.copy());
 
 			List<InterfaceHttpData> parmList = decoder.getBodyHttpDatas();
 
@@ -86,9 +88,10 @@ public class SimpleContext implements Context {
 	}
 
 	public String getCapturedParameter(String captured) {
-		
+
 		return ResponseBodyInterpolator.interpolate(captured, this);
 	}
+
 	public String getRequestParameter(String param) {
 		return parmMap.get(param);
 	}
@@ -105,12 +108,16 @@ public class SimpleContext implements Context {
 		return request.headers().get(param);
 	}
 
-//	@Override
-//	public byte[] getBody() {
-//		return request.content().array();
-//	}
-//	@Override
-//	public String getBody2String() {
-//		return new String(getBody(),Charset.defaultCharset());
-//	}
+	public byte[] getRequestBody() {
+		ByteBuf content = request.content();
+		if (content.isReadable()) {
+			return request.content().array();
+		}
+		return null;
+	}
+
+	public String getRequestBodyAsString() {
+		
+		return new String(getRequestBody(),CharsetUtil.UTF_8);
+	}
 }

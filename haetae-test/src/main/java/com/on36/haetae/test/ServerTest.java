@@ -29,8 +29,14 @@ public class ServerTest {
 		server.register("/black").with("Hello black!").ban("172.31.25.40","127.0.0.1");
 		server.register("/white").with("Hello white!").permit("172.31.25.40","127.0.0.1");
 		server.register("/whitecontrol").with("Hello white!").permit("127.0.0.1",ServiceLevel.LEVELC);
-		server.register("/custom",HttpMethod.POST).with(new CustomHandler<String>() {
+		server.register("/body",HttpMethod.POST).with(new CustomHandler<String>() {
 
+			public String handle(Context context) {
+				return context.getRequestBodyAsString();
+			}
+		});
+		server.register("/custom",HttpMethod.POST).with(new CustomHandler<String>() {
+			
 			public String handle(Context context) {
 				return context.getRequestParameter("user");
 			}

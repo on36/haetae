@@ -3,9 +3,9 @@ package com.on36.haetae.server.core.body;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.util.CharsetUtil;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 
 import com.on36.haetae.server.utils.FormatorUtils;
 
@@ -57,10 +57,10 @@ public class EntityResonseBody extends ResponseBody {
 				if (entity instanceof String) {
                     String body = (String) entity; 
 					content.writeBytes(body.getBytes(
-							Charset.defaultCharset()));
+							CharsetUtil.UTF_8));
 				} else
 					content.writeBytes(FormatorUtils.toJson(entity).getBytes(
-							Charset.defaultCharset()));
+							CharsetUtil.UTF_8));
 			}
 		}
 	}

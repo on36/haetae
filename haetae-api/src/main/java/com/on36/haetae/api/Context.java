@@ -20,8 +20,8 @@ public interface Context {
 
 	Session getSession();
 
-	//byte[] getBody();
+	byte[] getRequestBody();
 
-	//String getBody2String();
+	String getRequestBodyAsString();
 
 }
