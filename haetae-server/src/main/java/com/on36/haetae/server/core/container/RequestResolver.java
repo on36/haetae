@@ -128,7 +128,6 @@ public class RequestResolver {
 			resolved.key = rootHandlerKey;
 		} else {
 			HandlerKey key = new HandlerKey(method, route);
-			key.setContentType(contentType);
 
 			RequestHandlerImpl handler = handlerMap.get(key);
 			if (handler == null) {
@@ -136,6 +135,7 @@ public class RequestResolver {
 				return resolved;
 			}
 
+			key.setContentType(contentType);
 			resolved.handler = handler;
 			resolved.route = route;
 			resolved.key = key;

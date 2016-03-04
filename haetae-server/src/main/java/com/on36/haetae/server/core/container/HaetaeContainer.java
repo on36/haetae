@@ -71,17 +71,22 @@ public class HaetaeContainer implements Container {
 				responseBody = handlerBody;
 			}
 
+			/* set the response status code */
 			int responseStatus = handler.statusCode();
 			if (responseStatus > -1)
 				handlerStatusCode = HttpResponseStatus.valueOf(resolved.handler
 						.statusCode());
 
-			/* set the response status code */
 			if (handlerStatusCode.code() == -1) {
 				throw new RuntimeException(
 						"a response status code must be specified");
 			}
 			response.setStatus(handlerStatusCode);
+
+			/* set the response content type */
+			String handlerContentType = resolved.key.contentType();
+			if (handlerContentType != null)
+				responseContentType = handlerContentType;
 
 			/* set any headers */
 			Set<SimpleImmutableEntry<String, String>> headers = handler
@@ -108,11 +113,11 @@ public class HaetaeContainer implements Container {
 			String responseContentType, ResponseBody responseBody) {
 		responseBody.sendAndCommit(response, responseContentType);
 	}
-	
+
 	public RequestHandler findHandler(String resource) {
 		return requestResolver.findHandler(resource);
 	}
-	
+
 	public boolean removeHandler(String resource) {
 		return requestResolver.removeHandler(resource);
 	}

@@ -24,6 +24,10 @@ public class HttpRequestExt implements HttpRequest,HttpContent{
 		this.startHandleTime = startHandleTime;
 	}
 	
+	public HttpRequest getRequest() {
+		return request;
+	}
+	
 	public long getStartHandleTime() {
 		return startHandleTime;
 	}

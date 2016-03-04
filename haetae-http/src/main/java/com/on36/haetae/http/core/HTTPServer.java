@@ -56,7 +56,7 @@ public class HTTPServer implements Server {
 		if (channel == null || !channel.isActive()) {
 			final SslContext sslCtx;
 			if (ssl) {
-				SelfSignedCertificate ssc = new SelfSignedCertificate();
+				SelfSignedCertificate ssc = new SelfSignedCertificate("on36.com");
 				sslCtx = SslContextBuilder.forServer(ssc.certificate(),
 						ssc.privateKey()).build();
 			} else {

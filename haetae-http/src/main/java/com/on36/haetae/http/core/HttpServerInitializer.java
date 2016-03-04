@@ -26,7 +26,7 @@ import com.on36.haetae.http.Container;
 	            p.addLast(sslCtx.newHandler(ch.alloc()));
 	        }
 	        p.addLast(new HttpServerCodec());
-	        p.addLast(new HttpObjectAggregator(4 * 1024));// max content length 
+	        p.addLast(new HttpObjectAggregator(10 * 1024));// max content length 
 	        p.addLast(new HttpServerHandler(container));
 	    }
 	}

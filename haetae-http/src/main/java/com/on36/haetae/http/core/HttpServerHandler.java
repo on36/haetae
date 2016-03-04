@@ -43,7 +43,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 		boolean keepAlive = HttpHeaders.isKeepAlive(request);
 		FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,NOT_FOUND, Unpooled.directBuffer());
 		HttpRequestExt httpRequestExt = new HttpRequestExt(request, remoteAddress, start);
-		//HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
 		if (container != null)
 			container.handle(httpRequestExt, response);
 

@@ -45,8 +45,8 @@ public class MavenClassLoaderTest {
 		MavenClassLoaderTest.mkdirClass();
 		
 		URLClassLoader myloader = MavenClassLoader.forGAVS("com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT","com.ideal.shcrm:shcrm-order-domain:1.0-SNAPSHOT");
-		System.out.println(ClassPathAnnotationScanner.scan(myloader, "com/ideal/crm/order"));
-		Class<?> clazz = myloader.loadClass("com.ideal.crm.cust.domain.entity.ProdInst");
+		System.out.println(ClassPathAnnotationScanner.scan(loader, "org.joda.time.chrono"));
+		Class<?> clazz = loader.loadClass("com.ideal.crm.cust.domain.entity.ProdInst");
 		clazz.newInstance();
 	}
 }

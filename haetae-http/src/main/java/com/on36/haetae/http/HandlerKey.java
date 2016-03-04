@@ -36,7 +36,6 @@ public class HandlerKey {
         int hash = 1;
         hash = hash * 17 + method.hashCode();
         hash = hash * 31 + route.hashCode();
-        hash = hash * 13 + (contentType == null ? 0 : contentType.hashCode());
         return hash;
     }
     
