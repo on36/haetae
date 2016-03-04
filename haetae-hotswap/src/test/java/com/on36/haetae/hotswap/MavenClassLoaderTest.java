@@ -43,10 +43,5 @@ public class MavenClassLoaderTest {
 		MavenClassLoaderTest.setup();
 		MavenClassLoaderTest.findClass();
 		MavenClassLoaderTest.mkdirClass();
-		
-		URLClassLoader myloader = MavenClassLoader.forGAVS("com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT","com.ideal.shcrm:shcrm-order-domain:1.0-SNAPSHOT");
-		System.out.println(ClassPathAnnotationScanner.scan(myloader, "com.i.crm.cust.domain"));
-		Class<?> clazz = myloader.loadClass("com.ideal.crm.cust.domain.entity.ProdInst");
-		clazz.newInstance();
 	}
 }
