@@ -124,7 +124,7 @@ public final class MavenClassLoader {
 
 	public static ClassLoaderBuilder usingCentralRepo() {
 		RemoteRepository central = new RemoteRepository("central", "default",
-				"http://10.4.246.193:8081/nexus/content/groups/public");
+				"http://maven.oschina.net/content/groups/public");
 		return new ClassLoaderBuilder(central);
 	}
 }
