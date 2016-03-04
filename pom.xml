@@ -13,7 +13,7 @@
 		<module>haetae-api</module>
 		<module>haetae-hotswap</module>
 		<module>haetae-test</module>
-		<module>haetae.tools</module>
+		<module>haetae-tools</module>
 	</modules>
 
 	<properties>
