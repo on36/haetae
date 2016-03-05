@@ -15,14 +15,15 @@ import org.apache.commons.cli.Options;
  */
 public class CommandStartup {
 
+	
 	public static void main(String[] args) {
 		Options options = new Options();
-		options.addOption("t", "thread", true, "thread count default:2");
-		options.addOption("r", "runtime", true, "run time(s)  default:30");
-		options.addOption("o", "operate", true,
-				"operation type (get,set)  default:get");
-		options.addOption("s", "vsize", true,
-				"total bytes by value  default:32 byte");
+		options.addOption("a", "add", true, "add a resource path  eg:/hello");
+		options.addOption("c", "class", true, "specify a whole class path   eg:com.on36.haetae.crm.UserHandler");
+		options.addOption("m", "method", true,
+				"specify the http method name  default:Get");
+		options.addOption("r", "remove", true,
+				"remove a resource path  eg:/hello");
 		options.addOption("h", "help", false, "help information");
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();

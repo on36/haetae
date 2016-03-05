@@ -17,7 +17,7 @@ public class ServerTest {
 
 	public static void main(String[] args) {
 		
-		HaetaeServer server = new HaetaeServer(8080);
+		HaetaeServer server = new HaetaeServer(8080,32);
 		server.register("/hello").with("Hello xiongdi!").session(true);
 		server.register("name/:name<[A-Za-z]+>").with("Hello :name");
 		server.register("/multi/*/*").with("Hello *[0] *[1]");

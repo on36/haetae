@@ -28,6 +28,7 @@
 		<maven.version>3.0.4</maven.version>
 		<wagon.version>2.10</wagon.version>
 		<guava.version>18.0</guava.version>
+		
 	</properties>
 
 	<dependencyManagement>

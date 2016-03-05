@@ -16,8 +16,9 @@ import com.on36.haetae.server.core.container.HaetaeContainer;
  */
 public class HaetaeServer {
 
-	private Container container;
-	private Server server;
+	private final Container container;
+	private final Server server;
+	
 
 	public HaetaeServer(int port) {
 		this(port, false);
@@ -25,6 +26,9 @@ public class HaetaeServer {
 
 	public HaetaeServer(int port, boolean ssl) {
 		this(port, 0, ssl);
+	}
+	public HaetaeServer(int port, int threadPoolSize) {
+		this(port, threadPoolSize, false);
 	}
 
 	public HaetaeServer(int port, int threadPoolSize, boolean ssl) {
@@ -69,5 +73,21 @@ public class HaetaeServer {
 	public RequestHandler find(String resource) {
 		
 		return container.findHandler(resource);
+	}
+	
+	public static void main(String[] args) {
+		int port = 8080;
+		if (args.length > 0) {
+			try {
+				port = Integer.parseInt(args[0]);
+			} catch (Exception e) {
+				System.out.println(args[0]
+						+ " is a invalid port number, using the default port:"
+						+ port);
+			}
+		}
+		
+		HaetaeServer server = new HaetaeServer(port);
+		server.start();
 	}
 }
