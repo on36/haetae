@@ -122,7 +122,7 @@ public class RequestResolver {
 			return resolved;
 		}
 
-		if (Route.PATH_ROOT.equals(route)) {
+		if (Route.PATH_ROOT.equals(route) && rootHandlerKey.getMethod().equals(method)) {
 			resolved.handler = rootHandler;
 			resolved.route = Route.PATH_ROOT;
 			resolved.key = rootHandlerKey;

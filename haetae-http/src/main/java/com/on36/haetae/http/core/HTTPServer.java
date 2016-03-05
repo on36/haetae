@@ -14,14 +14,14 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.Server;
+import com.on36.haetae.http.Version;
 
 public class HTTPServer implements Server {
 
-	private SocketAddress socketAddress;
+	private InetSocketAddress socketAddress;
 	private int threadPoolSize;
 	private boolean ssl;
 	
@@ -79,14 +79,16 @@ public class HTTPServer implements Server {
 						.childHandler(new HttpServerInitializer(sslCtx, container));
 
 				channel = b.bind(socketAddress).sync().channel();
-				System.out.println("Server is running at [" + socketAddress +"]");
+				
+				print(socketAddress.getPort());
+				System.out.println("Server is now ready to accept connection on [" + socketAddress +"]");
 				channel.closeFuture().sync();
 			} finally {
 				bossGroup.shutdownGracefully();
 				workerGroup.shutdownGracefully();
 			}
 		} else {
-			System.out.println("Server is already running at [" + socketAddress +"], startup abort!");
+			System.out.println("Server is already running on [" + socketAddress +"], startup abort!");
 		}
 	}
 
@@ -94,5 +96,17 @@ public class HTTPServer implements Server {
 		if (channel != null && channel.isActive()) {
 			channel.close();
 		}
+	}
+	
+	private void print(int port) {
+		System.out.println("  HH        HH                           ");
+		System.out.println("  HH        HH     HHHHHH        HHHHHH           HHH         HHHHHH       HHHHHHH       ");
+		System.out.println("  HH        HH    HH    HH     HH      HH         HHH        HH    HH     HH      HH     ");
+		System.out.println("  HH        HH           HH   HH        HH   HHHHHHHHHHHHH          HH   HH        HH    ");
+		System.out.println("  HHHHHHHHHHHH     HHHHHHH    HHHHHHHHHHH         HHH         HHHHHHH    HHHHHHHHHHH     ");
+		System.out.println("  HH        HH    HH    HH    HH                  HHH        HH    HH    HH              ");
+		System.out.println("  HH        HH   HH      HH    HH       HH        HHH       HH      HH    HH       HH    Version: "+Version.CURRENT_VERSION);
+		System.out.println("  HH        HH    HH    HH      HHH   HHH         HHH  HH    HH    HH      HHH   HHH     Port: "+port);
+		System.out.println("  HH        HH     HHHHHH HH      HHHHH            HHHH       HHHHHH HH      HHHHH       Author: zhanghr");
 	}
 }

@@ -28,7 +28,7 @@ public class ServerTest {
 		server.register("/skip").withRedirect("http://www.baidu.com");
 		server.register("/black").with("Hello black!").ban("172.31.25.40","127.0.0.1");
 		server.register("/white").with("Hello white!").permit("172.31.25.40","127.0.0.1");
-		server.register("/whitecontrol").with("Hello white!").permit("127.0.0.1",ServiceLevel.LEVELC);
+		server.register("/whitecontrol").with("Hello white!").permit("127.0.0.1",ServiceLevel.LEVEL_50);
 		server.register("/body",HttpMethod.POST).with(new CustomHandler<String>() {
 
 			public String handle(Context context) {

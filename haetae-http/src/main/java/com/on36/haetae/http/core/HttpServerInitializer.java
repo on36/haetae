@@ -3,7 +3,6 @@ package com.on36.haetae.http.core;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http.HttpContentCompressor;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.ssl.SslContext;
@@ -14,7 +13,6 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
 	private final SslContext sslCtx;
 	private final Container container;
-	private boolean compression = false;
 
 	public HttpServerInitializer(SslContext sslCtx, Container container) {
 		this.sslCtx = sslCtx;
@@ -29,8 +27,6 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 		}
 		p.addLast(new HttpServerCodec());
 		p.addLast(new HttpObjectAggregator(10 * 1024));// max content length
-		if (compression)
-			p.addLast(new HttpContentCompressor());
 		p.addLast(new HttpServerHandler(container));
 	}
 }

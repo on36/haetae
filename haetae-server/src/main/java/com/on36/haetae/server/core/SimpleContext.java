@@ -108,16 +108,12 @@ public class SimpleContext implements Context {
 		return request.headers().get(param);
 	}
 
-	public byte[] getRequestBody() {
-		ByteBuf content = request.content();
-		if (content.isReadable()) {
-			return request.content().array();
-		}
-		return null;
-	}
-
 	public String getRequestBodyAsString() {
 		
-		return new String(getRequestBody(),CharsetUtil.UTF_8);
+		ByteBuf content = request.content();
+		if (content.isReadable()) {
+			return request.content().toString(CharsetUtil.UTF_8);
+		}
+		return null;
 	}
 }
