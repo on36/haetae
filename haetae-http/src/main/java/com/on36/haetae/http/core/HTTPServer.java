@@ -12,35 +12,40 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.net.InetSocketAddress;
 
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.Server;
 import com.on36.haetae.http.Version;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 public class HTTPServer implements Server {
 
+	public static InternalLogger LOG = InternalLoggerFactory.getInstance(HTTPServer.class);
+	private static Config config = ConfigFactory.load();
+	
 	private InetSocketAddress socketAddress;
 	private int threadPoolSize;
-	private boolean ssl;
 	
 	private Container container;
 
 	private Channel channel;
+	
+	public static Config getConfig(){
+        return config;
+    }
 
 	public HTTPServer(int port) {
-		this(port, 0, false);
+		this(port, 0);
 	}
 
-	public HTTPServer(int port, boolean ssl) {
-		this(port, 0, ssl);
-	}
-
-	public HTTPServer(int port, int threadPoolSize, boolean ssl) {
+	public HTTPServer(int port, int threadPoolSize) {
 		this.socketAddress = new InetSocketAddress(port);
 		this.threadPoolSize = threadPoolSize;
-		this.ssl = ssl;
 	}
     
 	public Container getContainer() {
@@ -55,6 +60,7 @@ public class HTTPServer implements Server {
 		
 		if (channel == null || !channel.isActive()) {
 			final SslContext sslCtx;
+			boolean ssl = getConfig().getBoolean("httpServer.ssl");
 			if (ssl) {
 				SelfSignedCertificate ssc = new SelfSignedCertificate("on36.com");
 				sslCtx = SslContextBuilder.forServer(ssc.certificate(),
@@ -68,7 +74,7 @@ public class HTTPServer implements Server {
 			EventLoopGroup workerGroup = new NioEventLoopGroup(threadPoolSize);
 			try {
 				ServerBootstrap b = new ServerBootstrap();
-				b.option(ChannelOption.SO_BACKLOG, 1024);
+				b.option(ChannelOption.SO_BACKLOG, getConfig().getInt("httpServer.soBacklog"));
 				b.option(ChannelOption.SO_REUSEADDR, true);
 	            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS,5000);
 	            b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);

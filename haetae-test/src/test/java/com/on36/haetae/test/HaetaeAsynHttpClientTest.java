@@ -5,13 +5,13 @@ import org.junit.Test;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
-import com.ning.http.multipart.StringPart;
+import com.ning.http.client.multipart.StringPart;
 
 /**
  * @author zhanghr
  * @date 2016年1月3日
  */
-public class HaetaeTest {
+public class HaetaeAsynHttpClientTest {
 
 	@Test
 	public void testHello() throws Exception {
@@ -146,7 +146,7 @@ public class HaetaeTest {
 		AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 		Response resp = asyncHttpClient
 				.preparePost("http://localhost:8080/services/custom")
-				.addParameter("user", "zhangsan").addParameter("name", "nihao")
+				.addQueryParam("user", "zhangsan").addQueryParam("name", "nihao")
 				.execute().get();
 
 		String result = resp.getResponseBody().trim();

@@ -71,8 +71,7 @@ public class WhiteListAuthentication implements IAuthentication {
 		/* validation white list */
 		if (!whiteMap.isEmpty()) {
 
-			String remoteIp = request.getRemoteAddress().getAddress()
-					.getHostAddress();
+			String remoteIp = request.getRemoteAddress();
 			Integer level = whiteMap.get(remoteIp);
 			if (level == null)
 				return true;

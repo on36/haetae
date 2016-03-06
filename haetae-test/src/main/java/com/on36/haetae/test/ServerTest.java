@@ -15,9 +15,9 @@ import com.on36.haetae.server.HaetaeServer;
  */
 public class ServerTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		
-		HaetaeServer server = new HaetaeServer(8080,32);
+		HaetaeServer server = new HaetaeServer(8080);
 		server.register("/hello").with("Hello xiongdi!").session(true);
 		server.register("name/:name<[A-Za-z]+>").with("Hello :name");
 		server.register("/multi/*/*").with("Hello *[0] *[1]");
@@ -44,8 +44,8 @@ public class ServerTest {
 		server.register("/customobject",HttpMethod.POST).with(new CustomHandler<String>() {
 			
 			public String handle(Context context) {
-				User user = context.getBody(User.class);
-				return user.getVal();
+//				User user = context.getBody(User.class);
+				return context.getURI("/hello");
 			}
 		});
 		server.register("/custombody/*/*",HttpMethod.POST).with(new CustomHandler<String>() {

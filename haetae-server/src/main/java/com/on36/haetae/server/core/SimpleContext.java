@@ -17,6 +17,7 @@ import java.util.Set;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.http.Session;
+import com.on36.haetae.http.Container;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.Route;
 import com.on36.haetae.server.core.interpolation.ResponseBodyInterpolator;
@@ -30,15 +31,19 @@ public class SimpleContext implements Context {
 
 	private final Session session;
 
+	private final Container container;
+
 	private Map<String, String> parmMap = new HashMap<String, String>();
 
 	private String path;
 
-	public SimpleContext(HttpRequestExt request, Route route, Session session) {
+	public SimpleContext(HttpRequestExt request, Route route, Session session,
+			Container container) {
 
 		this.request = request;
 		this.route = route;
 		this.session = session;
+		this.container = container;
 		try {
 			path = new URI(this.request.getUri()).getPath();
 			parse();
@@ -110,7 +115,7 @@ public class SimpleContext implements Context {
 	}
 
 	public String getRequestBodyAsString() {
-		
+
 		ByteBuf content = request.content();
 		if (content.isReadable()) {
 			return request.content().toString(CharsetUtil.UTF_8);
@@ -122,5 +127,25 @@ public class SimpleContext implements Context {
 	public <T> T getBody(Class<T> clazz) {
 
 		return FormatorUtils.fromJson(clazz, getRequestBodyAsString());
+	}
+
+	@Override
+	public String getURI(String resource) {
+
+		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
+				.findHandler(resource);
+		if (requestHandler != null) {
+			return requestHandler.body(this).content();
+		}
+		return null;
+	}
+
+	@Override
+	public <T> T getURI(String resource, Class<T> clazz) {
+
+		String result = getURI(resource);
+		if (result != null)
+			return FormatorUtils.fromJson(clazz, result);
+		return null;
 	}
 }

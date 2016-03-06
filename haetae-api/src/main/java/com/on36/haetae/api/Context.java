@@ -11,7 +11,7 @@ public interface Context {
 	String getPath();
 
 	String getRequestParameter(String param);
-	
+
 	String getCapturedParameter(String captured);
 
 	String getHeaderValue(String param);
@@ -23,4 +23,9 @@ public interface Context {
 	String getRequestBodyAsString();
 
 	<T> T getBody(Class<T> clazz);
+
+	String getURI(String resource);
+
+	<T> T getURI(String resource, Class<T> clazz);
+
 }

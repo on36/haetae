@@ -38,8 +38,7 @@ public class BlackListAuthentication implements IAuthentication {
 		/* validation black list */
 		if (blackList != null) {
 
-			String remoteIp = request.getRemoteAddress().getAddress()
-					.getHostAddress();
+			String remoteIp = request.getRemoteAddress();
 			if (blackList.contains(remoteIp))
 				return false;
 		}

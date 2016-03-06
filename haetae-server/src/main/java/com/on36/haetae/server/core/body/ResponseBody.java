@@ -17,6 +17,8 @@ public abstract class ResponseBody {
     
     public abstract boolean hasContent();
     
+    public abstract String content();
+    
     protected void addStandardHeaders(HttpResponse response, String responseContentType) {
         
         long time = System.currentTimeMillis();

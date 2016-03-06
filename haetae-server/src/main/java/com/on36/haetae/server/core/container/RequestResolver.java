@@ -76,14 +76,22 @@ public class RequestResolver {
 	}
 
 	public RequestHandlerImpl findHandler(String resource) {
-		Route route = router.route(resource);
+		
+		String path = resource;
+		if (!resource.startsWith(PATH_ELEMENT_ROOT))
+			path = PATH_ELEMENT_ROOT
+					+ (resource.startsWith(PATH_ELEMENT_SEPARATOR) ? resource
+							: (PATH_ELEMENT_SEPARATOR + resource));
+		
+		Route route = router.route(path);
 		if (route != null) {
 			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
 			RequestHandlerImpl handler = handlerMap.get(key);
 			if (handler == null) {
 				key = new HandlerKey(HttpMethod.POST.name(), route);
 				return handlerMap.get(key);
-			}
+			} else
+				return handler;
 		}
 		return null;
 	}

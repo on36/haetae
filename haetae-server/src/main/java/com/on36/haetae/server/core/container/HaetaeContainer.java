@@ -63,7 +63,7 @@ public class HaetaeContainer implements Container {
 
 			/* create context */
 			Context context = new SimpleContext(request, resolved.route,
-					session);
+					session, this);
 
 			/* set the response body */
 			ResponseBody handlerBody = handler.body(context);

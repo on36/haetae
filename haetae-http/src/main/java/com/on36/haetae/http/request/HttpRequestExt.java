@@ -8,17 +8,15 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
 
-import java.net.InetSocketAddress;
-
-public class HttpRequestExt implements HttpRequest,HttpContent{
+public class HttpRequestExt {
 	
 	private final HttpRequest request;
 	
 	private final long startHandleTime;
 	
-	private final InetSocketAddress remoteAddress;
+	private final String remoteAddress;
 	
-	public HttpRequestExt(HttpRequest request, InetSocketAddress remoteAddress, long startHandleTime) {
+	public HttpRequestExt(HttpRequest request, String remoteAddress, long startHandleTime) {
 		this.request = request;
 		this.remoteAddress = remoteAddress;
 		this.startHandleTime = startHandleTime;
@@ -117,8 +115,8 @@ public class HttpRequestExt implements HttpRequest,HttpContent{
 		return request.setProtocolVersion(version);
 	}
 
-	public InetSocketAddress getRemoteAddress() {
+	public String getRemoteAddress() {
 		return remoteAddress;
 	}
-	
+
 }

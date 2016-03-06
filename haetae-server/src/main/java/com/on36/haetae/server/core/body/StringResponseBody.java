@@ -19,6 +19,9 @@ public class StringResponseBody extends ResponseBody {
     public boolean hasContent() {
         return body != null && body.trim().length() > 0;
     }
+    public String content() {
+    	return body;
+    }
     
     @Override
     public void send(HttpResponse response, String contentType) {
@@ -34,8 +37,7 @@ public class StringResponseBody extends ResponseBody {
         try {
 			printBody(response, contentType);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
     }
     
