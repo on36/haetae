@@ -16,6 +16,11 @@ public class FormatorUtils {
 
 		return gson.toJson(src);
 	}
+	
+	public static <T> T fromJson(Class<T> clazz, String json) {
+		
+		return gson.fromJson(json, clazz);
+	}
 
 	public static String toXML(Object src) {
 		

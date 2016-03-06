@@ -5,8 +5,8 @@ public class Statistics {
 	private String path;
 	private String method;
 	
-	private int success;
-	private int failure;
+	private int successCount;
+	private int failureCount;
 
 	private long minElapsedTime;
 	private long avgElapsedTime;
@@ -16,8 +16,8 @@ public class Statistics {
 
 	public Statistics(int success, int failure, long minElapsedTime,
 			long avgElapsedTime, long maxElapsedTime, int maxConcurrent) {
-		this.success = success;
-		this.failure = failure;
+		this.successCount = success;
+		this.failureCount = failure;
 		this.minElapsedTime = minElapsedTime;
 		this.avgElapsedTime = avgElapsedTime;
 		this.maxElapsedTime = maxElapsedTime;
@@ -48,20 +48,20 @@ public class Statistics {
 		this.maxConcurrent = maxConcurrent;
 	}
 
-	public int getSuccess() {
-		return success;
+	public int getSuccessCount() {
+		return successCount;
 	}
 
-	public void setSuccess(int success) {
-		this.success = success;
+	public void setSuccessCount(int success) {
+		this.successCount = success;
 	}
 
-	public int getFailure() {
-		return failure;
+	public int getFailureCount() {
+		return failureCount;
 	}
 
-	public void setFailure(int failure) {
-		this.failure = failure;
+	public void setFailureCount(int failure) {
+		this.failureCount = failure;
 	}
 
 	public long getMinElapsedTime() {
@@ -93,8 +93,8 @@ public class Statistics {
 		StringBuffer sb = new StringBuffer("{");
 		sb.append("path:" + path + ", ");
 		sb.append("method:" + method + ", ");
-		sb.append("success:" + success + ", ");
-		sb.append("failure:" + failure + ", ");
+		sb.append("success:" + successCount + ", ");
+		sb.append("failure:" + failureCount + ", ");
 		sb.append("min elapsed time(ms):" + minElapsedTime + ", ");
 		sb.append("avg elapsed time(ms):" + avgElapsedTime + ", ");
 		sb.append("max elapsed time(ms):" + maxElapsedTime + ", ");

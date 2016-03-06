@@ -20,6 +20,7 @@ import com.on36.haetae.api.http.Session;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.Route;
 import com.on36.haetae.server.core.interpolation.ResponseBodyInterpolator;
+import com.on36.haetae.server.utils.FormatorUtils;
 
 public class SimpleContext implements Context {
 
@@ -115,5 +116,11 @@ public class SimpleContext implements Context {
 			return request.content().toString(CharsetUtil.UTF_8);
 		}
 		return null;
+	}
+
+	@Override
+	public <T> T getBody(Class<T> clazz) {
+
+		return FormatorUtils.fromJson(clazz, getRequestBodyAsString());
 	}
 }

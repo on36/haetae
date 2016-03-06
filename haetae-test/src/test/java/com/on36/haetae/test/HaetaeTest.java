@@ -168,19 +168,31 @@ public class HaetaeTest {
 		Assert.assertEquals("zhangsan", result);
 		asyncHttpClient.close();
 	}
+
 	@Test
 	public void testBodyString() throws Exception {
 		AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 		Response resp = asyncHttpClient
-				.preparePost(
-						"http://localhost:8080/services/body")
-						.setHeader("Content-Type", "application/json")
-						.setBody("{\"val\":\"someJSON\"}")
-						.execute().get();
-		
+				.preparePost("http://localhost:8080/services/body")
+				.setHeader("Content-Type", "application/json")
+				.setBody("{\"val\":\"someJSON\"}").execute().get();
+
 		String result = resp.getResponseBody().trim();
 		System.out.println(result);
 		Assert.assertEquals("{\"val\":\"someJSON\"}", result);
+		asyncHttpClient.close();
+	}
+	@Test
+	public void testBodyObejct() throws Exception {
+		AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+		Response resp = asyncHttpClient
+				.preparePost("http://localhost:8080/services/customobject")
+				.setHeader("Content-Type", "application/json")
+				.setBody("{\"val\":\"someJSON\"}").execute().get();
+		
+		String result = resp.getResponseBody().trim();
+		System.out.println(result);
+		Assert.assertEquals("someJSON", result);
 		asyncHttpClient.close();
 	}
 
@@ -197,4 +209,5 @@ public class HaetaeTest {
 		Assert.assertEquals("lisi zhangsan", result);
 		asyncHttpClient.close();
 	}
+
 }

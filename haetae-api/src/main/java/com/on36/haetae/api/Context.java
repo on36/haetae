@@ -22,4 +22,5 @@ public interface Context {
 
 	String getRequestBodyAsString();
 
+	<T> T getBody(Class<T> clazz);
 }

@@ -29,7 +29,6 @@
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-server</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 		
 		 <dependency>
