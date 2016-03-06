@@ -39,17 +39,20 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 		if (HttpHeaders.is100ContinueExpected(request)) {
 			ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
 		}
-		
+
 		String remoteAddress = request.headers().get("X-Forwarded-For");
-        if (remoteAddress == null) {
-            InetSocketAddress is = (InetSocketAddress) ctx.channel().remoteAddress();
-            remoteAddress = is.getAddress().getHostAddress();
-        } else {
-        	remoteAddress = remoteAddress.split(",")[0].trim();
-        }
+		if (remoteAddress == null) {
+			InetSocketAddress is = (InetSocketAddress) ctx.channel()
+					.remoteAddress();
+			remoteAddress = is.getAddress().getHostAddress();
+		} else {
+			remoteAddress = remoteAddress.split(",")[0].trim();
+		}
 		boolean keepAlive = HttpHeaders.isKeepAlive(request);
-		FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,NOT_FOUND, Unpooled.directBuffer());
-		HttpRequestExt httpRequestExt = new HttpRequestExt(request, remoteAddress, start);
+		FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,
+				NOT_FOUND, Unpooled.directBuffer());
+		HttpRequestExt httpRequestExt = new HttpRequestExt(request,
+				remoteAddress, start);
 		if (container != null)
 			container.handle(httpRequestExt, response);
 
@@ -68,6 +71,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		ctx.close();
 	}
+
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 		ctx.close();
