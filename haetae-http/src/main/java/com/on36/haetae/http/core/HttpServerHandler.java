@@ -54,7 +54,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 		FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,
 				NOT_FOUND, Unpooled.directBuffer());
 		response.headers().set(DATE, start);
-		
 		HttpRequestExt httpRequestExt = new HttpRequestExt(request,
 				remoteAddress, start);
 		if (container != null)
@@ -62,8 +61,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 
 		response.headers().set(CONTENT_LENGTH,
 				response.content().readableBytes());
-		response.headers().set(LAST_MODIFIED, System.currentTimeMillis());
-		
+
+        response.headers().set(LAST_MODIFIED, System.currentTimeMillis());
 		if (!keepAlive) {
 			ctx.write(response).addListener(ChannelFutureListener.CLOSE);
 		} else {

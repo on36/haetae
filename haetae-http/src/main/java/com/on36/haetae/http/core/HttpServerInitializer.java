@@ -14,7 +14,7 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
 	private final SslContext sslCtx;
 	private final Container container;
-	private boolean compressor = true;
+	private boolean compressior = true;
 
 	public HttpServerInitializer(SslContext sslCtx, Container container) {
 		this.sslCtx = sslCtx;
@@ -29,9 +29,8 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 		}
 		p.addLast(new HttpServerCodec());
 		p.addLast(new HttpObjectAggregator(10 * 1024));// max content length
-		if (compressor) {
+		if (compressior)
 			p.addLast(new HttpContentCompressor(1));
-		}
 		p.addLast(new HttpServerHandler(container));
 	}
 }
