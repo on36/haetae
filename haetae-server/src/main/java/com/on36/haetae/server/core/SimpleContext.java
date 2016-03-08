@@ -130,7 +130,7 @@ public class SimpleContext implements Context {
 	}
 
 	@Override
-	public String getURI(String resource) {
+	public String getURI(String resource) throws Exception {
 
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
 				.findHandler(resource);
@@ -141,7 +141,7 @@ public class SimpleContext implements Context {
 	}
 
 	@Override
-	public <T> T getURI(String resource, Class<T> clazz) {
+	public <T> T getURI(String resource, Class<T> clazz) throws Exception {
 
 		String result = getURI(resource);
 		if (result != null)

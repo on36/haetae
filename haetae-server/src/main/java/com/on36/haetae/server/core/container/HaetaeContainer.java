@@ -26,7 +26,7 @@ public class HaetaeContainer implements Container {
 	private final RequestResolver requestResolver = new RequestResolver(this);
 
 	private final SessionManager sessionManager = new SessionManager();
-
+	
 	public void handle(HttpRequestExt request, HttpResponse response) {
 
 		RequestHandlerImpl handler = null;

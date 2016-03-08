@@ -12,6 +12,8 @@ public interface RequestHandler {
 
     RequestHandler withHeader(String name, String value);
     
+    RequestHandler timeout(long timeout, TimeUnit timeoutUnit);
+    
     RequestHandler every(long period, TimeUnit periodUnit, int times);
     
     RequestHandler every(int times);

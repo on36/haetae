@@ -7,7 +7,12 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,9 +24,10 @@ import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.server.core.auth.impl.BlackListAuthentication;
 import com.on36.haetae.server.core.auth.impl.RequestFlowAuthentication;
 import com.on36.haetae.server.core.auth.impl.WhiteListAuthentication;
-import com.on36.haetae.server.core.body.EntityResonseBody;
+import com.on36.haetae.server.core.body.EntityResponseBody;
 import com.on36.haetae.server.core.body.InterpolatedResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
+import com.on36.haetae.server.core.body.TimeoutResponseBody;
 import com.on36.haetae.server.core.stats.Statistics;
 
 public class RequestHandlerImpl implements RequestHandler {
@@ -29,6 +35,9 @@ public class RequestHandlerImpl implements RequestHandler {
 	private int statusCode = -1;
 	private String body;
 	private boolean hasSession = false;
+
+	private long timeout = -1;
+	private TimeUnit timeoutUnit = TimeUnit.MILLISECONDS;
 
 	private AtomicLong minElapsedTime = new AtomicLong(0);
 	private AtomicLong avgElapsedTime = new AtomicLong(0);
@@ -45,6 +54,8 @@ public class RequestHandlerImpl implements RequestHandler {
 	private WhiteListAuthentication whiteList = new WhiteListAuthentication();
 	private RequestFlowAuthentication requestFlow = new RequestFlowAuthentication();
 	private boolean auth = true;
+
+	private final ExecutorService es = Executors.newCachedThreadPool();
 
 	public RequestHandler with(String body) {
 
@@ -126,8 +137,15 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
-	public RequestHandler every(long period, TimeUnit periodUnit, int times) {
+	public RequestHandler timeout(long timeout, TimeUnit timeoutUnit) {
 
+		this.timeout = timeout;
+		this.timeoutUnit = timeoutUnit;
+		return this;
+	}
+
+	public RequestHandler every(long period, TimeUnit periodUnit, int times) {
+		
 		requestFlow.every(period, periodUnit, times);
 		return this;
 	}
@@ -146,11 +164,27 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
-	public ResponseBody body(Context context) {
+	public ResponseBody body(Context context) throws Exception {
 
-		if (getCustomHandler() != null)
-			return new EntityResonseBody(getCustomHandler().handle(context),
-					context);
+		if (getCustomHandler() != null) {
+			Future<Object> future = es.submit(new Callable<Object>() {
+				@Override
+				public Object call() throws Exception {
+					return getCustomHandler().handle(context);
+				}
+			});
+			Object result = null;
+			try {
+				if (timeout > 0)
+					result = future.get(timeout, timeoutUnit);
+				else
+					result = future.get();
+			} catch (TimeoutException | InterruptedException e) {
+				future.cancel(true);
+				return new TimeoutResponseBody();
+			} 
+			return new EntityResponseBody(result, context);
+		}
 
 		return new InterpolatedResponseBody(body, context);
 	}

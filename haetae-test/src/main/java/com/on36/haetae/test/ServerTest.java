@@ -43,14 +43,24 @@ public class ServerTest {
 		});
 		server.register("/customobject",HttpMethod.POST).with(new CustomHandler<String>() {
 			
-			public String handle(Context context) {
+			public String handle(Context context) throws Exception {
 //				User user = context.getBody(User.class);
+				return context.getURI("/hello");
+			}
+		});
+		server.register("/timeout",HttpMethod.GET).timeout(1, TimeUnit.SECONDS).with(new CustomHandler<String>() {
+			
+			public String handle(Context context) throws Exception {
+//				User user = context.getBody(User.class);
+				Thread.currentThread().sleep(2000);
+				
+				System.out.println(Thread.currentThread().getName());
 				return context.getURI("/hello");
 			}
 		});
 		server.register("/custombody/*/*",HttpMethod.POST).with(new CustomHandler<String>() {
 			
-			public String handle(Context context) {
+			public String handle(Context context) throws Exception{
 				return context.getCapturedParameter("*[0] *[1]");
 			}
 		});

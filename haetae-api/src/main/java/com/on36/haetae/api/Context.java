@@ -24,8 +24,8 @@ public interface Context {
 
 	<T> T getBody(Class<T> clazz);
 
-	String getURI(String resource);
+	String getURI(String resource) throws Exception;
 
-	<T> T getURI(String resource, Class<T> clazz);
+	<T> T getURI(String resource, Class<T> clazz) throws Exception;
 
 }

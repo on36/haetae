@@ -8,8 +8,6 @@ import com.on36.haetae.http.Version;
 
 public abstract class ResponseBody {
 
-    public abstract void send(HttpResponse resp, String contentType);
-    
     public abstract void sendAndCommit(HttpResponse resp, String contentType);
     
     public abstract boolean hasContent();
@@ -18,6 +16,6 @@ public abstract class ResponseBody {
     
     protected void addStandardHeaders(HttpResponse response, String responseContentType) {
         response.headers().set(CONTENT_TYPE, responseContentType);
-        response.headers().set(SERVER, "Haetae/" +Version.CURRENT_VERSION+ " (netty 4.0.34)");
+        response.headers().set(SERVER, "Haetae/" +Version.CURRENT_VERSION+ "(netty 4.0.34)");
     }
 }

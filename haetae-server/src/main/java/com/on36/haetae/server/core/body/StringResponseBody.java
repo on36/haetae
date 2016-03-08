@@ -22,15 +22,6 @@ public class StringResponseBody extends ResponseBody {
     public String content() {
     	return body;
     }
-    
-    @Override
-    public void send(HttpResponse response, String contentType) {
-        try {
-            printBody(response, contentType);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void sendAndCommit(HttpResponse response, String contentType) {

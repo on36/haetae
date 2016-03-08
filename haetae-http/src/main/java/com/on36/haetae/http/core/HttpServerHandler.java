@@ -62,7 +62,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpRequest> 
 		response.headers().set(CONTENT_LENGTH,
 				response.content().readableBytes());
 
-        response.headers().set(LAST_MODIFIED, System.currentTimeMillis());
+		response.headers().set(LAST_MODIFIED, System.currentTimeMillis());
 		if (!keepAlive) {
 			ctx.write(response).addListener(ChannelFutureListener.CLOSE);
 		} else {
