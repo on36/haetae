@@ -149,7 +149,8 @@ public class RequestHandlerImpl implements RequestHandler {
 	public ResponseBody body(Context context) {
 
 		if (getCustomHandler() != null)
-			return new EntityResonseBody(getCustomHandler().handle(context), context);
+			return new EntityResonseBody(getCustomHandler().handle(context),
+					context);
 
 		return new InterpolatedResponseBody(body, context);
 	}
@@ -215,6 +216,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		return new Statistics(successHandlTimes.intValue(),
 				failHandlTimes.intValue(), minElapsedTime.longValue(),
 				avgElapsedTime.longValue(), maxElapsedTime.longValue(),
+				requestFlow.getCurTPS(), requestFlow.getMaxTPS(),
 				maxConcurrent.intValue());
 	}
 

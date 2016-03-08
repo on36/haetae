@@ -11,18 +11,46 @@ public class Statistics {
 	private long minElapsedTime;
 	private long avgElapsedTime;
 	private long maxElapsedTime;
+	
+	private int curTPS;
+	private int maxTPS;
 
 	private int maxConcurrent;
 
-	public Statistics(int success, int failure, long minElapsedTime,
-			long avgElapsedTime, long maxElapsedTime, int maxConcurrent) {
-		this.successCount = success;
-		this.failureCount = failure;
+	public Statistics(int successCount, int failureCount, long minElapsedTime,
+			long avgElapsedTime, long maxElapsedTime, int curTPS, int maxTPS,
+			int maxConcurrent) {
+		super();
+		this.successCount = successCount;
+		this.failureCount = failureCount;
 		this.minElapsedTime = minElapsedTime;
 		this.avgElapsedTime = avgElapsedTime;
 		this.maxElapsedTime = maxElapsedTime;
+		this.curTPS = curTPS;
+		this.maxTPS = maxTPS;
 		this.maxConcurrent = maxConcurrent;
 	}
+
+
+	public int getCurTPS() {
+		return curTPS;
+	}
+
+
+	public void setCurTPS(int curTPS) {
+		this.curTPS = curTPS;
+	}
+
+
+	public int getMaxTPS() {
+		return maxTPS;
+	}
+
+
+	public void setMaxTPS(int maxTPS) {
+		this.maxTPS = maxTPS;
+	}
+
 
 	public int getMaxConcurrent() {
 		return maxConcurrent;

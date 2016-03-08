@@ -13,6 +13,10 @@ public class RequestFlowAuthentication implements IAuthentication {
 
 	private AtomicLong firstTime = new AtomicLong(0L);
 	private AtomicInteger curTimes = new AtomicInteger(0);
+	
+	private AtomicLong tpsTime = new AtomicLong(0L);
+	private AtomicInteger curTPS = new AtomicInteger(0);
+	private AtomicInteger maxTPS = new AtomicInteger(0);
 
 	private long period = -1;
 	private TimeUnit periodUnit = TimeUnit.SECONDS;
@@ -24,13 +28,24 @@ public class RequestFlowAuthentication implements IAuthentication {
 		this.period = period;
 		this.periodUnit = periodUnit;
 	}
+	
+	
+
+	public int getCurTPS() {
+		return curTPS.intValue();
+	}
+
+	public int getMaxTPS() {
+		return maxTPS.intValue();
+	}
+
+
 
 	@Override
 	public boolean auth(HttpRequestExt request, HttpResponse response) {
 		/* validation request times */
+		long current = System.currentTimeMillis();
 		if (period > -1) {
-
-			long current = System.currentTimeMillis();
 			long last = firstTime.get();
 			if (last == 0) {
 				firstTime.set(current);
@@ -50,6 +65,22 @@ public class RequestFlowAuthentication implements IAuthentication {
 				}
 			}
 		}
+		
+		long lastTPS = tpsTime.longValue();
+		if (tpsTime.longValue() == 0) {
+			tpsTime.set(current);
+			curTPS.incrementAndGet();
+		} else {
+			if ((current - lastTPS) < 1000) {
+				curTPS.incrementAndGet();
+			} else {
+				tpsTime.set(current);
+				curTPS.set(1);
+			}
+		}
+		
+		if(maxTPS.intValue() < curTPS.intValue())
+			maxTPS.set(curTPS.intValue());
 		return true;
 	}
 
