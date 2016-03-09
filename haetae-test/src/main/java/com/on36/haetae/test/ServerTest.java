@@ -51,8 +51,8 @@ public class ServerTest {
 		server.register("/timeout",HttpMethod.GET).timeout(1, TimeUnit.SECONDS).with(new CustomHandler<String>() {
 			
 			public String handle(Context context) throws Exception {
-//				User user = context.getBody(User.class);
-				Thread.currentThread().sleep(2000);
+				//				User user = context.getBody(User.class);
+						Thread.sleep(2000);
 				
 				System.out.println(Thread.currentThread().getName());
 				return context.getURI("/hello");
