@@ -20,6 +20,7 @@ import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.SimpleContext;
 import com.on36.haetae.server.core.body.ResponseBody;
 import com.on36.haetae.server.core.body.StringResponseBody;
+import com.on36.haetae.server.core.manager.SessionManager;
 
 public class HaetaeContainer implements Container {
 

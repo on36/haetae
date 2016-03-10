@@ -4,6 +4,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,6 +37,9 @@ public class RequestHandlerImpl implements RequestHandler {
 	private String body;
 	private boolean hasSession = false;
 
+	private Object object;
+	private Method method;
+
 	private long timeout = -1;
 	private TimeUnit timeoutUnit = TimeUnit.MILLISECONDS;
 
@@ -66,6 +70,25 @@ public class RequestHandlerImpl implements RequestHandler {
 	public RequestHandler with(CustomHandler<?> customHandler) {
 
 		this.httpHandler = customHandler;
+		return this;
+	}
+
+	@Override
+	public RequestHandler with(Object object, Method method) {
+		if (object == null || method == null)
+			throw new IllegalArgumentException(
+					"Method or object cannot be null");
+		Class<?>[] clazzs = method.getParameterTypes();
+		if (clazzs.length == 1 && clazzs[0] == Context.class) {
+			this.object = null;
+			this.method = null;
+			this.object = object;
+			this.method = method;
+		} else
+			throw new IllegalArgumentException(
+					"The parameter type of Method is not "
+							+ Context.class.getName());
+
 		return this;
 	}
 
@@ -145,7 +168,7 @@ public class RequestHandlerImpl implements RequestHandler {
 	}
 
 	public RequestHandler every(long period, TimeUnit periodUnit, int times) {
-		
+
 		requestFlow.every(period, periodUnit, times);
 		return this;
 	}
@@ -166,11 +189,14 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public ResponseBody body(Context context) throws Exception {
 
-		if (getCustomHandler() != null) {
+		if (getCustomHandler() != null || method != null) {
 			Future<Object> future = es.submit(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					return getCustomHandler().handle(context);
+					if (getCustomHandler() != null)
+						return getCustomHandler().handle(context);
+					else
+						return method.invoke(object, context);
 				}
 			});
 			Object result = null;
@@ -182,7 +208,7 @@ public class RequestHandlerImpl implements RequestHandler {
 			} catch (TimeoutException | InterruptedException e) {
 				future.cancel(true);
 				return new TimeoutResponseBody();
-			} 
+			}
 			return new EntityResponseBody(result, context);
 		}
 
@@ -228,6 +254,10 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public boolean hasSession() {
 		return hasSession;
+	}
+	
+	public boolean hasAuth() {
+		return auth;
 	}
 
 	public boolean validation(HttpRequestExt request, HttpResponse response) {

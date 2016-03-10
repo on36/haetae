@@ -8,5 +8,5 @@ import com.on36.haetae.api.http.MediaType;
 @Target(ElementType.METHOD)
 public @interface Produces {
 
-	MediaType[] value();
+	MediaType[] value() default MediaType.APPLICATION_JSON;
 }

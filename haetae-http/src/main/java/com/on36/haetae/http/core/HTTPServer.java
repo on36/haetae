@@ -20,24 +20,30 @@ import java.net.InetSocketAddress;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.Server;
 import com.on36.haetae.http.Version;
+import com.on36.haetae.udp.Message;
+import com.on36.haetae.udp.Message.Title;
+import com.on36.haetae.udp.UDPClient;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
 public class HTTPServer implements Server {
 
-	public static InternalLogger LOG = InternalLoggerFactory.getInstance(HTTPServer.class);
+	public static InternalLogger LOG = InternalLoggerFactory
+			.getInstance(HTTPServer.class);
 	private static Config config = ConfigFactory.load();
-	
+
 	private InetSocketAddress socketAddress;
 	private int threadPoolSize;
-	
+
 	private Container container;
 
 	private Channel channel;
-	
-	public static Config getConfig(){
-        return config;
-    }
+
+	private Thread endPointThread;
+
+	public static Config getConfig() {
+		return config;
+	}
 
 	public HTTPServer(int port) {
 		this(port, 0);
@@ -47,7 +53,7 @@ public class HTTPServer implements Server {
 		this.socketAddress = new InetSocketAddress(port);
 		this.threadPoolSize = threadPoolSize;
 	}
-    
+
 	public Container getContainer() {
 		return container;
 	}
@@ -57,12 +63,13 @@ public class HTTPServer implements Server {
 	}
 
 	public void start() throws Exception {
-		
+
 		if (channel == null || !channel.isActive()) {
 			final SslContext sslCtx;
 			boolean ssl = getConfig().getBoolean("httpServer.ssl");
 			if (ssl) {
-				SelfSignedCertificate ssc = new SelfSignedCertificate("on36.com");
+				SelfSignedCertificate ssc = new SelfSignedCertificate(
+						"on36.com");
 				sslCtx = SslContextBuilder.forServer(ssc.certificate(),
 						ssc.privateKey()).build();
 			} else {
@@ -74,27 +81,48 @@ public class HTTPServer implements Server {
 			EventLoopGroup workerGroup = new NioEventLoopGroup(threadPoolSize);
 			try {
 				ServerBootstrap b = new ServerBootstrap();
-				b.option(ChannelOption.SO_BACKLOG, getConfig().getInt("httpServer.soBacklog"));
+				b.option(ChannelOption.SO_BACKLOG,
+						getConfig().getInt("httpServer.soBacklog"));
 				b.option(ChannelOption.SO_REUSEADDR, true);
-	            b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS,5000);
-	            b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
-//	            b.childOption(ChannelOption.AUTO_READ, false);
+				b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
+				b.option(ChannelOption.ALLOCATOR,
+						PooledByteBufAllocator.DEFAULT);
+				// b.childOption(ChannelOption.AUTO_READ, false);
 				b.group(bossGroup, workerGroup)
 						.channel(NioServerSocketChannel.class)
 						.handler(new LoggingHandler(LogLevel.DEBUG))
-						.childHandler(new HttpServerInitializer(sslCtx, container));
+						.childHandler(
+								new HttpServerInitializer(sslCtx, container));
 
 				channel = b.bind(socketAddress).sync().channel();
-				
+
 				print(socketAddress.getPort());
-				System.out.println("Server is now ready to accept connection on [" + socketAddress +"]");
+
+				endPointThread = new Thread() {
+					public void run() {
+						while (true) {
+							try {
+								UDPClient.send(new Message(Title.ENDPOINT,
+										socketAddress.getHostString()));
+								sleep(5000);
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					};
+				};
+				endPointThread.start();
+				System.out
+						.println("Server is now ready to accept connection on ["
+								+ socketAddress + "]");
 				channel.closeFuture().sync();
 			} finally {
 				bossGroup.shutdownGracefully();
 				workerGroup.shutdownGracefully();
 			}
 		} else {
-			System.out.println("Server is already running on [" + socketAddress +"], startup abort!");
+			System.out.println("Server is already running on [" + socketAddress
+					+ "], startup abort!");
 		}
 	}
 
@@ -102,17 +130,29 @@ public class HTTPServer implements Server {
 		if (channel != null && channel.isActive()) {
 			channel.close();
 		}
+
+		endPointThread.interrupt();
 	}
-	
+
 	private void print(int port) {
 		System.out.println("  HH        HH                           ");
-		System.out.println("  HH        HH     HHHHHH        HHHHHH           HHH         HHHHHH       HHHHHHH       ");
-		System.out.println("  HH        HH    HH    HH     HH      HH         HHH        HH    HH     HH      HH     ");
-		System.out.println("  HH        HH           HH   HH        HH   HHHHHHHHHHHHH          HH   HH        HH    ");
-		System.out.println("  HHHHHHHHHHHH     HHHHHHH    HHHHHHHHHHH         HHH         HHHHHHH    HHHHHHHHHHH     ");
-		System.out.println("  HH        HH    HH    HH    HH                  HHH        HH    HH    HH              ");
-		System.out.println("  HH        HH   HH      HH    HH       HH        HHH       HH      HH    HH       HH    Version: "+Version.CURRENT_VERSION);
-		System.out.println("  HH        HH    HH    HH      HHH   HHH         HHH  HH    HH    HH      HHH   HHH     Port: "+port);
-		System.out.println("  HH        HH     HHHHHH HH      HHHHH            HHHH       HHHHHH HH      HHHHH       Author: zhanghr");
+		System.out
+				.println("  HH        HH     HHHHHH        HHHHHH           HHH         HHHHHH       HHHHHHH       ");
+		System.out
+				.println("  HH        HH    HH    HH     HH      HH         HHH        HH    HH     HH      HH     ");
+		System.out
+				.println("  HH        HH           HH   HH        HH   HHHHHHHHHHHHH          HH   HH        HH    ");
+		System.out
+				.println("  HHHHHHHHHHHH     HHHHHHH    HHHHHHHHHHH         HHH         HHHHHHH    HHHHHHHHHHH     ");
+		System.out
+				.println("  HH        HH    HH    HH    HH                  HHH        HH    HH    HH              ");
+		System.out
+				.println("  HH        HH   HH      HH    HH       HH        HHH       HH      HH    HH       HH    Version: "
+						+ Version.CURRENT_VERSION);
+		System.out
+				.println("  HH        HH    HH    HH      HHH   HHH         HHH  HH    HH    HH      HHH   HHH     Port: "
+						+ port);
+		System.out
+				.println("  HH        HH     HHHHHH HH      HHHHH            HHHH       HHHHHH HH      HHHHH       Author: zhanghr");
 	}
 }

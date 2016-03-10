@@ -43,5 +43,10 @@
 			<version>4.5.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-hotswap</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

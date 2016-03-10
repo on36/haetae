@@ -1,4 +1,4 @@
-package com.on36.haetae.server.core.container;
+package com.on36.haetae.server.core.manager;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.on36.haetae.api.http.Session;
 import com.on36.haetae.http.request.HttpRequestExt;
 
-class SessionManager {
+public class SessionManager {
 
 	private static final String SESSION_COOKIE_NAME = "Haetae-Session";
 

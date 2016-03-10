@@ -10,16 +10,19 @@ public class EntityResponseBody extends StringResponseBody {
 	}
 
 	private static String translate(Object entity, Context context) {
+
 		String body = null;
-		if (entity instanceof String) {
+		if (entity.getClass().isPrimitive()) {
+			body = entity.toString();
+		} else if (entity instanceof String) {
 			body = (String) entity;
 		} else {
-//			String contentType = context.getHeaderValue("Content-Type");
-//			if (MediaType.APPLICATION_XML.value().equals(contentType)
-//					|| MediaType.TEXT_XML.value().equals(contentType))
-//				FormatorUtils.toXML(entity);
-//			else
-				body = FormatorUtils.toJson(entity);
+			// String contentType = context.getHeaderValue("Content-Type");
+			// if (MediaType.APPLICATION_XML.value().equals(contentType)
+			// || MediaType.TEXT_XML.value().equals(contentType))
+			// FormatorUtils.toXML(entity);
+			// else
+			body = FormatorUtils.toJson(entity);
 		}
 		return body;
 	}
