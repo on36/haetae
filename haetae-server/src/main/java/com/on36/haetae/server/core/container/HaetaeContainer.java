@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.on36.haetae.api.Context;
+import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.api.http.Session;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
@@ -32,7 +33,7 @@ public class HaetaeContainer implements Container {
 
 		RequestHandlerImpl handler = null;
 		try {
-			String responseContentType = "text/plain";
+			String responseContentType = MediaType.APPLICATION_JSON.value();
 			ResponseBody responseBody = new StringResponseBody("");
 			HttpResponseStatus handlerStatusCode = OK;
 

@@ -53,7 +53,7 @@ public class RequestResolver {
 		if (PATH_ELEMENT_SEPARATOR.equals(resource)
 				|| PATH_ELEMENT_ROOT.equals(resource)) {
 			throw new IllegalArgumentException(
-					"resource cannot be '/' or '/services'");
+					"resource cannot be '/' or '"+ PATH_ELEMENT_ROOT +"'");
 		}
 
 		String path = resource;
