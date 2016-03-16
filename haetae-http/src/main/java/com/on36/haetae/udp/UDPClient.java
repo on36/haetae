@@ -15,7 +15,7 @@ public class UDPClient {
 	private static final int PORT = Integer.parseInt(System.getProperty("port",
 			"1015"));
 	private static final String MULTI_ADDR = System.getProperty("multiAddr",
-			"225.0.0.1");
+			"225.4.5.6");
 	private static final int PACKET_MAX_LENGTH = Integer.parseInt(System
 			.getProperty("maxLength", "4096"));
 
