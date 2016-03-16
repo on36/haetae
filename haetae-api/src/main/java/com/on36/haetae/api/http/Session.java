@@ -7,8 +7,10 @@ import java.util.UUID;
 
 public class Session {
 
-	private static final int MAX_INACTIVE_INTERVAL = 5 * 60 * 1000;// max inactive interval
-	
+	private static final int MAX_INACTIVE_INTERVAL = 5 * 60 * 1000;// max
+																	// inactive
+																	// interval
+
 	private final String sessionId;
 	private final long time;
 
@@ -35,6 +37,17 @@ public class Session {
 	public Object get(String key) {
 
 		return values.get(key);
+	}
+
+	public String getString(String key) {
+
+		return values.get(key) == null ? null : values.get(key).toString();
+	}
+
+	public Integer getInt(String key) {
+
+		return values.get(key) == null ? null : Integer.parseInt(values
+				.get(key).toString());
 	}
 
 	public void set(String key, Object value) {
