@@ -1,10 +1,9 @@
 package com.on36.haetae.api.annotation;
 
-
-public class PathTest {
+public class GetTest {
 
 	@Get
-	@Path("/user/list")
+	@Path("/user/test")
 	public String test() {
 
 		return "test";

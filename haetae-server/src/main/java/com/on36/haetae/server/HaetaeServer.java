@@ -41,6 +41,15 @@ public class HaetaeServer {
 		server.stop();
 	}
 
+	/**
+	 * 注册一个服务
+	 * 
+	 * @param resource
+	 *            服务请求URI路径
+	 * @param method
+	 *            服务请求的方法类型 如GET、POST
+	 * @return
+	 */
 	public RequestHandler register(String resource, HttpMethod method) {
 
 		RequestHandlerImpl handler = new RequestHandlerImpl();
@@ -48,16 +57,37 @@ public class HaetaeServer {
 		return handler;
 	}
 
+	/**
+	 * 注册一个服务,默认方法类型为GET
+	 * 
+	 * @param resource
+	 *            服务请求URI路径
+	 * @return
+	 */
 	public RequestHandler register(String resource) {
 
 		return register(resource, HttpMethod.GET);
 	}
 
+	/**
+	 * 注销指定请求路径的所有服务
+	 * 
+	 * @param resource
+	 *            服务请求URI路径
+	 * @return
+	 */
 	public boolean unregister(String resource) {
 
 		return container.removeHandler(resource);
 	}
 
+	/**
+	 * 搜索指定请求路径的服务
+	 * 
+	 * @param resource
+	 *            服务请求URI路径
+	 * @return
+	 */
 	public RequestHandler find(String resource) {
 
 		return container.findHandler(resource);

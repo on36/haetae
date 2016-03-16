@@ -5,6 +5,7 @@ import java.lang.annotation.Target;
 
 import com.on36.haetae.api.http.MediaType;
 
+@Deprecated
 @Target(ElementType.METHOD)
 public @interface Produces {
 
