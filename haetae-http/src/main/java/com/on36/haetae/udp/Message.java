@@ -1,52 +1,63 @@
 package com.on36.haetae.udp;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
 /**
  * @author zhanghr
  * @date 2016年1月8日
  */
 public class Message {
 
+	private static final int PACKET_MAX_LENGTH = Integer.parseInt(System
+			.getProperty("maxLength", "4096"));
+
 	public enum Title {
-		TEST("TEST"), ENDPOINT("ENDPOINT"), SESSSION("SESSION");
+		TEST(0), ENDPOINT(1), SESSSION(2), REQUEST(3);
 
-		private final String value;
+		private final int value;
 
-		private Title(String value) {
+		private Title(int value) {
 			this.value = value;
 		}
 
-		public String getValue() {
+		public int getValue() {
 			return value;
 		}
 	}
 
 	private final Title title;
-	private final String content;
+	private final byte[] content;
 
-	public Message(Title title, String content) {
+	public Message(Title title, byte[] content) {
 		super();
 		this.title = title;
 		this.content = content;
+
+		if (content.length > PACKET_MAX_LENGTH - 4) {
+			throw new IllegalArgumentException(
+					"the length of message is too large !");
+		}
 	}
 
 	public Title title() {
 		return title;
 	}
 
-	public String content() {
+	public byte[] content() {
 		return content;
 	}
 
-	public static Message toMessage(byte[] msg, String charsetName)
-			throws Exception {
-		String message = new String(msg, charsetName);
-		int index = message.indexOf(":");
-		return new Message(Title.valueOf(message.substring(0, index)),
-				message.substring(index + 1));
+	public static Message toMessage(byte[] msg) throws Exception {
+		int title = msg[0];
+		return new Message(Title.values()[title], Arrays.copyOfRange(msg, 1,
+				msg.length));
 	}
 
-	public byte[] toBytes(String charsetName) throws Exception {
-		String msg = title.getValue() + ":" + content();
-		return msg.getBytes(charsetName);
+	public byte[] toBytes() throws Exception {
+		ByteBuffer buffer = ByteBuffer.allocate(PACKET_MAX_LENGTH);
+		buffer.putInt(title().getValue());
+		buffer.put(content());
+		return buffer.array();
 	}
 }

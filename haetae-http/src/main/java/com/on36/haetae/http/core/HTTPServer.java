@@ -20,9 +20,6 @@ import java.net.InetSocketAddress;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.Server;
 import com.on36.haetae.http.Version;
-import com.on36.haetae.udp.Message;
-import com.on36.haetae.udp.Message.Title;
-import com.on36.haetae.udp.UDPClient;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -32,34 +29,33 @@ public class HTTPServer implements Server {
 			.getInstance(HTTPServer.class);
 	private static Config config = ConfigFactory.load();
 
-	private InetSocketAddress socketAddress;
-	private int threadPoolSize;
+	private final InetSocketAddress socketAddress;
+	private final int threadPoolSize;
 
-	private Container container;
+	private final Container container;
 
 	private Channel channel;
-
-	private Thread endPointThread;
 
 	public static Config getConfig() {
 		return config;
 	}
 
-	public HTTPServer(int port) {
-		this(port, 0);
+	public HTTPServer(int port, Container container) {
+		this(port, 0, container);
 	}
 
-	public HTTPServer(int port, int threadPoolSize) {
+	public HTTPServer(int port, int threadPoolSize, Container container) {
 		this.socketAddress = new InetSocketAddress(port);
 		this.threadPoolSize = threadPoolSize;
+		this.container = container;
 	}
 
 	public Container getContainer() {
 		return container;
 	}
 
-	public void setContainer(Container container) {
-		this.container = container;
+	public InetSocketAddress getSocketAddress() {
+		return socketAddress;
 	}
 
 	public void start() throws Exception {
@@ -98,20 +94,6 @@ public class HTTPServer implements Server {
 
 				print(socketAddress.getPort());
 
-				endPointThread = new Thread() {
-					public void run() {
-						while (true) {
-							try {
-								UDPClient.send(new Message(Title.ENDPOINT,
-										socketAddress.getHostString()));
-								sleep(5000);
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
-					};
-				};
-				endPointThread.start();
 				System.out
 						.println("Server is now ready to accept connection on ["
 								+ socketAddress + "]");
@@ -130,12 +112,10 @@ public class HTTPServer implements Server {
 		if (channel != null && channel.isActive()) {
 			channel.close();
 		}
-
-		endPointThread.interrupt();
 	}
 
 	private void print(int port) {
-		System.out.println("  HH        HH                           ");
+		System.out.println("  HH        HH");
 		System.out
 				.println("  HH        HH     HHHHHH        HHHHHH           HHH         HHHHHH       HHHHHHH       ");
 		System.out

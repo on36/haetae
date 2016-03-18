@@ -21,11 +21,13 @@ public class UDPServer {
 	private static final int PACKET_MAX_LENGTH = Integer.parseInt(System
 			.getProperty("maxLength", "4096"));
 
-	private final Handler handler;
+	private final Scheduler scheduler;
 	private final DatagramChannel channel;
 
-	public UDPServer(Handler handler) throws Exception {
-		this.handler = handler;
+	private boolean running = true;
+
+	public UDPServer(Scheduler scheduler) throws Exception {
+		this.scheduler = scheduler;
 
 		NetworkInterface ni = NetworkInterface.getByIndex(1);
 		channel = DatagramChannel.open(StandardProtocolFamily.INET)
@@ -39,37 +41,21 @@ public class UDPServer {
 	}
 
 	public void start() throws Exception {
-
-		boolean running = true;
 		// new buffer to avoid clear problems
 		ByteBuffer buffer = ByteBuffer.allocate(PACKET_MAX_LENGTH);
 
 		while (running) {
 			channel.receive(buffer);
 			buffer.flip();
-			if (handler != null)
-				handler.handle(Message.toMessage(buffer.array(), "UTF-8"));
+			if (scheduler != null)
+				scheduler.revieve(Message.toMessage(buffer.array()));
 			buffer.clear();
 		}
 
 	}
 
 	public void close() throws Exception {
+		running = false;
 		channel.close();
 	}
-
-	public static void main(String[] args) throws Exception {
-
-		UDPServer server = new UDPServer(new Handler() {
-
-			@Override
-			public void handle(Message message) {
-				// TODO Auto-generated method stub
-				System.out.println(message.content());
-			}
-		});
-
-		server.start();
-	}
-
 }

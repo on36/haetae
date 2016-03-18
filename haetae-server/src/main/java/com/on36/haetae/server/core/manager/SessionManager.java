@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.on36.haetae.api.http.Session;
 import com.on36.haetae.http.request.HttpRequestExt;
+import com.on36.haetae.server.utils.ShortUUID;
 
 public class SessionManager {
 
@@ -51,10 +52,11 @@ public class SessionManager {
 	public Session newSession(HttpResponse response) {
 
 		Session session = new Session();
-		sessions.put(session.getSessionId(), session);
+		String sessionid = new ShortUUID.Builder()
+				.build(session.getSessionId()).toString();
+		sessions.put(sessionid, session);
 
-		Cookie cookie = new DefaultCookie(SESSION_COOKIE_NAME,
-				session.getSessionId());
+		Cookie cookie = new DefaultCookie(SESSION_COOKIE_NAME, sessionid);
 		ServerCookieEncoder cookieEncoder = ServerCookieEncoder.STRICT;
 		response.headers().add(HttpHeaders.Names.SET_COOKIE,
 				cookieEncoder.encode(cookie));

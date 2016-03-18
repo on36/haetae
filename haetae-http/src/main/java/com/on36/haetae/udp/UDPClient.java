@@ -4,8 +4,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
-import com.on36.haetae.udp.Message.Title;
-
 /**
  * @author zhanghr
  * @date 2016年1月8日
@@ -19,10 +17,10 @@ public class UDPClient {
 	private static final int PACKET_MAX_LENGTH = Integer.parseInt(System
 			.getProperty("maxLength", "4096"));
 
-	public static void send(Message message) throws Exception {
+	public void send(Message message) throws Exception {
 		MulticastSocket sender = new MulticastSocket();
 		sender.setTimeToLive(4);
-		byte[] buf = message.toBytes("UTF-8");
+		byte[] buf = message.toBytes();
 		if (buf.length > PACKET_MAX_LENGTH) {
 			sender.close();
 			throw new IllegalArgumentException(
@@ -37,8 +35,4 @@ public class UDPClient {
 		sender.close();
 	}
 
-	public static void main(String[] args) throws Exception {
-		UDPClient.send(new Message(Title.TEST,
-				"你好呀，！！你好呀，！！你好呀，！！你好呀，！！你好呀，！！你好呀，！！你好呀，！！你好呀，！！你好呀，！！你好呀，！！"));
-	}
 }

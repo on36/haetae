@@ -8,6 +8,8 @@ import com.on36.haetae.http.Server;
 import com.on36.haetae.http.core.HTTPServer;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.container.HaetaeContainer;
+import com.on36.haetae.server.core.manager.DisruptorManager;
+import com.on36.haetae.udp.Scheduler;
 
 /**
  * 
@@ -18,18 +20,23 @@ public class HaetaeServer {
 
 	private final Container container;
 	private final Server server;
+	private final Scheduler scheduler;
+	private final MessageThread msgThread;
 
 	public HaetaeServer(int port) {
 		this(port, 0);
 	}
 
 	public HaetaeServer(int port, int threadPoolSize) {
-		server = new HTTPServer(port, threadPoolSize);
 		container = new HaetaeContainer();
-		server.setContainer(container);
+		server = new HTTPServer(port, threadPoolSize, container);
+		DisruptorManager disruptorManager = new DisruptorManager();
+		scheduler = new MessageScheduler(disruptorManager);
+		msgThread = new MessageThread(scheduler);
 	}
 
 	public void start() throws Exception {
+		msgThread.start();
 		server.start();
 	}
 
@@ -38,6 +45,7 @@ public class HaetaeServer {
 			throw new IllegalStateException("server has not been started");
 		}
 
+		msgThread.close();
 		server.stop();
 	}
 
@@ -52,7 +60,7 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(String resource, HttpMethod method) {
 
-		RequestHandlerImpl handler = new RequestHandlerImpl();
+		RequestHandlerImpl handler = new RequestHandlerImpl(scheduler);
 		container.addHandler(handler, method, resource);
 		return handler;
 	}

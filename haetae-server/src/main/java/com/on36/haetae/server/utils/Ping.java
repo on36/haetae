@@ -9,11 +9,12 @@ import java.util.regex.Pattern;
 
 public class Ping {
 	private static int count = 4;
+	private static String osName = System.getProperties()
+			.getProperty("os.name");
 
 	public static long isReachable(String remoteIp) {
 		BufferedReader in = null;
 		Runtime r = Runtime.getRuntime(); // 将要执行的ping命令,此命令是windows格式的命令
-		String osName = System.getProperties().getProperty("os.name");
 		String pingCmd = null;
 		if (osName.startsWith("Windows")) {
 			pingCmd = "cmd /c ping -n {0} {1}";

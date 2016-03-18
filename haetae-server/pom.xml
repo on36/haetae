@@ -13,7 +13,11 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 		</dependency>
-		
+		<dependency>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-http</artifactId>

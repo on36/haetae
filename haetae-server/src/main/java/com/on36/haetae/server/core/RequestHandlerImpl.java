@@ -30,15 +30,16 @@ import com.on36.haetae.server.core.body.InterpolatedResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
 import com.on36.haetae.server.core.body.TimeoutResponseBody;
 import com.on36.haetae.server.core.stats.Statistics;
+import com.on36.haetae.udp.Scheduler;
 
 public class RequestHandlerImpl implements RequestHandler {
 
 	private int statusCode = -1;
-	private String body;
+	private String body = null;
 	private boolean hasSession = false;
 
-	private Object object;
-	private Method method;
+	private Object object = null;
+	private Method method = null;
 
 	private long timeout = -1;
 	private TimeUnit timeoutUnit = TimeUnit.MILLISECONDS;
@@ -47,9 +48,9 @@ public class RequestHandlerImpl implements RequestHandler {
 	private AtomicLong avgElapsedTime = new AtomicLong(0);
 	private AtomicLong maxElapsedTime = new AtomicLong(0);
 
-	private AtomicInteger maxConcurrent = new AtomicInteger(0);;
-	private AtomicInteger successHandlTimes = new AtomicInteger(0);;
-	private AtomicInteger failHandlTimes = new AtomicInteger(0);;
+	private AtomicInteger maxConcurrent = new AtomicInteger(0);
+	private AtomicInteger successHandlTimes = new AtomicInteger(0);
+	private AtomicInteger failHandlTimes = new AtomicInteger(0);
 
 	private Set<SimpleImmutableEntry<String, String>> headers = new HashSet<SimpleImmutableEntry<String, String>>();
 
@@ -60,6 +61,12 @@ public class RequestHandlerImpl implements RequestHandler {
 	private boolean auth = true;
 
 	private final ExecutorService es = Executors.newCachedThreadPool();
+
+	private final Scheduler scheduler;
+
+	public RequestHandlerImpl(Scheduler scheduler) {
+		this.scheduler = scheduler;
+	}
 
 	public RequestHandler with(String body) {
 
@@ -255,7 +262,7 @@ public class RequestHandlerImpl implements RequestHandler {
 	public boolean hasSession() {
 		return hasSession;
 	}
-	
+
 	public boolean hasAuth() {
 		return auth;
 	}

@@ -6,5 +6,4 @@ public interface Server {
 
 	void stop();
 	
-	void setContainer(Container container) ;
 }

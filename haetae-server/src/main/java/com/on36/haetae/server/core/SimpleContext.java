@@ -22,8 +22,11 @@ import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.Route;
 import com.on36.haetae.server.core.interpolation.ResponseBodyInterpolator;
 import com.on36.haetae.server.utils.FormatorUtils;
+import com.on36.haetae.server.utils.ShortUUID;
 
 public class SimpleContext implements Context {
+
+	private static final String HEADER_REQUEST_ID = "Haetae-Request-Id";
 
 	private final HttpRequestExt request;
 
@@ -32,6 +35,8 @@ public class SimpleContext implements Context {
 	private final Session session;
 
 	private final Container container;
+
+	private String requestId;
 
 	private Map<String, String> parmMap = new HashMap<String, String>();
 
@@ -44,12 +49,20 @@ public class SimpleContext implements Context {
 		this.route = route;
 		this.session = session;
 		this.container = container;
+		this.requestId = getHeaderValue(HEADER_REQUEST_ID);
 		try {
+			if (this.requestId == null)
+				this.requestId = new ShortUUID.Builder().build().toString();
+
 			path = new URI(this.request.getUri()).getPath();
 			parse();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String getRequestId() {
+		return requestId;
 	}
 
 	public long getStartHandleTime() {

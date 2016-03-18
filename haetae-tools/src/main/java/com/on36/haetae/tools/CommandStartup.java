@@ -18,7 +18,7 @@ public class CommandStartup {
 	
 	public static void main(String[] args) {
 		Options options = new Options();
-		options.addOption("a", "add", true, "add a resource path  eg:/hello");
+		options.addOption("p", "path", true, "add a resource path  eg:/hello");
 		options.addOption("c", "class", true, "specify a whole class path   eg:com.on36.haetae.crm.UserHandler");
 		options.addOption("m", "method", true,
 				"specify the http method name  default:Get");

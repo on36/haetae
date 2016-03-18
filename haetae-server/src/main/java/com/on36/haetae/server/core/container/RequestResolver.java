@@ -37,7 +37,7 @@ public class RequestResolver {
 		router.add(Route.PATH_ROOT);
 		rootHandlerKey = new HandlerKey(HttpMethod.GET.name(), Route.PATH_ROOT);
 
-		rootHandler = new RequestHandlerImpl();
+		rootHandler = new RequestHandlerImpl(null);
 		rootHandler.with(new StatisticsHandler(container));
 	}
 

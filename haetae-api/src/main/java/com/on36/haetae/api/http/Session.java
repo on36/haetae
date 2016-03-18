@@ -11,7 +11,7 @@ public class Session {
 																	// inactive
 																	// interval
 
-	private final String sessionId;
+	private final UUID sessionId;
 	private final long time;
 
 	private final Map<String, Object> values = new HashMap<String, Object>();
@@ -20,11 +20,11 @@ public class Session {
 
 	public Session() {
 
-		this.sessionId = UUID.randomUUID().toString();
+		this.sessionId = UUID.randomUUID();
 		this.time = System.currentTimeMillis();
 	}
 
-	public String getSessionId() {
+	public UUID getSessionId() {
 
 		return sessionId;
 	}

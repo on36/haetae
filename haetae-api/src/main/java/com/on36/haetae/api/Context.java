@@ -14,6 +14,11 @@ public interface Context {
 	long getStartHandleTime();
 
 	/**
+	 * 返回请求ID
+	 * @return
+	 */
+	String getRequestId();
+	/**
 	 * 请求URI路径
 	 * 
 	 * @return
