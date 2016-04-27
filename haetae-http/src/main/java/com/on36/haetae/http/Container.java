@@ -17,7 +17,7 @@ public interface Container {
 	
 	boolean addHandler(RequestHandler handler, String resource);
 	
-	boolean addHandler(RequestHandler handler, HttpMethod method, String resource);
+	boolean addHandler(RequestHandler handler, HttpMethod method, String resource, String version);
 	
-	List<?> getStatistics(String contentType);
+	List<?> getStatistics();
 }

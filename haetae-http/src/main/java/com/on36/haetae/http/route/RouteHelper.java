@@ -10,11 +10,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.on36.haetae.http.Configuration;
+
 
 public class RouteHelper {
 
     public static final String PATH_ELEMENT_SEPARATOR = "/";
-    public static final String PATH_ELEMENT_ROOT = "/services";
+    public static final String PATH_ELEMENT_ROOT = Configuration.create().getString("httpServer.path.root", "/services");
     public static final String PARAM_PREFIX = ":";
     public static final char CUSTOM_REGEX_START = '<';
     public static final char CUSTOM_REGEX_END = '>';
