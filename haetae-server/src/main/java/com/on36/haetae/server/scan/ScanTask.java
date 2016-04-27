@@ -3,15 +3,15 @@ package com.on36.haetae.server.scan;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.lang.reflect.Method;
-import java.net.URLClassLoader;
 import java.util.List;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Path;
 import com.on36.haetae.api.annotation.Post;
-import com.on36.haetae.hotswap.classloader.MavenClassLoader;
+import com.on36.haetae.hotswap.IClassLoader;
 import com.on36.haetae.hotswap.scan.ClassPathPackageScanner;
+import com.on36.haetae.http.Configuration;
 import com.on36.haetae.server.HaetaeServer;
 
 /**
@@ -21,21 +21,18 @@ import com.on36.haetae.server.HaetaeServer;
 public class ScanTask implements Runnable {
 
 	private final String packageName;
+	private final String classLoaderName;
 
 	private final HaetaeServer server;
 
-	private String[] gavs;
-
 	private boolean running = true;
+	
+	private Configuration config = Configuration.create();
 
-	public ScanTask(String packageName, HaetaeServer server, String... gavs) {
-		this.packageName = packageName;
+	public ScanTask(HaetaeServer server) {
+		this.packageName = config.getString("httpServer.scan.packageName", "com.on36.crm");
+		this.classLoaderName = config.getString("httpServer.scan.classLoader", "com.on36.haetae.hotswap.classloader.DirectoryClassLoader");
 		this.server = server;
-		this.gavs = gavs;
-	}
-
-	public void setGavs(String... gavs) {
-		this.gavs = gavs;
 	}
 
 	@Override
@@ -43,13 +40,15 @@ public class ScanTask implements Runnable {
 
 		while (running) {
 			try {
-				URLClassLoader loader = MavenClassLoader.forGAVS(gavs);
+				Class<?> classLoaderClass = Class.forName(classLoaderName);
+				IClassLoader cl = (IClassLoader) classLoaderClass.newInstance();
+				ClassLoader loader = cl.load();
 				List<String> clazzs = ClassPathPackageScanner.scan(loader,
 						packageName);
 
 				for (String classString : clazzs) {
 					Class<?> clazz = loader.loadClass(classString);
-					Method[] methods = clazz.getDeclaredMethods();
+					Method[] methods = clazz.getMethods();
 
 					Object object = null;
 					for (Method method : methods) {
@@ -64,14 +63,17 @@ public class ScanTask implements Runnable {
 							if (path != null) {
 								if (object == null)
 									object = clazz.newInstance();
-								if (post != null)
-									server.register(path.value(),
-											HttpMethod.POST).with(object,
-											method);
-								else if (get != null)
-									server.register(path.value(),
-											HttpMethod.GET)
-											.with(object, method);
+								if (post != null) {
+									if (server.find(path.value()) == null)
+										server.register(path.value(),
+												HttpMethod.POST).with(object,
+												method);
+								} else if (get != null) {
+									if (server.find(path.value()) == null)
+										server.register(path.value(),
+												HttpMethod.GET).with(object,
+												method);
+								}
 							}
 						}
 					}

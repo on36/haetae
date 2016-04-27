@@ -18,10 +18,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.core.CustomHandler;
+import com.on36.haetae.api.core.HttpRequestHandler;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.request.HttpRequestExt;
+import com.on36.haetae.http.route.RouteHelper;
+import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.core.auth.impl.BlackListAuthentication;
 import com.on36.haetae.server.core.auth.impl.RequestFlowAuthentication;
 import com.on36.haetae.server.core.auth.impl.WhiteListAuthentication;
@@ -30,7 +32,6 @@ import com.on36.haetae.server.core.body.InterpolatedResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
 import com.on36.haetae.server.core.body.TimeoutResponseBody;
 import com.on36.haetae.server.core.stats.Statistics;
-import com.on36.haetae.udp.Scheduler;
 
 public class RequestHandlerImpl implements RequestHandler {
 
@@ -47,14 +48,14 @@ public class RequestHandlerImpl implements RequestHandler {
 	private AtomicLong minElapsedTime = new AtomicLong(0);
 	private AtomicLong avgElapsedTime = new AtomicLong(0);
 	private AtomicLong maxElapsedTime = new AtomicLong(0);
+	private AtomicLong totalTime = new AtomicLong(0);
 
-	private AtomicInteger maxConcurrent = new AtomicInteger(0);
 	private AtomicInteger successHandlTimes = new AtomicInteger(0);
 	private AtomicInteger failHandlTimes = new AtomicInteger(0);
 
 	private Set<SimpleImmutableEntry<String, String>> headers = new HashSet<SimpleImmutableEntry<String, String>>();
 
-	private CustomHandler<?> httpHandler;
+	private HttpRequestHandler<?> httpHandler;
 	private BlackListAuthentication blackList = new BlackListAuthentication();
 	private WhiteListAuthentication whiteList = new WhiteListAuthentication();
 	private RequestFlowAuthentication requestFlow = new RequestFlowAuthentication();
@@ -74,7 +75,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
-	public RequestHandler with(CustomHandler<?> customHandler) {
+	public RequestHandler with(HttpRequestHandler<?> customHandler) {
 
 		this.httpHandler = customHandler;
 		return this;
@@ -196,39 +197,81 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public ResponseBody body(Context context) throws Exception {
 
-		if (getCustomHandler() != null || method != null) {
-			Future<Object> future = es.submit(new Callable<Object>() {
-				@Override
-				public Object call() throws Exception {
-					if (getCustomHandler() != null)
-						return getCustomHandler().handle(context);
-					else
-						return method.invoke(object, context);
-				}
-			});
-			Object result = null;
-			try {
+		Future<Object> future = null;
+		try {
+			if (getCustomHandler() != null || method != null) {
+				future = es.submit(new Callable<Object>() {
+					@Override
+					public Object call() throws Exception {
+						if (getCustomHandler() != null)
+							return getCustomHandler().handle(context);
+						else
+							return method.invoke(object, context);
+					}
+				});
+				Object result = null;
 				if (timeout > 0)
 					result = future.get(timeout, timeoutUnit);
 				else
 					result = future.get();
-			} catch (TimeoutException | InterruptedException e) {
-				future.cancel(true);
-				return new TimeoutResponseBody();
+				return new EntityResponseBody(result);
 			}
-			return new EntityResponseBody(result, context);
+		} catch (TimeoutException | InterruptedException e) {
+			future.cancel(true);
+			return new TimeoutResponseBody();
+		} finally {
+
 		}
 
 		return new InterpolatedResponseBody(body, context);
 	}
+	
+	public String body(Context context, String resource) throws Exception {
+		long start = System.currentTimeMillis();
+		try {
+			return body(context).content();
+		} finally {
+			long elapsedTime = System.currentTimeMillis() - start;
+			String requestId = context.getRequestId();
+			String deep = ((SimpleContext)context).nextDeep();
+			
+			trace(elapsedTime, requestId, resource, deep);
+		}
+	}
 
-	public void stats(HttpResponse response, long elapsedTime) {
+	private void trace(long elapsedTime, String requestId, String resource,
+			String deep) {
+		String className = "com.on36.haetae.server.core.RequestHandlerImpl";
+		String methodName = "body";
+		if (getCustomHandler() != null) {
+			className = getCustomHandler().getClass().getName();
+			methodName = "handle";
+		} else if (object != null && method != null) {
+			className = object.getClass().getName();
+			methodName = method.getName();
+		}
+		
+		String info = requestId + "|" + deep + "|" + className+ "|" + methodName + "|" + resource + "|"
+				+ elapsedTime + "ms";
+		scheduler.trace(info);
+	}
 
+	public void stats(HttpResponse response, long elapsedTime, Context context) {
+
+		if (context != null) {
+			String requestId = context.getRequestId();
+			String deep = context.getRequestDeep();
+			String resource = context.getPath().replace(RouteHelper.PATH_ELEMENT_ROOT, "");
+			if(resource.length() > 1)
+			   trace(elapsedTime, requestId, resource, deep);
+			else
+				return ;
+		}
 		// total times
 		int totalTimes = successHandlTimes.intValue()
 				+ failHandlTimes.intValue();
 		// total time(ms)
-		long totalTime = totalTimes * avgElapsedTime.longValue() + elapsedTime;
+		totalTime.addAndGet(elapsedTime);
 
 		if (HttpResponseStatus.OK.equals(response.getStatus()))
 			successHandlTimes.incrementAndGet();
@@ -243,7 +286,7 @@ public class RequestHandlerImpl implements RequestHandler {
 				|| maxElapsedTime.longValue() < elapsedTime)
 			maxElapsedTime.set(elapsedTime);
 
-		long avgTime = totalTime / (totalTimes + 1);
+		long avgTime = totalTime.longValue() / (totalTimes + 1);
 		avgElapsedTime.set(avgTime);
 	}
 
@@ -255,7 +298,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		return new HashSet<SimpleImmutableEntry<String, String>>(headers);
 	}
 
-	public CustomHandler<?> getCustomHandler() {
+	public HttpRequestHandler<?> getCustomHandler() {
 		return httpHandler;
 	}
 
@@ -287,8 +330,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		return new Statistics(successHandlTimes.intValue(),
 				failHandlTimes.intValue(), minElapsedTime.longValue(),
 				avgElapsedTime.longValue(), maxElapsedTime.longValue(),
-				requestFlow.getCurTPS(), requestFlow.getMaxTPS(),
-				maxConcurrent.intValue());
+				requestFlow.getCurTPS(), requestFlow.getMaxTPS());
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.on36.haetae.server.core.stats;
 
-public class Statistics {
+public class Statistics implements Comparable<Statistics>{
 
 	private String path;
 	private String method;
@@ -15,11 +15,10 @@ public class Statistics {
 	private int curRPS;
 	private int maxRPS;
 
-	private int maxConcurrent;
+	//private int maxConcurrent;
 
 	public Statistics(int successCount, int failureCount, long minElapsedTime,
-			long avgElapsedTime, long maxElapsedTime, int curRPS, int maxRPS,
-			int maxConcurrent) {
+			long avgElapsedTime, long maxElapsedTime, int curRPS, int maxRPS) {
 		super();
 		this.successCount = successCount;
 		this.failureCount = failureCount;
@@ -28,7 +27,6 @@ public class Statistics {
 		this.maxElapsedTime = maxElapsedTime;
 		this.curRPS = curRPS;
 		this.maxRPS = maxRPS;
-		this.maxConcurrent = maxConcurrent;
 	}
 
 	public int getCurRPS() {
@@ -47,10 +45,6 @@ public class Statistics {
 		this.maxRPS = maxRPS;
 	}
 
-	public int getMaxConcurrent() {
-		return maxConcurrent;
-	}
-
 	public String getMethod() {
 		return method;
 	}
@@ -65,10 +59,6 @@ public class Statistics {
 
 	public void setPath(String path) {
 		this.path = path;
-	}
-
-	public void setMaxConcurrent(int maxConcurrent) {
-		this.maxConcurrent = maxConcurrent;
 	}
 
 	public int getSuccessCount() {
@@ -121,8 +111,13 @@ public class Statistics {
 		sb.append("min elapsed time(ms):" + minElapsedTime + ", ");
 		sb.append("avg elapsed time(ms):" + avgElapsedTime + ", ");
 		sb.append("max elapsed time(ms):" + maxElapsedTime + ", ");
-		sb.append("max Concurrent:" + maxConcurrent);
 		sb.append("}");
 		return sb.toString();
 	}
+
+	@Override
+	public int compareTo(Statistics o) {
+		return getPath().compareTo(o.getPath());
+	}
+	
 }

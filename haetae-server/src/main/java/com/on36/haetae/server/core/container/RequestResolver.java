@@ -3,12 +3,12 @@ package com.on36.haetae.server.core.container;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_ROOT;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_SEPARATOR;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
-import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +42,7 @@ public class RequestResolver {
 	}
 
 	public boolean addHandler(RequestHandler handler, HttpMethod method,
-			String resource) {
+			String resource, String version) {
 		if (handler == null || method == null) {
 			throw new IllegalArgumentException(
 					"handler or method cannot be null");
@@ -126,7 +126,7 @@ public class RequestResolver {
 
 		Route route = router.route(path);
 		if (route == null) {
-			resolved.errorStatus = NOT_FOUND;
+			resolved.errorStatus = SERVICE_UNAVAILABLE;
 			return resolved;
 		}
 
@@ -139,7 +139,7 @@ public class RequestResolver {
 
 			RequestHandlerImpl handler = handlerMap.get(key);
 			if (handler == null) {
-				resolved.errorStatus = METHOD_NOT_ALLOWED;
+				resolved.errorStatus = SERVICE_UNAVAILABLE;
 				return resolved;
 			}
 
@@ -163,6 +163,7 @@ public class RequestResolver {
 			stat.setMethod(entry.getKey().getMethod());
 			stats.add(stat);
 		}
+		Collections.sort(stats);
 		return stats;
 	}
 

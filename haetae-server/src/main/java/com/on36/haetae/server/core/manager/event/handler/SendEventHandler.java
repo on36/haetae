@@ -1,8 +1,8 @@
 package com.on36.haetae.server.core.manager.event.handler;
 
 import com.lmax.disruptor.EventHandler;
+import com.on36.haetae.net.udp.UDPClient;
 import com.on36.haetae.server.core.manager.event.SendEvent;
-import com.on36.haetae.udp.UDPClient;
 
 /**
  * @author zhanghr

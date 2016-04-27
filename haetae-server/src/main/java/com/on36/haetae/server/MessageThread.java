@@ -1,7 +1,7 @@
 package com.on36.haetae.server;
 
-import com.on36.haetae.udp.Scheduler;
-import com.on36.haetae.udp.UDPServer;
+import com.on36.haetae.net.udp.Scheduler;
+import com.on36.haetae.net.udp.UDPServer;
 
 /**
  * @author zhanghr

@@ -1,29 +1,24 @@
 package com.on36.haetae.server.core.body;
 
-import com.on36.haetae.api.Context;
 import com.on36.haetae.server.utils.FormatorUtils;
 
 public class EntityResponseBody extends StringResponseBody {
 
-	public EntityResponseBody(Object entity, Context context) {
-		super(translate(entity, context));
+	public EntityResponseBody(Object entity) {
+		super(translate(entity));
 	}
 
-	private static String translate(Object entity, Context context) {
+	private static String translate(Object entity) {
 
 		String body = null;
-		if (entity.getClass().isPrimitive()) {
+		if(entity == null)
+			body = "";
+		else if (entity.getClass().isPrimitive())
 			body = entity.toString();
-		} else if (entity instanceof String) {
+		else if (entity instanceof String)
 			body = (String) entity;
-		} else {
-			// String contentType = context.getHeaderValue("Content-Type");
-			// if (MediaType.APPLICATION_XML.value().equals(contentType)
-			// || MediaType.TEXT_XML.value().equals(contentType))
-			// FormatorUtils.toXML(entity);
-			// else
+		else
 			body = FormatorUtils.toJson(entity);
-		}
 		return body;
 	}
 }

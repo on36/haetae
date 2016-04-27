@@ -1,6 +1,6 @@
 package com.on36.haetae.server.core.manager.event;
 
-import com.on36.haetae.udp.Message;
+import com.on36.haetae.net.udp.Message;
 
 /**
  * @author zhanghr

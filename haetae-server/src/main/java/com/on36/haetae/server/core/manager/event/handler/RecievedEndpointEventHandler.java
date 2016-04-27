@@ -14,8 +14,8 @@ public class RecievedEndpointEventHandler implements EventHandler<RecievedEvent>
 	@Override
 	public void onEvent(RecievedEvent event, long sequence, boolean endOfBatch)
 			throws Exception {
-		// TODO Auto-generated method stub
-		System.out.println(this.hashCode() + " " + new String(event.getSendMessage().content()));
+		String endPoint = new String(event.getSendMessage().content(),"UTF-8");
+		endpointMgr.update(endPoint);
 	}
 
 }

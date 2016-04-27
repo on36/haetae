@@ -4,16 +4,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.lmax.disruptor.dsl.Disruptor;
+import com.on36.haetae.net.udp.Message;
+import com.on36.haetae.net.udp.Message.Title;
+import com.on36.haetae.server.core.manager.event.LogEvent;
+import com.on36.haetae.server.core.manager.event.LogEventFactory;
 import com.on36.haetae.server.core.manager.event.RecievedEvent;
 import com.on36.haetae.server.core.manager.event.RecievedEventFactory;
 import com.on36.haetae.server.core.manager.event.SendEvent;
 import com.on36.haetae.server.core.manager.event.SendEventFactory;
+import com.on36.haetae.server.core.manager.event.handler.LogEventHandler;
 import com.on36.haetae.server.core.manager.event.handler.RecievedEndpointEventHandler;
 import com.on36.haetae.server.core.manager.event.handler.RecievedEventHandler;
 import com.on36.haetae.server.core.manager.event.handler.RecievedSessionEventHandler;
 import com.on36.haetae.server.core.manager.event.handler.SendEventHandler;
-import com.on36.haetae.udp.Message;
-import com.on36.haetae.udp.Message.Title;
 
 /**
  * @author zhanghr
@@ -23,12 +26,14 @@ public class DisruptorManager {
 
 	private ExecutorService disruptorExecutors;
 
-	private static final int DEFAULT_SMALL_RINGBUFFER_SIZE = 128;
+	private static final int DEFAULT_SMALL_RINGBUFFER_SIZE = 64;
 
 	private Disruptor<SendEvent> sendEventDisruptor;
 	private Disruptor<RecievedEvent> recievedEndpointEventDisruptor;
 	private Disruptor<RecievedEvent> recievedSessionEventDisruptor;
 	private Disruptor<RecievedEvent> recievedTestEventDisruptor;
+
+	private Disruptor<LogEvent> logEventDisruptor;
 
 	@SuppressWarnings("unchecked")
 	public DisruptorManager() {
@@ -53,6 +58,11 @@ public class DisruptorManager {
 				.handleEventsWith(new RecievedSessionEventHandler());
 		this.recievedSessionEventDisruptor.start();
 
+		this.logEventDisruptor = new Disruptor<>(new LogEventFactory(),
+				DEFAULT_SMALL_RINGBUFFER_SIZE, disruptorExecutors);
+		this.logEventDisruptor.handleEventsWith(new LogEventHandler());
+		this.logEventDisruptor.start();
+
 		this.recievedTestEventDisruptor = new Disruptor<>(
 				new RecievedEventFactory(), DEFAULT_SMALL_RINGBUFFER_SIZE,
 				disruptorExecutors);
@@ -63,6 +73,10 @@ public class DisruptorManager {
 
 	public Disruptor<SendEvent> getSendEventDisruptor() {
 		return sendEventDisruptor;
+	}
+
+	public Disruptor<LogEvent> getLogEventDisruptor() {
+		return logEventDisruptor;
 	}
 
 	public Disruptor<RecievedEvent> getRecievedEventDisruptor(Message message) {
@@ -79,6 +93,7 @@ public class DisruptorManager {
 		recievedEndpointEventDisruptor.shutdown();
 		recievedSessionEventDisruptor.shutdown();
 		recievedTestEventDisruptor.shutdown();
+		logEventDisruptor.shutdown();
 		disruptorExecutors.shutdown();
 	}
 }

@@ -32,6 +32,7 @@ public class HaetaeContainer implements Container {
 	public void handle(HttpRequestExt request, HttpResponse response) {
 
 		RequestHandlerImpl handler = null;
+		Context context = null;
 		try {
 			String responseContentType = MediaType.APPLICATION_JSON.value();
 			ResponseBody responseBody = new StringResponseBody("");
@@ -47,7 +48,7 @@ public class HaetaeContainer implements Container {
 			}
 			handler = resolved.handler;
 
-			/* validatetion information */
+			/* validatetion handler information */
 			boolean isValid = handler.validation(request, response);
 			if (!isValid) {
 				response.setStatus(SERVICE_UNAVAILABLE);
@@ -64,7 +65,7 @@ public class HaetaeContainer implements Container {
 			}
 
 			/* create context */
-			Context context = new SimpleContext(request, resolved.route,
+			context = new SimpleContext(request, resolved.route,
 					session, this);
 
 			/* set the response body */
@@ -107,7 +108,8 @@ public class HaetaeContainer implements Container {
 			long end = System.currentTimeMillis();
 			long elapsedTime = end - request.getStartHandleTime();
 			if (handler != null)
-				handler.stats(response, elapsedTime);
+				handler.stats(response, elapsedTime, context);
+				
 		}
 	}
 
@@ -125,16 +127,16 @@ public class HaetaeContainer implements Container {
 	}
 
 	public boolean addHandler(RequestHandler handler, HttpMethod method,
-			String resource) {
-		return requestResolver.addHandler(handler, method, resource);
+			String resource, String version) {
+		return requestResolver.addHandler(handler, method, resource, version);
 	}
 
 	public boolean addHandler(RequestHandler handler, String resource) {
-		return addHandler(handler, HttpMethod.GET, resource);
+		return addHandler(handler, HttpMethod.GET, resource, null);
 	}
 
 	@Override
-	public List<?> getStatistics(String contentType) {
+	public List<?> getStatistics() {
 		return requestResolver.getStatistics();
 	}
 }
