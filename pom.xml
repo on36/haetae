@@ -14,12 +14,13 @@
 		<module>haetae-hotswap</module>
 		<module>haetae-test</module>
 		<module>haetae-tools</module>
+		<module>haetae-sample</module>
 	</modules>
 
 	<properties>
 		<java.version>1.8</java.version>
 		<junit.version>4.11</junit.version>
-		<netty.version>4.0.34.Final</netty.version>
+		<netty.version>4.0.36.Final</netty.version>
 		<disruptor.version>3.3.2</disruptor.version>
 		<typesafe.version>1.3.0</typesafe.version>
 		<common-cli.version>1.3.1</common-cli.version>
