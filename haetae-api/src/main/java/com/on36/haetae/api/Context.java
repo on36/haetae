@@ -19,6 +19,11 @@ public interface Context {
 	 */
 	String getRequestId();
 	/**
+	 * 返回请求深度
+	 * @return
+	 */
+	String getRequestDeep();
+	/**
 	 * 请求URI路径
 	 * 
 	 * @return
@@ -71,7 +76,7 @@ public interface Context {
 	 * 
 	 * @return
 	 */
-	String getRequestBodyAsString();
+	String getBodyAsString();
 
 	/**
 	 * 返回获取请求体的值对象，如果请求体数据是JSON对象格式，否则抛出异常
@@ -80,7 +85,7 @@ public interface Context {
 	 *            返回对象类型
 	 * @return
 	 */
-	<T> T getBody(Class<T> clazz);
+	<T> T getBodyAsEntity(Class<T> clazz);
 
 	/**
 	 * 调用其他请求，返回字符串结果

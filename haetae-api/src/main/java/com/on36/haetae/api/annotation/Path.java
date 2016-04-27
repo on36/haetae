@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
 public @interface Path {
 
 	String value();
+
+	String version() default "1.0";
 }
