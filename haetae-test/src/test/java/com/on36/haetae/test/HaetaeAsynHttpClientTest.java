@@ -209,5 +209,18 @@ public class HaetaeAsynHttpClientTest {
 		Assert.assertEquals("lisi zhangsan", result);
 		asyncHttpClient.close();
 	}
+	@Test
+	public void testTimeout() throws Exception {
+		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
+		Response resp = asyncHttpClient
+				.prepareGet(
+						"http://localhost:8080/services/timeout")
+						.execute().get();
+		
+		String result = resp.getResponseBody().trim();
+		System.out.println(result);
+		Assert.assertEquals("lisi zhangsan", result);
+		asyncHttpClient.close();
+	}
 
 }

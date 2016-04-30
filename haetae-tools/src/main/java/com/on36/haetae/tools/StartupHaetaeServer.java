@@ -19,12 +19,14 @@ public class StartupHaetaeServer {
 
 	public static void main(String[] args) {
 		Options options = new Options();
-		options.addOption("p", "port", true, "default: 8080");
+		options.addOption("p", "port", true, "service port, default: 8080");
+		options.addOption("n", "name", false, "service name, default: services");
 		options.addOption(
 				"t",
 				"threadPoolSize",
 				true,
 				"the size of thread pool  default: the twice maximum number of processors available to the virtual machine ");
+		options.addOption("h", "help", false, "help information");
 		CommandLineParser parser = new DefaultParser();
 		HelpFormatter formatter = new HelpFormatter();
 		try {

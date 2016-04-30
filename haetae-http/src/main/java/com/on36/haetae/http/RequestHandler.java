@@ -3,7 +3,7 @@ package com.on36.haetae.http;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
-import com.on36.haetae.api.core.HttpRequestHandler;
+import com.on36.haetae.api.core.HttpHandler;
 
 /**
  * @author zhanghr
@@ -27,7 +27,7 @@ public interface RequestHandler {
 	 *            自定义处理逻辑实现类
 	 * @return
 	 */
-	RequestHandler with(HttpRequestHandler<?> customHandler);
+	RequestHandler with(HttpHandler<?> customHandler);
 
 	/**
 	 * 指定自定义处理逻辑实现实现类.

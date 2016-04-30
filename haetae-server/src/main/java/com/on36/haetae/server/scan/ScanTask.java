@@ -78,10 +78,15 @@ public class ScanTask implements Runnable {
 						}
 					}
 				}
+				Thread.sleep(10000);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public void close() {
+		running = false;
 	}
 
 }

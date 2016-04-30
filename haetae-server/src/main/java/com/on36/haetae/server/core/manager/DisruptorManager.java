@@ -1,7 +1,6 @@
 package com.on36.haetae.server.core.manager;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.lmax.disruptor.dsl.Disruptor;
 import com.on36.haetae.net.udp.Message;
@@ -24,7 +23,7 @@ import com.on36.haetae.server.core.manager.event.handler.SendEventHandler;
  */
 public class DisruptorManager {
 
-	private ExecutorService disruptorExecutors;
+	private final ExecutorService disruptorExecutors;
 
 	private static final int DEFAULT_SMALL_RINGBUFFER_SIZE = 64;
 
@@ -36,8 +35,8 @@ public class DisruptorManager {
 	private Disruptor<LogEvent> logEventDisruptor;
 
 	@SuppressWarnings("unchecked")
-	public DisruptorManager() {
-		this.disruptorExecutors = Executors.newCachedThreadPool();
+	public DisruptorManager(ExecutorService executorService) {
+		this.disruptorExecutors = executorService;
 
 		this.sendEventDisruptor = new Disruptor<>(new SendEventFactory(),
 				DEFAULT_SMALL_RINGBUFFER_SIZE, disruptorExecutors);
@@ -94,6 +93,5 @@ public class DisruptorManager {
 		recievedSessionEventDisruptor.shutdown();
 		recievedTestEventDisruptor.shutdown();
 		logEventDisruptor.shutdown();
-		disruptorExecutors.shutdown();
 	}
 }

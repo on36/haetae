@@ -42,4 +42,5 @@ public class FormatorUtils {
 
 		return new String(out.toByteArray(), CharsetUtil.UTF_8);
 	}
+	
 }

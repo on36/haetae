@@ -10,11 +10,17 @@ public class HandlerKey {
     
     public HandlerKey(String method, Route route) {
         
-        this.method = method;
-        this.route = route;
+        this(method, route, null);
     }
     
-    public String contentType() {
+    public HandlerKey(String method, Route route, String contentType) {
+		super();
+		this.method = method;
+		this.route = route;
+		this.contentType = contentType;
+	}
+
+	public String contentType() {
         return contentType;
     }
     

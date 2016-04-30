@@ -1,5 +1,8 @@
 package com.on36.haetae.server;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import io.netty.handler.codec.http.HttpMethod;
 
 import com.on36.haetae.api.annotation.Path;
@@ -11,6 +14,7 @@ import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.container.HaetaeContainer;
 import com.on36.haetae.server.core.manager.DisruptorManager;
+import com.on36.haetae.server.scan.ScanTask;
 
 /**
  * 
@@ -24,23 +28,29 @@ public class HaetaeServer {
 	private final DisruptorManager disruptorManager;
 	private final Scheduler scheduler;
 	private final MessageThread msgThread;
+	private final ScanTask sanner;
+	private final ExecutorService threadPools;
 
 	public HaetaeServer(int port) {
 		this(port, 0);
 	}
 
 	public HaetaeServer(int port, int threadPoolSize) {
+		threadPools = Executors.newCachedThreadPool();
+		
 		container = new HaetaeContainer();
 		server = new HTTPServer(port, threadPoolSize, container);
-		disruptorManager = new DisruptorManager();
+		disruptorManager = new DisruptorManager(threadPools);
 		scheduler = new MessageScheduler(disruptorManager);
 		msgThread = new MessageThread(scheduler);
+		sanner = new ScanTask(this);
 	}
 
 	public void start() {
 		try {
 			server.start();
-			msgThread.start();
+			threadPools.submit(msgThread);
+			threadPools.submit(sanner);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -55,6 +65,8 @@ public class HaetaeServer {
 		}
 		disruptorManager.close();
 		msgThread.close();
+		sanner.close();
+		threadPools.shutdown();
 		server.stop();
 	}
 

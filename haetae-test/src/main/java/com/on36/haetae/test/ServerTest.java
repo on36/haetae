@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Path;
 import com.on36.haetae.api.annotation.Post;
-import com.on36.haetae.api.core.CustomHandler;
+import com.on36.haetae.api.core.HttpHandler;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.server.HaetaeServer;
 
@@ -35,29 +35,30 @@ public class ServerTest {
 		server.register("/whitecontrol").with("Hello white!")
 				.permit("127.0.0.1", ServiceLevel.LEVEL_50);
 		server.register("/body", HttpMethod.POST).with(
-				new CustomHandler<String>() {
+				new HttpHandler<String>() {
 
 					public String handle(Context context) {
-						return context.getRequestBodyAsString();
+						return context.getBodyAsString();
 					}
 				});
 		server.register("/custom", HttpMethod.POST).with(
-				new CustomHandler<String>() {
+				new HttpHandler<String>() {
 
 					public String handle(Context context) {
 						return context.getRequestParameter("user");
 					}
 				});
 		server.register("/customobject", HttpMethod.POST).with(
-				new CustomHandler<String>() {
+				new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
 						// User user = context.getBody(User.class);
+						context.getURI("/custom");
 						return context.getURI("/hello");
 					}
 				});
 		server.register("/timeout", HttpMethod.GET)
-				.timeout(1, TimeUnit.SECONDS).with(new CustomHandler<String>() {
+				.timeout(1, TimeUnit.SECONDS).with(new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
 						// User user = context.getBody(User.class);
@@ -68,7 +69,7 @@ public class ServerTest {
 					}
 				});
 		server.register("/custombody/*/*", HttpMethod.POST).with(
-				new CustomHandler<String>() {
+				new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
 						return context.getCapturedParameter("*[0] *[1]");

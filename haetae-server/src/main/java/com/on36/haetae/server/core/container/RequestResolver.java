@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.HandlerKey;
 import com.on36.haetae.http.RequestHandler;
@@ -35,7 +36,7 @@ public class RequestResolver {
 
 	public RequestResolver(Container container) {
 		router.add(Route.PATH_ROOT);
-		rootHandlerKey = new HandlerKey(HttpMethod.GET.name(), Route.PATH_ROOT);
+		rootHandlerKey = new HandlerKey(HttpMethod.GET.name(), Route.PATH_ROOT, MediaType.TEXT_HTML.value());
 
 		rootHandler = new RequestHandlerImpl(null);
 		rootHandler.with(new StatisticsHandler(container));

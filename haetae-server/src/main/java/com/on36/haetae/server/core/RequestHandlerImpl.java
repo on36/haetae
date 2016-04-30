@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.core.HttpRequestHandler;
+import com.on36.haetae.api.core.HttpHandler;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.request.HttpRequestExt;
@@ -55,7 +55,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	private Set<SimpleImmutableEntry<String, String>> headers = new HashSet<SimpleImmutableEntry<String, String>>();
 
-	private HttpRequestHandler<?> httpHandler;
+	private HttpHandler<?> httpHandler;
 	private BlackListAuthentication blackList = new BlackListAuthentication();
 	private WhiteListAuthentication whiteList = new WhiteListAuthentication();
 	private RequestFlowAuthentication requestFlow = new RequestFlowAuthentication();
@@ -75,7 +75,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
-	public RequestHandler with(HttpRequestHandler<?> customHandler) {
+	public RequestHandler with(HttpHandler<?> customHandler) {
 
 		this.httpHandler = customHandler;
 		return this;
@@ -267,9 +267,6 @@ public class RequestHandlerImpl implements RequestHandler {
 			else
 				return ;
 		}
-		// total times
-		int totalTimes = successHandlTimes.intValue()
-				+ failHandlTimes.intValue();
 		// total time(ms)
 		totalTime.addAndGet(elapsedTime);
 
@@ -277,6 +274,9 @@ public class RequestHandlerImpl implements RequestHandler {
 			successHandlTimes.incrementAndGet();
 		else
 			failHandlTimes.incrementAndGet();
+		// total times
+		int totalTimes = successHandlTimes.intValue()
+				+ failHandlTimes.intValue();
 
 		// elapsed time
 		if (minElapsedTime.longValue() == 0
@@ -286,7 +286,7 @@ public class RequestHandlerImpl implements RequestHandler {
 				|| maxElapsedTime.longValue() < elapsedTime)
 			maxElapsedTime.set(elapsedTime);
 
-		long avgTime = totalTime.longValue() / (totalTimes + 1);
+		long avgTime = totalTime.longValue() / totalTimes;
 		avgElapsedTime.set(avgTime);
 	}
 
@@ -298,7 +298,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		return new HashSet<SimpleImmutableEntry<String, String>>(headers);
 	}
 
-	public HttpRequestHandler<?> getCustomHandler() {
+	public HttpHandler<?> getCustomHandler() {
 		return httpHandler;
 	}
 

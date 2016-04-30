@@ -7,7 +7,7 @@ import com.on36.haetae.net.udp.UDPServer;
  * @author zhanghr
  * @date 2016年3月18日
  */
-public class MessageThread extends Thread {
+public class MessageThread implements Runnable {
 
 	private UDPServer server;
 
