@@ -55,7 +55,7 @@ public class Environment {
 		put(l, "java.library.path",
 				System.getProperty("java.library.path", "<NA>"));
 		put(l, "java.io.tmpdir", System.getProperty("java.io.tmpdir", "<NA>"));
-		put(l, "java.compiler", System.getProperty("java.compiler", "<NA>"));
+		put(l, "java.compiler", System.getProperty("java.compiler", "maven-compiler-plugin 3.1"));
 		put(l, "os.name", System.getProperty("os.name", "<NA>"));
 		put(l, "os.arch", System.getProperty("os.arch", "<NA>"));
 		put(l, "os.version", System.getProperty("os.version", "<NA>"));
