@@ -27,7 +27,7 @@ public class Configuration {
 		}
 		prop = new Properties();
 		
-		loadResource(prop, "default.conf");
+		loadResource(prop, "haetae-default.conf");
 	}
 	
 	public Properties getResource(String name) {
