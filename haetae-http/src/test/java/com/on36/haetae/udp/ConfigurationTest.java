@@ -23,12 +23,12 @@ public class ConfigurationTest {
 	}
 	@Test
 	public void testBoolean() {
-		boolean value = config.getBoolean("httpServer.ssl", true);
+		boolean value = config.getBoolean("httpServer.ssl.enabled", true);
 		assertEquals(false, value);
 	}
 	@Test
 	public void testInt() {
-		int value = config.getInt("httpServer.soBacklog", 512);
+		int value = config.getInt("httpServer.sobacklog", 512);
 		assertEquals(1024, value);
 	}
 	@Test

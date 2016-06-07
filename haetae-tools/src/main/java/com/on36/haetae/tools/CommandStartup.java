@@ -3,11 +3,15 @@
  */
 package com.on36.haetae.tools;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+
+import com.on36.haetae.tools.server.HaetaeServerSubCommand;
+import com.on36.haetae.tools.server.StopSubCommand;
 
 /**
  * @author zhanghr
@@ -15,51 +19,104 @@ import org.apache.commons.cli.Options;
  */
 public class CommandStartup {
 
-	
+	protected static List<SubCommand> subCommandList = new ArrayList<SubCommand>();
+
+	public static void initCommand() {
+		initCommand(new HaetaeServerSubCommand());
+		initCommand(new StopSubCommand());
+	}
+
+	public static void initCommand(SubCommand command) {
+		subCommandList.add(command);
+	}
+
 	public static void main(String[] args) {
-		Options options = new Options();
-		options.addOption("p", "path", true, "add a resource path  eg:/hello");
-		options.addOption("c", "class", true, "specify a whole class path   eg:com.on36.haetae.crm.UserHandler");
-		options.addOption("m", "method", true,
-				"specify the http method name  default:Get");
-		options.addOption("r", "remove", true,
-				"remove a resource path  eg:/hello");
-		options.addOption("h", "help", false, "help information");
-		CommandLineParser parser = new DefaultParser();
-		HelpFormatter formatter = new HelpFormatter();
+		initCommand();
+
 		try {
-			CommandLine line = parser.parse(options, args);
-			if (line.hasOption("help")) {
-				print(formatter, options);
-				System.exit(0);
-			} else {
-				parse(line);
-				print(formatter, options);
+			switch (args.length) {
+			case 0:
+				printHelp();
+				break;
+			case 2:
+				if (args[0].equals("help")) {
+					SubCommand cmd = findSubCommand(args[1]);
+					if (cmd != null) {
+						Options options = ServerUtil
+								.buildCommandlineOptions(new Options());
+						options = cmd.buildCommandlineOptions(options);
+						if (options != null) {
+							ServerUtil.printCommandLineHelp(
+									"haetae " + cmd.commandName(), options);
+						}
+					} else {
+						notFound(args[1]);
+					}
+					break;
+				}
+			case 1:
+			default:
+				SubCommand cmd = findSubCommand(args[0]);
+				if (cmd != null) {
+					// 将main中的args转化为子命令的args（去除第一个参数）
+					String[] subargs = parseSubArgs(args);
+
+					// 解析命令行
+					Options options = ServerUtil
+							.buildCommandlineOptions(new Options());
+					final CommandLine commandLine = ServerUtil.parseCmdLine(
+							"haetae " + cmd.commandName(), subargs,
+							cmd.buildCommandlineOptions(options),
+							new DefaultParser());
+					if (null == commandLine) {
+						System.exit(-1);
+						return;
+					}
+
+					cmd.execute(commandLine);
+				} else {
+					notFound(args[0]);
+				}
+				break;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			print(formatter, options);
-			System.exit(0);
 		}
 	}
-	
-	private static void parse(CommandLine line) {
-		
-//		if (line.hasOption("thread")) {
-//			String tms = line.getOptionValue("thread");//读取的参数为字符串
-//		}
-//		if (line.hasOption("runtime")) {
-//			String tms = line.getOptionValue("runtime");//读取的参数为字符串
-//		}
-//		if (line.hasOption("operate")) {
-//		}
-//		if (line.hasOption("vsize")) {
-//			String value = line.getOptionValue("vsize");//读取的参数为字符串
-//		}
-		
+
+	private static void notFound(String cmd) {
+		System.out.println("The sub command \'" + cmd + "\' not exist.");
 	}
-	
-	private static void print(HelpFormatter formatter, Options options) {
-		formatter.printHelp("haetae [options] ", options);
+
+	private static String[] parseSubArgs(String[] args) {
+		if (args.length > 1) {
+			String[] result = new String[args.length - 1];
+			for (int i = 0; i < args.length - 1; i++) {
+				result[i] = args[i + 1];
+			}
+			return result;
+		}
+		return null;
+	}
+
+	private static SubCommand findSubCommand(final String name) {
+		for (SubCommand cmd : subCommandList) {
+			if (cmd.commandName().toUpperCase().equals(name.toUpperCase())) {
+				return cmd;
+			}
+		}
+		return null;
+	}
+
+	private static void printHelp() {
+		System.out.println("The most commonly used haetae commands are:");
+
+		for (SubCommand cmd : subCommandList) {
+			System.out.printf("   %-20s %s\n", cmd.commandName(),
+					cmd.commandDesc());
+		}
+
+		System.out.println(
+				"\nSee 'haetae help <command>' for more information on a specific command.");
 	}
 }

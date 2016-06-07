@@ -67,7 +67,7 @@ public class StatisticsHandler implements HttpHandler<Object> {
 				sb.append("<td>" + stat.getMaxRPS() + "</td></tr>");
 			}
 		} else {
-			sb.append("<tr><h2>nothong to find</h2></tr>");
+			sb.append("<tr><h2>nothing to find</h2></tr>");
 		}
 		sb.append("</table></body></html>");
 		return sb.toString();
