@@ -10,7 +10,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
-import com.on36.haetae.tools.command.HaetaeServerSubCommand;
+import com.on36.haetae.tools.command.StartSubCommand;
 import com.on36.haetae.tools.command.StopSubCommand;
 import com.on36.haetae.tools.utils.ServerUtil;
 
@@ -23,7 +23,7 @@ public class CommandStartup {
 	protected static List<SubCommand> subCommandList = new ArrayList<SubCommand>();
 
 	public static void initCommand() {
-		initCommand(new HaetaeServerSubCommand());
+		initCommand(new StartSubCommand());
 		initCommand(new StopSubCommand());
 	}
 

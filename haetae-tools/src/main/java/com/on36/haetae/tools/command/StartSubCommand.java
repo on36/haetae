@@ -9,7 +9,7 @@ import com.on36.haetae.tools.utils.ProccesUtil;
  * @author zhanghr
  * @date 2016年3月3日
  */
-public class HaetaeServerSubCommand implements SubCommand {
+public class StartSubCommand implements SubCommand {
 
 	@Override
 	public String commandName() {
