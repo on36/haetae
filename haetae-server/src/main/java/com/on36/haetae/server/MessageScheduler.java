@@ -21,7 +21,7 @@ public class MessageScheduler implements Scheduler {
 	}
 
 	@Override
-	public void revieve(Message message) {
+	public void revieve(final Message message) {
 		disruptorManager.getRecievedEventDisruptor(message).publishEvent(
 				new EventTranslator<RecievedEvent>() {
 					@Override
@@ -32,7 +32,7 @@ public class MessageScheduler implements Scheduler {
 	}
 
 	@Override
-	public void send(Message message) {
+	public void send(final Message message) {
 		disruptorManager.getSendEventDisruptor().publishEvent(
 				new EventTranslator<SendEvent>() {
 					@Override
@@ -43,7 +43,7 @@ public class MessageScheduler implements Scheduler {
 	}
 
 	@Override
-	public void trace(String info) {
+	public void trace(final String info) {
 		disruptorManager.getLogEventDisruptor().publishEvent(
 				new EventTranslator<LogEvent>() {
 					@Override

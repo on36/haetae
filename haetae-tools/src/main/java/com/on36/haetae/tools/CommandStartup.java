@@ -10,8 +10,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
-import com.on36.haetae.tools.server.HaetaeServerSubCommand;
-import com.on36.haetae.tools.server.StopSubCommand;
+import com.on36.haetae.tools.command.HaetaeServerSubCommand;
+import com.on36.haetae.tools.command.StopSubCommand;
+import com.on36.haetae.tools.utils.ServerUtil;
 
 /**
  * @author zhanghr
@@ -73,7 +74,7 @@ public class CommandStartup {
 						return;
 					}
 
-					cmd.execute(commandLine);
+					cmd.execute(subargs);
 				} else {
 					notFound(args[0]);
 				}

@@ -1,0 +1,30 @@
+#! /bin/bash
+
+bin='dirname "$0"'
+
+# some Java parameters
+if [ "$JAVA_HOME" != "" ]; then
+  #echo "run java in $JAVA_HOME"
+  JAVA_HOME=$JAVA_HOME
+fi
+  
+if [ "$JAVA_HOME" = "" ]; then
+  echo "Error: JAVA_HOME is not set."
+  exit 1
+fi
+
+JAVA=$JAVA_HOME/bin/java
+
+# CLASSPATH initially
+
+for f in ../lib/*.jar; do
+   CLASSPATH=${CLASSPATH}:$f;
+done
+
+for f in ./*.jar; do
+   CLASSPATH=${CLASSPATH}:$f;
+done
+  
+CLASSPATH=${CLASSPATH}:../conf; 
+
+"$JAVA" -cp "$CLASSPATH" com.on36.haetae.tools.CommandStartup "$@" &

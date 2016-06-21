@@ -195,7 +195,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		return this;
 	}
 
-	public ResponseBody body(Context context) throws Exception {
+	public ResponseBody body(final Context context) throws Exception {
 
 		Future<Object> future = null;
 		try {

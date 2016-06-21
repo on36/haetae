@@ -1,6 +1,5 @@
 package com.on36.haetae.tools;
 
-import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 
 /**
@@ -14,5 +13,5 @@ public interface SubCommand {
 
 	public Options buildCommandlineOptions(final Options options);
 
-	public void execute(final CommandLine commandLine);
+	public void execute(String...args);
 }

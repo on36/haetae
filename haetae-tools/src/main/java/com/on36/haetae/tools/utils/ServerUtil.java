@@ -1,4 +1,4 @@
-package com.on36.haetae.tools;
+package com.on36.haetae.tools.utils;
 
 import java.util.Properties;
 
