@@ -14,7 +14,7 @@ public class ProccesUtil {
 		try {
 			ProcessBuilder pb = new ProcessBuilder("java", "-cp",
 					System.getProperty("java.class.path"), className);
-			if (args != null || args.length > 0)
+			if (args != null && args.length > 0)
 				pb.command().addAll(Arrays.asList(args));
 			
 			pb.redirectErrorStream(true);
