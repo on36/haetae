@@ -1,13 +1,10 @@
 package com.on36.haetae.server.scan;
 
-import io.netty.handler.codec.http.HttpMethod;
-
 import java.lang.reflect.Method;
 import java.util.List;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
-import com.on36.haetae.api.annotation.Path;
 import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.hotswap.IClassLoader;
 import com.on36.haetae.hotswap.scan.ClassPathPackageScanner;
@@ -26,12 +23,14 @@ public class ScanTask implements Runnable {
 	private final HaetaeServer server;
 
 	private boolean running = true;
-	
+
 	private Configuration config = Configuration.create();
 
 	public ScanTask(HaetaeServer server) {
-		this.packageName = config.getString("httpServer.scan.packageName", "com.on36.crm");
-		this.classLoaderName = config.getString("httpServer.scan.classLoader", "com.on36.haetae.hotswap.classloader.DirectoryClassLoader");
+		this.packageName = config.getString("httpServer.scan.packageName",
+				"com.on36.crm");
+		this.classLoaderName = config.getString("httpServer.scan.classLoader",
+				"com.on36.haetae.hotswap.classloader.DirectoryClassLoader");
 		this.server = server;
 	}
 
@@ -53,27 +52,20 @@ public class ScanTask implements Runnable {
 					Object object = null;
 					for (Method method : methods) {
 						Class<?>[] typeClazzs = method.getParameterTypes();
-						if (typeClazzs.length == 1
-								&& typeClazzs[0].getName().equals(
-										Context.class.getName())) {
+						if (typeClazzs.length == 1 && typeClazzs[0].getName()
+								.equals(Context.class.getName())) {
 
 							Post post = method.getAnnotation(Post.class);
 							Get get = method.getAnnotation(Get.class);
-							Path path = method.getAnnotation(Path.class);
-							if (path != null) {
-								if (object == null)
-									object = clazz.newInstance();
-								if (post != null) {
-									if (server.find(path.value()) == null)
-										server.register(path.value(),
-												HttpMethod.POST).with(object,
-												method);
-								} else if (get != null) {
-									if (server.find(path.value()) == null)
-										server.register(path.value(),
-												HttpMethod.GET).with(object,
-												method);
-								}
+							
+							if (object == null)
+								object = clazz.newInstance();
+							if (post != null) {
+								if (server.find(post.value()) == null)
+									server.register(post).with(object, method);
+							} else if (get != null) {
+								if (server.find(get.value()) == null)
+									server.register(get).with(object, method);
 							}
 						}
 					}
@@ -84,7 +76,7 @@ public class ScanTask implements Runnable {
 			}
 		}
 	}
-	
+
 	public void close() {
 		running = false;
 	}

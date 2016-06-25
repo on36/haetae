@@ -1,16 +1,16 @@
 package com.on36.haetae.test;
 
-import io.netty.handler.codec.http.HttpMethod;
-
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.annotation.Path;
+import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.api.core.HttpHandler;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.server.HaetaeServer;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * @author zhanghr
@@ -86,15 +86,13 @@ public class ServerTest {
 					&& clazzs[0].getName().equals(Context.class.getName())) {
 
 				Post post = method.getAnnotation(Post.class);
-				Path path = method.getAnnotation(Path.class);
-				if (path != null) {
+				Get get = method.getAnnotation(Get.class);
 					if (post != null)
-						server.register(path.value(), HttpMethod.POST).with(
+						server.register(post).with(
 								clazz.newInstance(), method);
 					else
-						server.register(path.value(), HttpMethod.GET).with(
+						server.register(get).with(
 								clazz.newInstance(), method);
-				}
 			}
 		}
 		server.start();

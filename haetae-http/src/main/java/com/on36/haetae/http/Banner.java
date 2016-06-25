@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import com.on36.haetae.net.utils.PidFile;
+
 /**
  * @author zhanghr
  * @date 2016年1月12日
@@ -35,6 +37,7 @@ public class Banner {
 			e.printStackTrace();
 		} finally {
 			try {
+				new PidFile(port+"");
 				reader.close();
 				is.close();
 			} catch (Exception e) {

@@ -3,9 +3,8 @@ package com.on36.haetae.server;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.netty.handler.codec.http.HttpMethod;
-
-import com.on36.haetae.api.annotation.Path;
+import com.on36.haetae.api.annotation.Get;
+import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.Server;
@@ -15,6 +14,8 @@ import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.container.HaetaeContainer;
 import com.on36.haetae.server.core.manager.DisruptorManager;
 import com.on36.haetae.server.scan.ScanTask;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * 
@@ -81,7 +82,7 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(String resource, HttpMethod method) {
 
-		return register(resource, null, method);
+		return register(resource, "1.0", method);
 	}
 	/**
 	 * 注册一个服务.
@@ -101,17 +102,27 @@ public class HaetaeServer {
 		return handler;
 	}
 	/**
-	 * 注册一个服务.
+	 * 注册一个get服务.
 	 * 
-	 * @param path
-	 *            服务请求的path
-	 * @param method
-	 *            服务请求的方法类型 如GET、POST
+	 * @param get
+	 *            服务请求的get
 	 * @return
 	 */
-	public RequestHandler register(Path path, HttpMethod method) {
+	public RequestHandler register(Get get) {
 		
-		return register(path.value(), path.version(), method);
+		return register(get.value(), get.version(), HttpMethod.GET);
+	}
+	
+	/**
+	 * 注册一个post服务.
+	 * 
+	 * @param post
+	 *            服务请求的post
+	 * @return
+	 */
+	public RequestHandler register(Post post) {
+		
+		return register(post.value(), post.version(), HttpMethod.POST);
 	}
 
 	/**

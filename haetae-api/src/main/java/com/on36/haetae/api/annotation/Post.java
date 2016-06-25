@@ -13,5 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Post {
+	String value();
 
+	String version() default "1.0";
 }

@@ -1,12 +1,10 @@
 package com.on36.haetae.test;
 
-import io.netty.handler.codec.http.HttpMethod;
-
 import java.lang.reflect.Method;
 import java.util.List;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.annotation.Path;
+import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.hotswap.scan.ClassPathPackageScanner;
 import com.on36.haetae.server.HaetaeServer;
@@ -37,16 +35,16 @@ public class HotswapTest {
 								Context.class.getName())) {
 
 					Post post = method.getAnnotation(Post.class);
-					Path path = method.getAnnotation(Path.class);
-					if (path != null) {
-						if (object == null)
-							object = clazz.newInstance();
-						if (post != null)
-							server.register(path.value(), HttpMethod.POST)
-									.with(object, method);
-						else
-							server.register(path.value(), HttpMethod.GET).with(
-									object, method);
+					Get get = method.getAnnotation(Get.class);
+					
+					if (object == null)
+						object = clazz.newInstance();
+					if (post != null) {
+						if (server.find(post.value()) == null)
+							server.register(post).with(object, method);
+					} else if (get != null) {
+						if (server.find(get.value()) == null)
+							server.register(get).with(object, method);
 					}
 				}
 			}
