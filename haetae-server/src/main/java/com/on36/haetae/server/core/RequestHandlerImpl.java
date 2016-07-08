@@ -1,8 +1,6 @@
 package com.on36.haetae.server.core;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleImmutableEntry;
@@ -10,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -24,6 +21,7 @@ import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.RouteHelper;
 import com.on36.haetae.net.udp.Scheduler;
+import com.on36.haetae.server.HaetaeServer;
 import com.on36.haetae.server.core.auth.impl.BlackListAuthentication;
 import com.on36.haetae.server.core.auth.impl.RequestFlowAuthentication;
 import com.on36.haetae.server.core.auth.impl.WhiteListAuthentication;
@@ -32,6 +30,9 @@ import com.on36.haetae.server.core.body.InterpolatedResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
 import com.on36.haetae.server.core.body.TimeoutResponseBody;
 import com.on36.haetae.server.core.stats.Statistics;
+
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class RequestHandlerImpl implements RequestHandler {
 
@@ -61,7 +62,7 @@ public class RequestHandlerImpl implements RequestHandler {
 	private RequestFlowAuthentication requestFlow = new RequestFlowAuthentication();
 	private boolean auth = true;
 
-	private final ExecutorService es = Executors.newCachedThreadPool();
+	private final ExecutorService es = HaetaeServer.threadPools;
 
 	private final Scheduler scheduler;
 

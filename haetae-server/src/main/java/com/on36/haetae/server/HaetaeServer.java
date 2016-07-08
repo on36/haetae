@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
+import com.on36.haetae.http.Configuration;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.Server;
@@ -30,15 +31,25 @@ public class HaetaeServer {
 	private final Scheduler scheduler;
 	private final MessageThread msgThread;
 	private final ScanTask sanner;
-	private final ExecutorService threadPools;
+	public static ExecutorService threadPools;
+
+	private Configuration conf = Configuration.create();
 
 	public HaetaeServer(int port) {
-		this(port, 0);
+		this(port, 0, null);
 	}
 
 	public HaetaeServer(int port, int threadPoolSize) {
+		this(port, threadPoolSize, null);
+	}
+
+	public HaetaeServer(int port, int threadPoolSize, String rootPath) {
+		conf.addResource("haetae.conf");
+		if (rootPath != null)
+			conf.set("httpServer.path.root", rootPath);
+
 		threadPools = Executors.newCachedThreadPool();
-		
+
 		container = new HaetaeContainer();
 		server = new HTTPServer(port, threadPoolSize, container);
 		disruptorManager = new DisruptorManager(threadPools);
@@ -53,9 +64,8 @@ public class HaetaeServer {
 			threadPools.submit(msgThread);
 			threadPools.submit(sanner);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
+
 			stop();
 		}
 	}
@@ -84,6 +94,7 @@ public class HaetaeServer {
 
 		return register(resource, "1.0", method);
 	}
+
 	/**
 	 * 注册一个服务.
 	 * 
@@ -95,12 +106,14 @@ public class HaetaeServer {
 	 *            服务请求的方法类型 如GET、POST
 	 * @return
 	 */
-	public RequestHandler register(String resource, String version, HttpMethod method) {
-		
+	public RequestHandler register(String resource, String version,
+			HttpMethod method) {
+
 		RequestHandlerImpl handler = new RequestHandlerImpl(scheduler);
 		container.addHandler(handler, method, resource, version);
 		return handler;
 	}
+
 	/**
 	 * 注册一个get服务.
 	 * 
@@ -109,10 +122,10 @@ public class HaetaeServer {
 	 * @return
 	 */
 	public RequestHandler register(Get get) {
-		
+
 		return register(get.value(), get.version(), HttpMethod.GET);
 	}
-	
+
 	/**
 	 * 注册一个post服务.
 	 * 
@@ -121,7 +134,7 @@ public class HaetaeServer {
 	 * @return
 	 */
 	public RequestHandler register(Post post) {
-		
+
 		return register(post.value(), post.version(), HttpMethod.POST);
 	}
 

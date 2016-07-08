@@ -27,7 +27,8 @@ public class ProccesUtil {
 		list.add("-cp");
 		list.add(System.getProperty("java.class.path"));
 		list.add(className);
-		list.addAll(Arrays.asList(args));
+		if (args != null)
+			list.addAll(Arrays.asList(args));
 		exec(false, list);
 	}
 
@@ -53,11 +54,23 @@ public class ProccesUtil {
 			if (autoClosed && process != null)
 				process.destroy();
 			es.shutdownNow();
-
 			// 执行完毕，强制退出
 			System.exit(-1);
 		}
 
+	}
+
+	public static void killProcess(int port) {
+
+		String command = null;
+		if (port > 0)
+			command = "kill -9 `lsof -i :" + port + " |grep '(LISTEN)'| awk '{print $2}'`";
+		else if (port == 0)
+			command = "kill -9 `ps -au |grep java |grep com.on36.haetae.tools.server.HaetaeServerStartup |grep '(LISTEN)'| awk '{print $1}'`";
+		else if (port == -1)
+			command = "kill -9 `ps -au |grep java |grep com.on36.haetae.test.ServerTest |grep '(LISTEN)'| awk '{print $1}'`";
+		System.out.println("executing " + command);
+		exec(true, command);
 	}
 
 	static class ProcessTask implements Runnable {
@@ -76,16 +89,15 @@ public class ProccesUtil {
 						new InputStreamReader(inputStream));
 				while ((s = bufferedReader.readLine()) != null) {
 					System.out.println(s);
-					
-//					Thread.sleep(200);
-//					if(inputStream.available() < 1)
-//						break;
+
+					// Thread.sleep(200);
+					// if(inputStream.available() < 1)
+					// break;
 				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 		}
 	}
 }

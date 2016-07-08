@@ -11,6 +11,8 @@ import com.on36.haetae.tools.utils.ProccesUtil;
  */
 public class StopSubCommand implements SubCommand {
 
+	private int port = 8080;
+
 	@Override
 	public String commandName() {
 		// TODO Auto-generated method stub
@@ -33,6 +35,9 @@ public class StopSubCommand implements SubCommand {
 	@Override
 	public void execute(String... args) {
 		// TODO Auto-generated method stub
+		if (args != null && args.length == 2)
+			port = Integer.parseInt(args[1]);
+		ProccesUtil.killProcess(port);
 	}
 
 }

@@ -27,8 +27,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
-			<artifactId>haetae-server</artifactId>
-			<version>${project.version}</version>
+			<artifactId>haetae-hotswap</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

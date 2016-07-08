@@ -19,9 +19,13 @@ import io.netty.handler.codec.http.HttpMethod;
 public class ServerTest {
 
 	public static void main(String[] args) throws Exception {
+		
+		int port = 8080;
+		if(args != null && args.length == 1)
+			port = Integer.parseInt(args[0]);
 
-		HaetaeServer server = new HaetaeServer(8080);
-		server.register("/hello").with("Hello xiongdi!").session(true);
+		HaetaeServer server = new HaetaeServer(port,128);
+		server.register("/hello").with("Hello xiongdi!").auth(false);
 		server.register("name/:name<[A-Za-z]+>").with("Hello :name");
 		server.register("/multi/*/*").with("Hello *[0] *[1]");
 		server.register("/greeting").with("Hello [request$User-Agent]");

@@ -12,8 +12,6 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import io.netty.util.internal.logging.InternalLogger;
-import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -24,11 +22,10 @@ import com.on36.haetae.http.Configuration;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.Environment;
 import com.on36.haetae.http.Server;
+import com.on36.haetae.http.route.RouteHelper;
 
 public class HTTPServer implements Server {
 
-	public static InternalLogger LOG = InternalLoggerFactory
-			.getInstance(HTTPServer.class);
 	private static Configuration config = Configuration.create();
 
 	private final InetSocketAddress socketAddress;
@@ -74,15 +71,21 @@ public class HTTPServer implements Server {
 			if (ssl) {
 				SelfSignedCertificate ssc = new SelfSignedCertificate(
 						"on36.com");
-				sslCtx = SslContextBuilder.forServer(ssc.certificate(),
-						ssc.privateKey()).build();
+				sslCtx = SslContextBuilder
+						.forServer(ssc.certificate(), ssc.privateKey()).build();
 			} else {
 				sslCtx = null;
 			}
 			System.out.println("Starting server...");
 			// Configure the server.
-			EventLoopGroup bossGroup = new NioEventLoopGroup(threadPoolSize);
-			EventLoopGroup workerGroup = new NioEventLoopGroup(threadPoolSize);
+			EventLoopGroup bossGroup = new NioEventLoopGroup(
+					threadPoolSize > 0 ? threadPoolSize
+							: getConfig().getInt("httpServer.threadpool.size",
+									threadPoolSize));
+			EventLoopGroup workerGroup = new NioEventLoopGroup(
+					threadPoolSize > 0 ? threadPoolSize
+							: getConfig().getInt("httpServer.threadpool.size",
+									threadPoolSize));
 			try {
 				ServerBootstrap b = new ServerBootstrap();
 				b.option(ChannelOption.SO_BACKLOG,
@@ -105,7 +108,7 @@ public class HTTPServer implements Server {
 
 				System.out
 						.println("Server is now ready to accept connection on ["
-								+ socketAddress + "]");
+								+ socketAddress + RouteHelper.PATH_ELEMENT_ROOT +"]");
 				channel.closeFuture().sync();
 			} finally {
 				bossGroup.shutdownGracefully();

@@ -1,12 +1,15 @@
 package com.on36.haetae.tools.server;
 
+import java.lang.reflect.Method;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 
-import com.on36.haetae.server.HaetaeServer;
+import com.on36.haetae.hotswap.IClassLoader;
+import com.on36.haetae.hotswap.classloader.DirectoryClassLoader;
 
 /**
  * @author zhanghr
@@ -16,6 +19,8 @@ public class HaetaeServerStartup {
 
 	private static int port = 8080;
 	private static int threadPoolSize = 0;
+	private static String rootPath = null;
+	private static IClassLoader cl = new DirectoryClassLoader();
 
 	public static void main(String[] args) {
 		Options options = new Options();
@@ -36,8 +41,14 @@ public class HaetaeServerStartup {
 			} else {
 				parse(line);
 
-				HaetaeServer server = new HaetaeServer(port, threadPoolSize);
-				server.start();
+				ClassLoader classLoader = cl.load();
+				Class<?> haetaeServerClass = classLoader
+						.loadClass("com.on36.haetae.server.HaetaeServer");
+				Object obj = haetaeServerClass
+						.getConstructor(int.class, int.class, String.class)
+						.newInstance(port, threadPoolSize, rootPath);
+				Method method = haetaeServerClass.getMethod("start");
+				method.invoke(obj);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -55,6 +66,14 @@ public class HaetaeServerStartup {
 		if (line.hasOption("threadPoolSize")) {
 			String size = line.getOptionValue("threadPoolSize");
 			threadPoolSize = Integer.parseInt(size);
+		}
+		if (line.hasOption("root")) {
+			String root = line.getOptionValue("root");
+
+			if (!root.startsWith("/"))
+				rootPath = "/" + root;
+			else
+				rootPath = root;
 		}
 	}
 

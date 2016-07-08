@@ -13,7 +13,7 @@ public class LogEventHandler implements EventHandler<LogEvent> {
 	public void onEvent(LogEvent event, long sequence, boolean endOfBatch)
 			throws Exception {
 		// TODO Auto-generated method stub
-		System.out.println(event.getInfo());
+		//System.out.println(event.getInfo());
 	}
 
 }

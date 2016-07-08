@@ -12,6 +12,7 @@ import org.apache.commons.cli.Options;
 
 import com.on36.haetae.tools.command.StartSubCommand;
 import com.on36.haetae.tools.command.StopSubCommand;
+import com.on36.haetae.tools.command.TestSubCommand;
 import com.on36.haetae.tools.utils.ServerUtil;
 
 /**
@@ -25,6 +26,7 @@ public class CommandStartup {
 	public static void initCommand() {
 		initCommand(new StartSubCommand());
 		initCommand(new StopSubCommand());
+		initCommand(new TestSubCommand());
 	}
 
 	public static void initCommand(SubCommand command) {
