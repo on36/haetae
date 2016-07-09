@@ -7,32 +7,30 @@ import com.on36.haetae.tools.utils.ProccesUtil;
 
 /**
  * @author zhanghr
- * @date 2016年3月5日
+ * @date 2016年3月8日
  */
-public class TestSubCommand implements SubCommand {
+public class LauncherSubCommand implements SubCommand {
 
 	@Override
 	public String commandName() {
-		return "test";
+		return "launcher";
 	}
 
 	@Override
 	public String commandDesc() {
-		return "start a test haetae server";
+		return "start a haeatae launcher";
 	}
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
-		options.addOption("p", "port", true, "service port, default: 8080");
+		// TODO Auto-generated method stub
 		return options;
 	}
 
 	@Override
 	public void execute(String... args) {
-		if (args == null)
-			args = new String[0];
-		ProccesUtil.execJava("com.on36.haetae.tools.server.HaetaeServerTest",
-				args);
+		// TODO Auto-generated method stub
+		ProccesUtil.execJava("com.on36.haetae.tools.updater.HaetaeUpdater",args);
 	}
 
 }

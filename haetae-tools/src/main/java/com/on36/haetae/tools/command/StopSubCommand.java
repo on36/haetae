@@ -22,7 +22,7 @@ public class StopSubCommand implements SubCommand {
 	@Override
 	public String commandDesc() {
 		// TODO Auto-generated method stub
-		return "stop a running server";
+		return "stop running server";
 	}
 
 	@Override
@@ -37,6 +37,8 @@ public class StopSubCommand implements SubCommand {
 		// TODO Auto-generated method stub
 		if (args != null && args.length == 2)
 			port = Integer.parseInt(args[1]);
+		else 
+			System.out.println("No specify port, using default port 8080");
 		ProccesUtil.killProcess(port);
 	}
 
