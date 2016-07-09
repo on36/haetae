@@ -13,6 +13,7 @@ import org.apache.commons.cli.Options;
 import com.on36.haetae.tools.command.StartSubCommand;
 import com.on36.haetae.tools.command.StopSubCommand;
 import com.on36.haetae.tools.command.TestSubCommand;
+import com.on36.haetae.tools.command.LauncherSubCommand;
 import com.on36.haetae.tools.utils.ServerUtil;
 
 /**
@@ -27,6 +28,7 @@ public class CommandStartup {
 		initCommand(new StartSubCommand());
 		initCommand(new StopSubCommand());
 		initCommand(new TestSubCommand());
+		initCommand(new LauncherSubCommand());
 	}
 
 	public static void initCommand(SubCommand command) {
@@ -59,6 +61,11 @@ public class CommandStartup {
 				}
 			case 1:
 			default:
+				if (args[0].equals("help") || args[0].equals("?")) {
+					printHelp();
+					break;
+				}
+
 				SubCommand cmd = findSubCommand(args[0]);
 				if (cmd != null) {
 					// 将main中的args转化为子命令的args（去除第一个参数）
