@@ -42,6 +42,9 @@ public class HaetaeServer {
 	public HaetaeServer(int port, int threadPoolSize) {
 		this(port, threadPoolSize, null);
 	}
+	public HaetaeServer(int port, String rootPath) {
+		this(port, 0, rootPath);
+	}
 
 	public HaetaeServer(int port, int threadPoolSize, String rootPath) {
 		conf.addResource("haetae.conf");
@@ -92,7 +95,7 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(String resource, HttpMethod method) {
 
-		return register(resource, "1.0", method);
+		return register(resource, "1.0", method, null);
 	}
 
 	/**
@@ -107,10 +110,10 @@ public class HaetaeServer {
 	 * @return
 	 */
 	public RequestHandler register(String resource, String version,
-			HttpMethod method) {
+			HttpMethod method,String contentType) {
 
 		RequestHandlerImpl handler = new RequestHandlerImpl(scheduler);
-		container.addHandler(handler, method, resource, version);
+		container.addHandler(handler, method, resource, version, contentType);
 		return handler;
 	}
 
@@ -123,7 +126,11 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(Get get) {
 
-		return register(get.value(), get.version(), HttpMethod.GET);
+		return register(get.value(), get.version(), HttpMethod.GET, null);
+	}
+	public RequestHandler register(Get get, String contentType) {
+		
+		return register(get.value(), get.version(), HttpMethod.GET,contentType);
 	}
 
 	/**
@@ -135,7 +142,11 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(Post post) {
 
-		return register(post.value(), post.version(), HttpMethod.POST);
+		return register(post.value(), post.version(), HttpMethod.POST, null);
+	}
+	public RequestHandler register(Post post, String contentType) {
+		
+		return register(post.value(), post.version(), HttpMethod.POST, contentType);
 	}
 
 	/**

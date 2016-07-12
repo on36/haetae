@@ -15,14 +15,18 @@ public interface Context {
 
 	/**
 	 * 返回请求ID
+	 * 
 	 * @return
 	 */
 	String getRequestId();
+
 	/**
 	 * 返回请求深度
+	 * 
 	 * @return
 	 */
 	String getRequestDeep();
+
 	/**
 	 * 请求URI路径
 	 * 
@@ -63,6 +67,13 @@ public interface Context {
 	 * @return
 	 */
 	String getHeaderValue(String param);
+
+	/**
+	 * 返回获取请求头Content-Type的参数值
+	 * 
+	 * @return
+	 */
+	String getContenType();
 
 	/**
 	 * 返回获取Session对象，如果没有，则返回null

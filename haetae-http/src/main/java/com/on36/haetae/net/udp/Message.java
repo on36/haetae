@@ -13,7 +13,7 @@ public class Message {
 			.getProperty("maxLength", "4096"));
 
 	public enum Title {
-		TEST(0), ENDPOINT(1), SESSSION(2), REQUEST(3);
+		TEST(0), ENDPOINT(1), SESSSION(2), MAVEN(3);
 
 		private final int value;
 

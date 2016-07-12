@@ -17,6 +17,13 @@
 			<directory>src/main/resources</directory>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
+		<fileSet>
+			<directory>../haetae-manager/target</directory>
+			<outputDirectory>lib</outputDirectory>
+			<includes>
+				<include>*.jar</include>
+			</includes>
+		</fileSet>
 	</fileSets>
 	<dependencySets>
 		<dependencySet>

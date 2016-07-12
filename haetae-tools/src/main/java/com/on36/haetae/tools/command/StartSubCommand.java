@@ -36,7 +36,8 @@ public class StartSubCommand implements SubCommand {
 	@Override
 	public void execute(String... args) {
 		// TODO Auto-generated method stub
-
-		 ProccesUtil.execJava("com.on36.haetae.tools.server.HaetaeServerStartup",args);
+		if (args == null)
+			args = new String[0];
+		 ProccesUtil.execJava("com.on36.haetae.tools.server.HaetaeServerStartup",true, args);
 	}
 }

@@ -128,7 +128,11 @@ public class HaetaeContainer implements Container {
 
 	public boolean addHandler(RequestHandler handler, HttpMethod method,
 			String resource, String version) {
-		return requestResolver.addHandler(handler, method, resource, version);
+		return addHandler(handler, method, resource, version, null);
+	}
+	public boolean addHandler(RequestHandler handler, HttpMethod method,
+			String resource, String version, String contentType) {
+		return requestResolver.addHandler(handler, method, resource, version,contentType);
 	}
 
 	public boolean addHandler(RequestHandler handler, String resource) {

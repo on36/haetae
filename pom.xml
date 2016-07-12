@@ -16,6 +16,7 @@
 		<module>haetae-sample</module>
     <module>haeatae-orm</module>
     <module>haetae-common</module>
+    <module>haetae-manager</module>
   </modules>
 
 	<properties>

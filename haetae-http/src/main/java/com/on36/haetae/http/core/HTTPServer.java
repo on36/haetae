@@ -109,6 +109,8 @@ public class HTTPServer implements Server {
 				System.out
 						.println("Server is now ready to accept connection on ["
 								+ socketAddress + RouteHelper.PATH_ELEMENT_ROOT +"]");
+				System.out.close();
+				System.err.close();
 				channel.closeFuture().sync();
 			} finally {
 				bossGroup.shutdownGracefully();

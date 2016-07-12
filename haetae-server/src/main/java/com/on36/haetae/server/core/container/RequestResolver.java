@@ -30,13 +30,15 @@ public class RequestResolver {
 	private final Router router = new TreeRouter();
 
 	private final Map<HandlerKey, RequestHandlerImpl> handlerMap = new ConcurrentHashMap<HandlerKey, RequestHandlerImpl>();
+	private final Map<String, HandlerKey> handlerKetMap = new ConcurrentHashMap<String, HandlerKey>();
 
 	private final HandlerKey rootHandlerKey;
 	private final RequestHandlerImpl rootHandler;
 
 	public RequestResolver(Container container) {
 		router.add(Route.PATH_ROOT);
-		rootHandlerKey = new HandlerKey(HttpMethod.GET.name(), Route.PATH_ROOT, MediaType.TEXT_HTML.value());
+		rootHandlerKey = new HandlerKey(HttpMethod.GET.name(), Route.PATH_ROOT,
+				MediaType.TEXT_HTML.value());
 
 		rootHandler = new RequestHandlerImpl(null);
 		rootHandler.with(new StatisticsHandler(container));
@@ -44,6 +46,11 @@ public class RequestResolver {
 
 	public boolean addHandler(RequestHandler handler, HttpMethod method,
 			String resource, String version) {
+		return addHandler(handler, method, resource, version, null);
+	}
+
+	public boolean addHandler(RequestHandler handler, HttpMethod method,
+			String resource, String version, String contentType) {
 		if (handler == null || method == null) {
 			throw new IllegalArgumentException(
 					"handler or method cannot be null");
@@ -54,7 +61,7 @@ public class RequestResolver {
 		if (PATH_ELEMENT_SEPARATOR.equals(resource)
 				|| PATH_ELEMENT_ROOT.equals(resource)) {
 			throw new IllegalArgumentException(
-					"resource cannot be '/' or '"+ PATH_ELEMENT_ROOT +"'");
+					"resource cannot be '/' or '" + PATH_ELEMENT_ROOT + "'");
 		}
 
 		String path = resource;
@@ -69,7 +76,8 @@ public class RequestResolver {
 					+ resource + "], adding operation is not allowed!");
 		}
 		route = new Route(path);
-		HandlerKey key = new HandlerKey(method.name(), route);
+		HandlerKey key = new HandlerKey(method.name(), route, contentType);
+		handlerKetMap.put(route.getResourcePath() + "-" + method.name(), key);
 		handlerMap.put(key, (RequestHandlerImpl) handler);
 		router.add(route);
 
@@ -77,13 +85,13 @@ public class RequestResolver {
 	}
 
 	public RequestHandlerImpl findHandler(String resource) {
-		
+
 		String path = resource;
 		if (!resource.startsWith(PATH_ELEMENT_ROOT))
 			path = PATH_ELEMENT_ROOT
 					+ (resource.startsWith(PATH_ELEMENT_SEPARATOR) ? resource
 							: (PATH_ELEMENT_SEPARATOR + resource));
-		
+
 		Route route = router.route(path);
 		if (route != null) {
 			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
@@ -107,8 +115,12 @@ public class RequestResolver {
 		if (route != null) {
 			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
 			handlerMap.remove(key);
+			handlerKetMap.remove(
+					route.getResourcePath() + "-" + HttpMethod.GET.name());
 			key = new HandlerKey(HttpMethod.POST.name(), route);
 			handlerMap.remove(key);
+			handlerKetMap.remove(
+					route.getResourcePath() + "-" + HttpMethod.POST.name());
 			router.remove(path);
 		}
 
@@ -131,20 +143,23 @@ public class RequestResolver {
 			return resolved;
 		}
 
-		if (Route.PATH_ROOT.equals(route) && rootHandlerKey.getMethod().equals(method)) {
+		if (Route.PATH_ROOT.equals(route)
+				&& rootHandlerKey.getMethod().equals(method)) {
 			resolved.handler = rootHandler;
 			resolved.route = Route.PATH_ROOT;
 			resolved.key = rootHandlerKey;
 		} else {
-			HandlerKey key = new HandlerKey(method, route);
+			HandlerKey key = handlerKetMap.get(
+					route.getResourcePath() + "-" + method);
 
 			RequestHandlerImpl handler = handlerMap.get(key);
 			if (handler == null) {
 				resolved.errorStatus = SERVICE_UNAVAILABLE;
 				return resolved;
 			}
+			if (contentType != null)
+				key.setContentType(contentType);
 
-			key.setContentType(contentType);
 			resolved.handler = handler;
 			resolved.route = route;
 			resolved.key = key;
@@ -159,8 +174,9 @@ public class RequestResolver {
 				.entrySet()) {
 			String resourcePath = entry.getKey().getRoute().getResourcePath();
 			Statistics stat = entry.getValue().getStatistics();
-			stat.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT) ? resourcePath
-					.replace(PATH_ELEMENT_ROOT, "") : resourcePath);
+			stat.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT)
+					? resourcePath.replace(PATH_ELEMENT_ROOT, "")
+					: resourcePath);
 			stat.setMethod(entry.getKey().getMethod());
 			stats.add(stat);
 		}

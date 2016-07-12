@@ -18,7 +18,7 @@ public class TestSubCommand implements SubCommand {
 
 	@Override
 	public String commandDesc() {
-		return "start a test haetae server";
+		return "start a testing haetae server";
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class TestSubCommand implements SubCommand {
 	public void execute(String... args) {
 		if (args == null)
 			args = new String[0];
-		ProccesUtil.execJava("com.on36.haetae.tools.server.HaetaeServerTest",
+		ProccesUtil.execJava("com.on36.haetae.tools.server.HaetaeServerTest",true,
 				args);
 	}
 

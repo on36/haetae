@@ -13,7 +13,7 @@ public class ProccesTest {
 		try {
 			ProcessBuilder pb = new ProcessBuilder("java", "-cp",
 					System.getProperty("java.class.path"),
-					"com.on36.haetae.test.ServerTest");
+					"com.on36.haetae.test.ServerTest","\n && exit\n");
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
 			String s = null;

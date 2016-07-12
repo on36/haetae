@@ -142,6 +142,10 @@ public class SimpleContext implements Context {
 		return request.headers().get(param);
 	}
 
+	public String getContenType() {
+		return request.headers().get("Content-Type");
+	}
+
 	public String getBodyAsString() {
 
 		ByteBuf content = request.content();
@@ -165,7 +169,7 @@ public class SimpleContext implements Context {
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
-			//TODO  增加外部访问HTTP
+			// TODO 增加外部访问HTTP
 		}
 		return null;
 	}

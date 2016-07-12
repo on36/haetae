@@ -39,7 +39,7 @@ public class StopSubCommand implements SubCommand {
 			port = Integer.parseInt(args[1]);
 		else 
 			System.out.println("No specify port, using default port 8080");
-		ProccesUtil.killProcess(port);
+		ProccesUtil.killProcess(true,port);
 	}
 
 }

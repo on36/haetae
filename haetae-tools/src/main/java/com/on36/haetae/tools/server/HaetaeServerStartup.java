@@ -6,6 +6,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import com.on36.haetae.hotswap.IClassLoader;
@@ -24,6 +26,9 @@ public class HaetaeServerStartup {
 
 	public static void main(String[] args) {
 		Options options = new Options();
+		Option opt = new Option("m", "maven", true, "service port, default: 8080");
+		opt.setRequired(true);
+		options.addOption(opt);
 		options.addOption("p", "port", true, "service port, default: 8080");
 		options.addOption("r", "root", true,
 				"root path name, default: /services");
@@ -50,6 +55,10 @@ public class HaetaeServerStartup {
 				Method method = haetaeServerClass.getMethod("start");
 				method.invoke(obj);
 			}
+		} catch (MissingOptionException e) {
+			System.out.println(e.getMessage());
+			print(formatter, options);
+			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			print(formatter, options);

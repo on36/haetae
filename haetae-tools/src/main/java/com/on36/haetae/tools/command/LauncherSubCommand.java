@@ -30,7 +30,10 @@ public class LauncherSubCommand implements SubCommand {
 	@Override
 	public void execute(String... args) {
 		// TODO Auto-generated method stub
-		ProccesUtil.execJava("com.on36.haetae.tools.updater.HaetaeUpdater",args);
+		if (args == null)
+			args = new String[0];
+		ProccesUtil.execJava("com.on36.haetae.tools.updater.HaetaeLauncher",true,
+				args);
 	}
 
 }
