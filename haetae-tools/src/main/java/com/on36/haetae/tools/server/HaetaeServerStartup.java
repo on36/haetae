@@ -26,7 +26,7 @@ public class HaetaeServerStartup {
 
 	public static void main(String[] args) {
 		Options options = new Options();
-		Option opt = new Option("m", "maven", true, "service port, default: 8080");
+		Option opt = new Option("c", "coords", true, "maven coords, example: com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT");
 		opt.setRequired(true);
 		options.addOption(opt);
 		options.addOption("p", "port", true, "service port, default: 8080");

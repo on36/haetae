@@ -1,6 +1,5 @@
 @echo off 
-echo now : %~dp0
-SET AGENT_LIB=%~dp0..\lib
+SET AGENT_LIB=%~dp0\..\lib
 @rem some Java parameters
 
 if not defined JAVA_HOME (
@@ -9,18 +8,15 @@ if not defined JAVA_HOME (
 )
 
 SET JAVA=%JAVA_HOME%\bin\java
-
+SET CLASSPATH=;
 @rem  CLASSPATH initially
 for /r %AGENT_LIB% %%i in (*.jar) do (
-    call set CLASSPATH=%%CLASSPATH%%;%%i
+ call set CLASSPATH=%%CLASSPATH%%;%%i
 )
 @rem get arguments
-echo %CLASSPATH%
+@rem echo %CLASSPATH%
 
 call %JAVA% -cp %CLASSPATH% com.on36.haetae.tools.CommandStartup %*
   
+:P
 pause
-
-:P 
-pause 
-exit 

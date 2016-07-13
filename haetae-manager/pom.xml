@@ -8,8 +8,8 @@
 		<artifactId>haetae</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>haetae-tools</artifactId>
-	<name>haetae-tools</name>
+	<artifactId>haetae-manager</artifactId>
+	<name>haetae-manager</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,15 +20,20 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
-			<artifactId>haetae-hotswap</artifactId>
-			<version>${project.version}</version>
+			<artifactId>haetae-server</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-tools</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>
