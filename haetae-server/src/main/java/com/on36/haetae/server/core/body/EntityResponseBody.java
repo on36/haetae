@@ -11,8 +11,8 @@ public class EntityResponseBody extends StringResponseBody {
 	private static String translate(Object entity) {
 
 		String body = null;
-		if(entity == null)
-			body = "";
+		if (entity == null)
+			body = "nothing";
 		else if (entity.getClass().isPrimitive())
 			body = entity.toString();
 		else if (entity instanceof String)

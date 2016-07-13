@@ -39,10 +39,8 @@ public class Configuration {
 		try {
 			properties.load(classLoader.getResourceAsStream(name));
 		} catch (Exception e) {
-			throw new RuntimeException(
-					"there is no found resource file of the name [" + name
-							+ "]",
-					e);
+			System.out.println("there is no found resource file of the name ["
+					+ name + "]");
 		}
 	}
 
@@ -60,6 +58,7 @@ public class Configuration {
 	public static Configuration create() {
 		return ConfigurationHolder.instance;
 	}
+
 	/**
 	 * 根据key获得String值.
 	 * 
@@ -70,6 +69,7 @@ public class Configuration {
 	public void set(String key, String value) {
 		prop.setProperty(key, value);
 	}
+
 	/**
 	 * 根据key获得String值.
 	 * 

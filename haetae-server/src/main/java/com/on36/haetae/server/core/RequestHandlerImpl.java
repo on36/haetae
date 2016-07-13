@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.core.HttpHandler;
+import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.request.HttpRequestExt;
@@ -207,7 +208,8 @@ public class RequestHandlerImpl implements RequestHandler {
 						if (getCustomHandler() != null)
 							return getCustomHandler().handle(context);
 						else
-							return method.invoke(object, context);
+							return html(method.invoke(object, context),
+									context);
 					}
 				});
 				Object result = null;
@@ -226,7 +228,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
 		return new InterpolatedResponseBody(body, context);
 	}
-	
+
 	public String body(Context context, String resource) throws Exception {
 		long start = System.currentTimeMillis();
 		try {
@@ -234,10 +236,33 @@ public class RequestHandlerImpl implements RequestHandler {
 		} finally {
 			long elapsedTime = System.currentTimeMillis() - start;
 			String requestId = context.getRequestId();
-			String deep = ((SimpleContext)context).nextDeep();
-			
+			String deep = ((SimpleContext) context).nextDeep();
+
 			trace(elapsedTime, requestId, resource, deep);
 		}
+	}
+
+	private Object html(Object result, Context context) {
+		if (result == null)
+			return "";
+		else if (result instanceof String) {
+			String html = null;
+			String contentType = context.getContenType();
+			if (MediaType.APPLICATION_JSON.value().equals(contentType)
+					|| MediaType.TEXT_JSON.value().equals(contentType)) {
+				return result;
+			} else {
+				html = (String) result;
+				html = html.replace("\t", "&nbsp;&nbsp;");// 替换跳格
+				html = html.replace(" ", "&nbsp;");// 替换空格
+				html = html.replace("\n", "<br />");// 替换空格
+				StringBuffer sb = new StringBuffer("<html><body>");
+				sb.append(html);
+				sb.append("</body></html>");
+				return sb.toString();
+			}
+		} else
+			return result;
 	}
 
 	private void trace(long elapsedTime, String requestId, String resource,
@@ -251,22 +276,24 @@ public class RequestHandlerImpl implements RequestHandler {
 			className = object.getClass().getName();
 			methodName = method.getName();
 		}
-		
-		String info = requestId + "|" + deep + "|" + className+ "|" + methodName + "|" + resource + "|"
-				+ elapsedTime + "ms";
+
+		String info = requestId + "|" + deep + "|" + className + "|"
+				+ methodName + "|" + resource + "|" + elapsedTime + "ms";
 		scheduler.trace(info);
 	}
 
-	public void stats(HttpResponse response, long elapsedTime, Context context) {
+	public void stats(HttpResponse response, long elapsedTime,
+			Context context) {
 
 		if (context != null) {
 			String requestId = context.getRequestId();
 			String deep = context.getRequestDeep();
-			String resource = context.getPath().replace(RouteHelper.PATH_ELEMENT_ROOT, "");
-			if(resource.length() > 1)
-			   trace(elapsedTime, requestId, resource, deep);
+			String resource = context.getPath()
+					.replace(RouteHelper.PATH_ELEMENT_ROOT, "");
+			if (resource.length() > 1)
+				trace(elapsedTime, requestId, resource, deep);
 			else
-				return ;
+				return;
 		}
 		// total time(ms)
 		totalTime.addAndGet(elapsedTime);

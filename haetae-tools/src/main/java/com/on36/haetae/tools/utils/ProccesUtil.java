@@ -1,6 +1,7 @@
 package com.on36.haetae.tools.utils;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,11 +21,12 @@ public class ProccesUtil {
 
 	private static long PROCCESS_TIMEOUT_SECONDS = 10;
 	private static String COMMAND_EXIT = "exit\n";
+	private static String COMMAND_LINE = "\n";
 
 	private static ExecutorService es = Executors.newCachedThreadPool();
 
-	public static Map<String,Object> execJava(String className, boolean autoExited,
-			String... args) {
+	public static Map<String, Object> execJava(String className,
+			boolean autoExited, String... args) {
 		List<String> list = new ArrayList<String>(4);
 		list.add("java");
 		list.add("-cp");
@@ -35,27 +37,29 @@ public class ProccesUtil {
 		return exec(false, autoExited, list);
 	}
 
-	public static Map<String,Object> exec(boolean autoClosed, boolean autoExited,
-			String... args) {
+	public static Map<String, Object> exec(boolean autoClosed,
+			boolean autoExited, String... args) {
 		return exec(autoClosed, autoExited, Arrays.asList(args));
 	}
 
-	public static Map<String,Object> exec(final boolean autoClosed,
+	public static Map<String, Object> exec(final boolean autoClosed,
 			final boolean autoExited, final List<String> args) {
 
-		Map<String,Object> map = new HashMap<String,Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		int resultCode = -1;
 		Future<?> future = null;
 		Process process = null;
 		ProcessTask task = null;
+		OutputStream out = null;
 		try {
-			if (args != null) {
-				args.add("\n");
-				args.add(COMMAND_EXIT);
-			}
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.redirectErrorStream(true);
 			process = pb.start();
+			out = process.getOutputStream();
+			out.write(COMMAND_LINE.getBytes());
+			out.write(COMMAND_EXIT.getBytes());
+			out.flush();
+			out.close();
 			task = new ProcessTask(process);
 			future = es.submit(task);
 			future.get(PROCCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -73,12 +77,13 @@ public class ProccesUtil {
 				System.exit(-1);
 			}
 		}
-		map.put("code", resultCode);
+		map.put("success", resultCode == -1 ? true : false);
 		map.put("message", task.printf());
 		return map;
 	}
 
-	public static Map<String,Object> killProcess(boolean autoExited, int port) {
+	public static Map<String, Object> killProcess(boolean autoExited,
+			int port) {
 
 		String command = null;
 		if (port > 0)
@@ -112,7 +117,7 @@ public class ProccesUtil {
 					s = scanner.nextLine();
 					System.out.println(s);
 					sb.append(s);
-					sb.append("\n");
+					sb.append(COMMAND_LINE);
 				}
 				scanner.close();
 			} catch (Exception e) {
