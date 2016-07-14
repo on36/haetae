@@ -24,7 +24,7 @@ public class ManagerService {
 			args[0] = port;
 		}
 		Map<String, Object> result = ProccesUtil.execJava(
-				"com.on36.haetae.tools.server.HaetaeServerTest", false, args);
+				"com.on36.haetae.tools.server.HaetaeServerStartup", false, args);
 
 		return result.get("message").toString();
 	}

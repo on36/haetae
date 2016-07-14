@@ -23,7 +23,7 @@ public class TestSubCommand implements SubCommand {
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
-		options.addOption("p", "port", true, "service port, default: 8080");
+		options.addOption("h", "help", true, "usage: haetae test 8080");
 		return options;
 	}
 

@@ -1,8 +1,11 @@
 package com.on36.haetae.server;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.http.Configuration;
@@ -14,7 +17,6 @@ import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.container.HaetaeContainer;
 import com.on36.haetae.server.core.manager.DisruptorManager;
-import com.on36.haetae.server.scan.ScanTask;
 
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -30,27 +32,30 @@ public class HaetaeServer {
 	private final DisruptorManager disruptorManager;
 	private final Scheduler scheduler;
 	private final MessageThread msgThread;
-	private final ScanTask sanner;
+	private final List<String> clazzes;
 	public static ExecutorService threadPools;
 
 	private Configuration conf = Configuration.create();
 
 	public HaetaeServer(int port) {
-		this(port, 0, null);
+		this(port, 0, null, null);
 	}
 
 	public HaetaeServer(int port, int threadPoolSize) {
-		this(port, threadPoolSize, null);
-	}
-	public HaetaeServer(int port, String rootPath) {
-		this(port, 0, rootPath);
+		this(port, threadPoolSize, null, null);
 	}
 
-	public HaetaeServer(int port, int threadPoolSize, String rootPath) {
+	public HaetaeServer(int port, String rootPath) {
+		this(port, 0, rootPath, null);
+	}
+
+	public HaetaeServer(int port, int threadPoolSize, String rootPath,
+			List<String> clazzes) {
 		conf.addResource("haetae.conf");
 		if (rootPath != null)
 			conf.set("httpServer.path.root", rootPath);
 
+		this.clazzes = clazzes;
 		threadPools = Executors.newCachedThreadPool();
 
 		container = new HaetaeContainer();
@@ -58,14 +63,43 @@ public class HaetaeServer {
 		disruptorManager = new DisruptorManager(threadPools);
 		scheduler = new MessageScheduler(disruptorManager);
 		msgThread = new MessageThread(scheduler);
-		sanner = new ScanTask(this);
 	}
 
 	public void start() {
 		try {
+
+			if (clazzes == null || clazzes.size() == 0)
+				System.out.println("there is no found any service class");
+			else {
+				for (String classString : clazzes) {
+					Class<?> clazz = this.getClass().getClassLoader()
+							.loadClass(classString);
+					Method[] methods = clazz.getDeclaredMethods();
+					Object object = null;
+
+					for (Method method : methods) {
+						Class<?>[] clazzs = method.getParameterTypes();
+						if (clazzs.length == 1 && clazzs[0].getName()
+								.equals(Context.class.getName())) {
+
+							Post post = method.getAnnotation(Post.class);
+							Get get = method.getAnnotation(Get.class);
+							if (object == null)
+								object = clazz.newInstance();
+							if (post != null) {
+								if (find(post.value()) == null)
+									register(post).with(object, method);
+							} else if (get != null) {
+								if (find(get.value()) == null)
+									register(get).with(object, method);
+							}
+						}
+					}
+				}
+			}
+
 			server.start();
 			threadPools.submit(msgThread);
-			threadPools.submit(sanner);
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -79,7 +113,6 @@ public class HaetaeServer {
 		}
 		disruptorManager.close();
 		msgThread.close();
-		sanner.close();
 		threadPools.shutdown();
 		server.stop();
 	}
@@ -110,7 +143,7 @@ public class HaetaeServer {
 	 * @return
 	 */
 	public RequestHandler register(String resource, String version,
-			HttpMethod method,String contentType) {
+			HttpMethod method, String contentType) {
 
 		RequestHandlerImpl handler = new RequestHandlerImpl(scheduler);
 		container.addHandler(handler, method, resource, version, contentType);
@@ -128,9 +161,11 @@ public class HaetaeServer {
 
 		return register(get.value(), get.version(), HttpMethod.GET, null);
 	}
+
 	public RequestHandler register(Get get, String contentType) {
-		
-		return register(get.value(), get.version(), HttpMethod.GET,contentType);
+
+		return register(get.value(), get.version(), HttpMethod.GET,
+				contentType);
 	}
 
 	/**
@@ -144,9 +179,11 @@ public class HaetaeServer {
 
 		return register(post.value(), post.version(), HttpMethod.POST, null);
 	}
+
 	public RequestHandler register(Post post, String contentType) {
-		
-		return register(post.value(), post.version(), HttpMethod.POST, contentType);
+
+		return register(post.value(), post.version(), HttpMethod.POST,
+				contentType);
 	}
 
 	/**

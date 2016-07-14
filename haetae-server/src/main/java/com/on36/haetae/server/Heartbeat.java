@@ -38,7 +38,6 @@ public class Heartbeat extends Thread {
 						mineEndPoint.getBytes("UTF-8")));
 				Thread.sleep(period);//3秒一次心跳信息
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

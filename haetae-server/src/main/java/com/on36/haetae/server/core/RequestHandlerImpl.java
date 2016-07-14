@@ -208,8 +208,7 @@ public class RequestHandlerImpl implements RequestHandler {
 						if (getCustomHandler() != null)
 							return getCustomHandler().handle(context);
 						else
-							return html(method.invoke(object, context),
-									context);
+							return method.invoke(object, context);
 					}
 				});
 				Object result = null;

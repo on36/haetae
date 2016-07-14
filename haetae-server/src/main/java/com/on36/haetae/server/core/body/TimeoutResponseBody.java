@@ -15,7 +15,6 @@ public class TimeoutResponseBody extends StringResponseBody {
 	
 	@Override
 	public boolean hasContent() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
