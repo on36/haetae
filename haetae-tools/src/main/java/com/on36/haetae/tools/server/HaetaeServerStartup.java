@@ -12,6 +12,7 @@ import org.apache.commons.cli.Options;
 
 import com.on36.haetae.hotswap.IClassLoader;
 import com.on36.haetae.hotswap.classloader.DirectoryClassLoader;
+import com.on36.haetae.hotswap.classloader.MavenClassLoader;
 import com.on36.haetae.hotswap.scan.ClassPathPackageScanner;
 
 /**
@@ -24,13 +25,18 @@ public class HaetaeServerStartup {
 	private static int threadPoolSize = 0;
 	private static String rootPath = null;
 	private static String coords = "";
+	private static String source = "directory";
 	private static String packageName = "com.on36.haetae.test";
-	private static IClassLoader cl = new DirectoryClassLoader();
+	private static IClassLoader cl = null;
 
 	public static void main(String[] args) {
 		Options options = new Options();
-		options.addOption("c", "coords", true, "maven coords, example: com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT");
-		options.addOption("pn", "package", true, "service package name, example: com.ideal.shcrm.service");
+		options.addOption("s", "source", true,
+				"optional value:directory,maven; default: directory");
+		options.addOption("c", "coords", true,
+				"maven coords, example: com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT");
+		options.addOption("pn", "package", true,
+				"service package name, example: com.ideal.shcrm.service");
 		options.addOption("p", "port", true, "service port, default: 8080");
 		options.addOption("r", "root", true,
 				"root path name, default: /services");
@@ -48,13 +54,16 @@ public class HaetaeServerStartup {
 			} else {
 				parse(line);
 
+				cl = getClassLoader();
 				ClassLoader classLoader = cl.load();
 				Class<?> haetaeServerClass = classLoader
 						.loadClass("com.on36.haetae.server.HaetaeServer");
-				
-				List<String> clazzs = ClassPathPackageScanner.scan(classLoader, packageName);
+
+				List<String> clazzs = ClassPathPackageScanner.scan(classLoader,
+						packageName);
 				Object obj = haetaeServerClass
-						.getConstructor(int.class, int.class, String.class, List.class)
+						.getConstructor(int.class, int.class, String.class,
+								List.class)
 						.newInstance(port, threadPoolSize, rootPath, clazzs);
 				Method method = haetaeServerClass.getMethod("start");
 				method.invoke(obj);
@@ -80,6 +89,15 @@ public class HaetaeServerStartup {
 			String size = line.getOptionValue("threadPoolSize");
 			threadPoolSize = Integer.parseInt(size);
 		}
+		if (line.hasOption("source")) {
+			source = line.getOptionValue("source");
+		}
+		if (line.hasOption("package")) {
+			packageName = line.getOptionValue("package");
+		}
+		if (line.hasOption("coords")) {
+			coords = line.getOptionValue("coords");
+		}
 		if (line.hasOption("root")) {
 			String root = line.getOptionValue("root");
 
@@ -92,5 +110,15 @@ public class HaetaeServerStartup {
 
 	private static void print(HelpFormatter formatter, Options options) {
 		formatter.printHelp("haetae start [options] ", options);
+	}
+
+	private static IClassLoader getClassLoader() throws Exception {
+		if ("directory".equals(source))
+			return new DirectoryClassLoader();
+		else if ("maven".equals(source))
+			return new MavenClassLoader(coords);
+		else
+			throw new IllegalArgumentException(
+					"illegal value of source =" + source);
 	}
 }

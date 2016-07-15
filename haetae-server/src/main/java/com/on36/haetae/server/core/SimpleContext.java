@@ -16,13 +16,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.on36.haetae.api.Context;
+import com.on36.haetae.api.JSONObject;
+import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.api.http.Session;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.Route;
 import com.on36.haetae.server.core.interpolation.ResponseBodyInterpolator;
 import com.on36.haetae.server.utils.Deep;
-import com.on36.haetae.server.utils.FormatorUtils;
+import com.on36.haetae.server.utils.JSONUtils;
 import com.on36.haetae.server.utils.ShortUUID;
 
 public class SimpleContext implements Context {
@@ -143,7 +145,10 @@ public class SimpleContext implements Context {
 	}
 
 	public String getContenType() {
-		return request.headers().get("Content-Type");
+		String contentType = request.headers().get("Content-Type");
+		if (contentType == null)
+			contentType = MediaType.TEXT_JSON.value();
+		return contentType;
 	}
 
 	public String getBodyAsString() {
@@ -156,9 +161,15 @@ public class SimpleContext implements Context {
 	}
 
 	@Override
+	public JSONObject getBodyAsJSONObject() {
+		
+		return new JSONObjectImpl(getBodyAsString());
+	}
+
+	@Override
 	public <T> T getBodyAsEntity(Class<T> clazz) {
 
-		return FormatorUtils.fromJson(clazz, getBodyAsString());
+		return JSONUtils.fromJson(clazz, getBodyAsString());
 	}
 
 	@Override
@@ -179,7 +190,7 @@ public class SimpleContext implements Context {
 
 		String result = getURI(resource);
 		if (result != null)
-			return FormatorUtils.fromJson(clazz, result);
+			return JSONUtils.fromJson(clazz, result);
 		return null;
 	}
 }

@@ -1,5 +1,16 @@
 package com.on36.haetae.http.core;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+
+import com.on36.haetae.http.Banner;
+import com.on36.haetae.http.Configuration;
+import com.on36.haetae.http.Container;
+import com.on36.haetae.http.Environment;
+import com.on36.haetae.http.Server;
+import com.on36.haetae.http.route.RouteHelper;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
@@ -12,17 +23,6 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-
-import com.on36.haetae.http.Banner;
-import com.on36.haetae.http.Configuration;
-import com.on36.haetae.http.Container;
-import com.on36.haetae.http.Environment;
-import com.on36.haetae.http.Server;
-import com.on36.haetae.http.route.RouteHelper;
 
 public class HTTPServer implements Server {
 
@@ -108,10 +108,14 @@ public class HTTPServer implements Server {
 
 				System.out
 						.println("Server is now ready to accept connection on ["
-								+ socketAddress + RouteHelper.PATH_ELEMENT_ROOT +"]");
+								+ socketAddress + RouteHelper.PATH_ELEMENT_ROOT
+								+ "]");
 				System.out.close();
 				System.err.close();
 				channel.closeFuture().sync();
+			} catch (Exception e) {
+				throw new Exception(
+						"Address[" + socketAddress + "] already in use: bind");
 			} finally {
 				bossGroup.shutdownGracefully();
 				workerGroup.shutdownGracefully();

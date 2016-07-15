@@ -15,7 +15,6 @@ public class MessageThread implements Runnable {
 		try {
 			server = new UDPServer(scheduler);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -25,7 +24,6 @@ public class MessageThread implements Runnable {
 		try {
 			server.start();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -34,7 +32,6 @@ public class MessageThread implements Runnable {
 		try {
 			server.close();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

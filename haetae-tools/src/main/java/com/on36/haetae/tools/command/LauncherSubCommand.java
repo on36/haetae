@@ -23,13 +23,12 @@ public class LauncherSubCommand implements SubCommand {
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
-		// TODO Auto-generated method stub
+		options.addOption("h", "help", false, "usage: haetae launcher <arg>; default:1015");
 		return options;
 	}
 
 	@Override
 	public void execute(String... args) {
-		// TODO Auto-generated method stub
 		if (args == null)
 			args = new String[0];
 		ProccesUtil.execJava("com.on36.haetae.tools.updater.HaetaeLauncher",true,

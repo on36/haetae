@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
+import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.http.Configuration;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
@@ -69,7 +70,7 @@ public class HaetaeServer {
 		try {
 
 			if (clazzes == null || clazzes.size() == 0)
-				System.out.println("there is no found any service class");
+				throw new Exception("there is no found any service class");
 			else {
 				for (String classString : clazzes) {
 					Class<?> clazz = this.getClass().getClassLoader()
@@ -159,7 +160,7 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(Get get) {
 
-		return register(get.value(), get.version(), HttpMethod.GET, null);
+		return register(get.value(), get.version(), HttpMethod.GET, MediaType.TEXT_JSON.value());
 	}
 
 	public RequestHandler register(Get get, String contentType) {
@@ -177,7 +178,7 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(Post post) {
 
-		return register(post.value(), post.version(), HttpMethod.POST, null);
+		return register(post.value(), post.version(), HttpMethod.POST, MediaType.TEXT_JSON.value());
 	}
 
 	public RequestHandler register(Post post, String contentType) {

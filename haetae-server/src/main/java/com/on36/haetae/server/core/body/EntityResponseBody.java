@@ -1,6 +1,6 @@
 package com.on36.haetae.server.core.body;
 
-import com.on36.haetae.server.utils.FormatorUtils;
+import com.on36.haetae.server.utils.JSONUtils;
 
 public class EntityResponseBody extends StringResponseBody {
 
@@ -18,7 +18,7 @@ public class EntityResponseBody extends StringResponseBody {
 		else if (entity instanceof String)
 			body = (String) entity;
 		else
-			body = FormatorUtils.toJson(entity);
+			body = JSONUtils.toJson(entity);
 		return body;
 	}
 }

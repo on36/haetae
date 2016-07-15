@@ -8,9 +8,7 @@
 		<artifactId>haetae</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>com.on36.haetae</groupId>
 	<artifactId>haetae-assembly</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>haetae-assembly</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -25,12 +23,12 @@
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-manager</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-test</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

@@ -23,6 +23,33 @@
 			<useProjectArtifact>true</useProjectArtifact>
 			<outputDirectory>lib</outputDirectory>
 			<scope>runtime</scope>
+			<excludes>
+				<exclude>com.on36.haetae:haetae-api:jar</exclude>
+				<exclude>com.on36.haetae:haetae-interpolatd:jar</exclude>
+				<exclude>com.on36.haetae:haetae-http:jar</exclude>
+				<exclude>com.on36.haetae:haetae-manager:jar</exclude>
+				<exclude>com.on36.haetae:haetae-server:jar</exclude>
+				<exclude>com.on36.haetae:haetae-test:jar</exclude>
+				<exclude>io.netty:netty-all:jar</exclude>
+				<exclude>com.lmax:disruptor:jar</exclude>
+				<exclude>com.google.code.gson:gson:jar</exclude>
+			</excludes>
+		</dependencySet>
+		<dependencySet>
+			<useProjectArtifact>true</useProjectArtifact>
+			<outputDirectory>ext</outputDirectory>
+			<scope>runtime</scope>
+			<includes>
+				<include>com.on36.haetae:haetae-api:jar</include>
+				<include>com.on36.haetae:haetae-interpolatd:jar</include>
+				<include>com.on36.haetae:haetae-http:jar</include>
+				<include>com.on36.haetae:haetae-manager:jar</include>
+				<include>com.on36.haetae:haetae-server:jar</include>
+				<include>com.on36.haetae:haetae-test:jar</include>
+				<include>io.netty:netty-all:jar</include>
+				<include>com.lmax:disruptor:jar</include>
+				<include>com.google.code.gson:gson:jar</include>
+			</includes>
 		</dependencySet>
 	</dependencySets>
 </assembly>

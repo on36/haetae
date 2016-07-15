@@ -37,6 +37,5 @@ public class RegexRouter implements Router {
 
 	@Override
 	public void remove(String path) {
-		//TODO just this
 	}
 }

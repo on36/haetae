@@ -74,9 +74,6 @@ public class RouteHelper {
 	}
 
 	public static String escapeNonCustomRegex(String path) {
-		/*
-		 * TODO replace with a regular expression
-		 */
 		StringBuilder sb = new StringBuilder();
 		boolean inCustomRegion = false;
 		CharacterIterator it = new StringCharacterIterator(path);

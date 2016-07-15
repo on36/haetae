@@ -81,6 +81,7 @@ public interface Context {
 	 * @return
 	 */
 	Session getSession();
+	
 
 	/**
 	 * 返回获取请求体的值，返回字符串类型
@@ -89,6 +90,12 @@ public interface Context {
 	 */
 	String getBodyAsString();
 
+	/**
+	 * 返回获取请求体的值，返回JSON对象
+	 * 
+	 * @return
+	 */
+	JSONObject getBodyAsJSONObject();
 	/**
 	 * 返回获取请求体的值对象，如果请求体数据是JSON对象格式，否则抛出异常
 	 * 

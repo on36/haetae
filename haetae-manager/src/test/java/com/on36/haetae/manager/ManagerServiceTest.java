@@ -9,7 +9,6 @@ import com.on36.haetae.tools.utils.ProccesUtil;
 public class ManagerServiceTest {
 
 	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
 		System.out.println(ProccesUtil.execJava(
 				"com.on36.haetae.tools.server.HaetaeServerTest",false, args));
 		Thread.sleep(5000);

@@ -34,7 +34,7 @@ public class HaetaeContainer implements Container {
 		RequestHandlerImpl handler = null;
 		Context context = null;
 		try {
-			String responseContentType = MediaType.APPLICATION_JSON.value();
+			String responseContentType = MediaType.TEXT_JSON.value();
 			ResponseBody responseBody = new StringResponseBody("");
 			HttpResponseStatus handlerStatusCode = OK;
 
@@ -102,7 +102,7 @@ public class HaetaeContainer implements Container {
 
 		} catch (Throwable e) {
 			response.setStatus(INTERNAL_SERVER_ERROR);
-			sendAndCommitResponse(response, "text/plain",
+			sendAndCommitResponse(response, MediaType.TEXT_JSON.value(),
 					new StringResponseBody(e.getMessage()));
 		} finally {
 			long end = System.currentTimeMillis();

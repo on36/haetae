@@ -13,20 +13,32 @@ import com.on36.haetae.tools.utils.ProccesUtil;
 public class ManagerService {
 
 	@Get("/add")
-	public String add(Context context) {
+	public Map<String, Object> add(Context context) {
 
 		String port = context.getRequestParameter("port");
-		String coords = context.getRequestParameter("coords");
+		String packageName = context.getRequestParameter("package");
 		String[] args = null;
 
-		if (port != null) {
-			args = new String[1];
-			args[0] = port;
+		if (port != null && packageName != null) {
+			args = new String[4];
+			args[0] = "-p";
+			args[1] = port;
+			args[2] = "-pn";
+			args[3] = packageName;
+		} else if (packageName != null) {
+			args = new String[2];
+			args[0] = "-pn";
+			args[1] = packageName;
+		} else if (port != null) {
+			args = new String[2];
+			args[0] = "-p";
+			args[1] = port;
 		}
 		Map<String, Object> result = ProccesUtil.execJava(
-				"com.on36.haetae.tools.server.HaetaeServerStartup", false, args);
+				"com.on36.haetae.tools.server.HaetaeServerStartup", false,
+				args);
 
-		return result.get("message").toString();
+		return result;
 	}
 
 	@Get("/del")

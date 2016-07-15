@@ -23,7 +23,7 @@ public class TestSubCommand implements SubCommand {
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
-		options.addOption("h", "help", true, "usage: haetae test 8080");
+		options.addOption("h", "false", true, "usage: haetae test <arg>; default:8080");
 		return options;
 	}
 

@@ -17,7 +17,6 @@
 			<groupId>com.lmax</groupId>
 			<artifactId>disruptor</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-http</artifactId>
@@ -26,11 +25,6 @@
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-interpolatd</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.on36.haetae</groupId>
-			<artifactId>haetae-hotswap</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

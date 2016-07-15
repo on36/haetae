@@ -28,7 +28,6 @@ public class ProccesTest {
 			while ((s = bufferedReader.readLine()) != null)
 				System.out.println(s);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

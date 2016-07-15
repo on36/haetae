@@ -4,7 +4,9 @@ import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 
 import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +25,7 @@ import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.RouteHelper;
 import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.HaetaeServer;
+import com.on36.haetae.server.core.auth.IAuthentication;
 import com.on36.haetae.server.core.auth.impl.BlackListAuthentication;
 import com.on36.haetae.server.core.auth.impl.RequestFlowAuthentication;
 import com.on36.haetae.server.core.auth.impl.WhiteListAuthentication;
@@ -58,9 +61,11 @@ public class RequestHandlerImpl implements RequestHandler {
 	private Set<SimpleImmutableEntry<String, String>> headers = new HashSet<SimpleImmutableEntry<String, String>>();
 
 	private HttpHandler<?> httpHandler;
+
 	private BlackListAuthentication blackList = new BlackListAuthentication();
 	private WhiteListAuthentication whiteList = new WhiteListAuthentication();
 	private RequestFlowAuthentication requestFlow = new RequestFlowAuthentication();
+	private List<IAuthentication> authList = null;
 	private boolean auth = true;
 
 	private final ExecutorService es = HaetaeServer.threadPools;
@@ -69,6 +74,10 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public RequestHandlerImpl(Scheduler scheduler) {
 		this.scheduler = scheduler;
+		this.authList = new ArrayList<IAuthentication>();
+		this.authList.add(blackList);
+		this.authList.add(whiteList);
+		this.authList.add(requestFlow);
 	}
 
 	public RequestHandler with(String body) {
@@ -340,15 +349,11 @@ public class RequestHandlerImpl implements RequestHandler {
 	public boolean validation(HttpRequestExt request, HttpResponse response) {
 
 		if (auth) {
-			boolean result = blackList.auth(request, response);
+			for(IAuthentication authentication : authList) {
+			boolean result = authentication.auth(request, response);
 			if (!result)
 				return result;
-			result = whiteList.auth(request, response);
-			if (!result)
-				return result;
-			result = requestFlow.auth(request, response);
-			if (!result)
-				return result;
+			}
 		}
 		return true;
 	}

@@ -26,4 +26,9 @@ public class UserService {
 		
 		return context.getCapturedParameter("*[0]");
 	}
+	@Get("/user/hello")
+	public String hello(Context context) {
+		
+		return "hello";
+	}
 }

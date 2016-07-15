@@ -13,18 +13,22 @@ public class StartSubCommand implements SubCommand {
 
 	@Override
 	public String commandName() {
-		// TODO Auto-generated method stub
 		return "start";
 	}
 
 	@Override
 	public String commandDesc() {
-		// TODO Auto-generated method stub
 		return "start a haetae server";
 	}
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
+		options.addOption("s", "source", true,
+				"optional value:directory,maven; default: directory");
+		options.addOption("c", "coords", true,
+				"maven coords, example: com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT");
+		options.addOption("pn", "package", true,
+				"service package name, example: com.ideal.shcrm.service");
 		options.addOption("p", "port", true, "service port, default: 8080");
 		options.addOption("r", "root", true,
 				"root path name, default: /services");
@@ -35,7 +39,6 @@ public class StartSubCommand implements SubCommand {
 
 	@Override
 	public void execute(String... args) {
-		// TODO Auto-generated method stub
 		if (args == null)
 			args = new String[0];
 		 ProccesUtil.execJava("com.on36.haetae.tools.server.HaetaeServerStartup",true, args);

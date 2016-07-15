@@ -12,7 +12,6 @@ public class RecievedEventHandler implements EventHandler<RecievedEvent> {
 	@Override
 	public void onEvent(RecievedEvent event, long sequence, boolean endOfBatch)
 			throws Exception {
-		// TODO Auto-generated method stub
 		System.out.println(this.hashCode() + " " + new String(event.getSendMessage().content()));
 	}
 

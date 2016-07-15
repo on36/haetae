@@ -17,15 +17,20 @@ public class HaetaeLauncher {
 
 	public static void main(String[] args) {
 		try {
+			int port = 1015;
+			if (args != null && args.length >= 1)
+				port = Integer.parseInt(args[0]);
+			
 			ClassLoader classLoader = cl.load();
-			List<String> clazzs = ClassPathPackageScanner.scan(classLoader,
-					"com.on36.haetae.manager.server");
-
-			for (String classString : clazzs) {
-				Class<?> managerClazz = classLoader.loadClass(classString);
-				Method method = managerClazz.getMethod("main", String[].class);
-				method.invoke(null, (Object) args);
-			}
+			Class<?> haetaeServerClass = classLoader
+					.loadClass("com.on36.haetae.server.HaetaeServer");
+			
+			List<String> clazzs = ClassPathPackageScanner.scan(classLoader, "com.on36.haetae.manager");
+			Object obj = haetaeServerClass
+					.getConstructor(int.class, int.class, String.class, List.class)
+					.newInstance(port, 16, "/manager", clazzs);
+			Method method = haetaeServerClass.getMethod("start");
+			method.invoke(obj);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

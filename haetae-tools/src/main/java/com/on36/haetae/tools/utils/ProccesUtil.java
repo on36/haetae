@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author zhanghr
@@ -78,7 +80,12 @@ public class ProccesUtil {
 			}
 		}
 		map.put("success", resultCode == -1 ? true : false);
-		map.put("message", task.printf());
+		if (resultCode == -1) {
+			map.put("message", "OK");
+			map.put("pid", task.pid());
+			map.put("port", task.port());
+		} else
+			map.put("message", task.printf());
 		return map;
 	}
 
@@ -102,6 +109,9 @@ public class ProccesUtil {
 		private InputStream inputStream;
 
 		private StringBuffer sb = null;
+		
+		private int port = -1;
+		private int pid = -1;
 
 		public ProcessTask(Process process) {
 			this.inputStream = process.getInputStream();
@@ -115,6 +125,10 @@ public class ProccesUtil {
 				Scanner scanner = new Scanner(inputStream);
 				while (scanner.hasNextLine()) {
 					s = scanner.nextLine();
+					if(pid < 0)
+						pid = getElementValue(s, "Pid");
+					if(port < 0)
+						port = getElementValue(s, "Port");
 					System.out.println(s);
 					sb.append(s);
 					sb.append(COMMAND_LINE);
@@ -127,6 +141,21 @@ public class ProccesUtil {
 
 		public String printf() {
 			return sb.toString();
+		}
+		public int port() {
+			return port;
+		}
+		public int pid() {
+			return pid;
+		}
+
+		private int getElementValue(String message, String elementString) {
+			Matcher m = Pattern.compile(elementString + ": " + "([0-9]*)")
+					.matcher(message);
+			if (m.find()) {
+				return Integer.parseInt(m.group(1));
+			}
+			return -1;
 		}
 	}
 }

@@ -15,28 +15,24 @@ public class StopSubCommand implements SubCommand {
 
 	@Override
 	public String commandName() {
-		// TODO Auto-generated method stub
 		return "stop";
 	}
 
 	@Override
 	public String commandDesc() {
-		// TODO Auto-generated method stub
 		return "stop running server";
 	}
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
-		// TODO Auto-generated method stub
-		options.addOption("p", "port", true, "service port, default: 8080");
+		options.addOption("h", "help", false, "usage: haetae stop <arg>; default:8080");
 		return options;
 	}
 
 	@Override
 	public void execute(String... args) {
-		// TODO Auto-generated method stub
-		if (args != null && args.length == 2)
-			port = Integer.parseInt(args[1]);
+		if (args != null && args.length == 1)
+			port = Integer.parseInt(args[0]);
 		else 
 			System.out.println("No specify port, using default port 8080");
 		ProccesUtil.killProcess(true,port);
