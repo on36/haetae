@@ -22,7 +22,7 @@ public class ServerTest {
 
 		HaetaeServer server = new HaetaeServer(port,"/manager");
 
-		Class<?> clazz = ManagerService.class;
+		Class<?> clazz = ClusterManagerService.class;
 		Method[] methods = clazz.getDeclaredMethods();
 		Object object = null;
 		for (Method method : methods) {

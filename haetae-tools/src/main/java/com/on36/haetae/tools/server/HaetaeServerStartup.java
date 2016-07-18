@@ -68,10 +68,6 @@ public class HaetaeServerStartup {
 				Method method = haetaeServerClass.getMethod("start");
 				method.invoke(obj);
 			}
-		} catch (MissingOptionException e) {
-			System.out.println(e.getMessage());
-			print(formatter, options);
-			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			print(formatter, options);

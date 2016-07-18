@@ -28,7 +28,7 @@ public class HaetaeLauncher {
 			List<String> clazzs = ClassPathPackageScanner.scan(classLoader, "com.on36.haetae.manager");
 			Object obj = haetaeServerClass
 					.getConstructor(int.class, int.class, String.class, List.class)
-					.newInstance(port, 16, "/manager", clazzs);
+					.newInstance(port, 0, "/_cluster", clazzs);
 			Method method = haetaeServerClass.getMethod("start");
 			method.invoke(obj);
 		} catch (Exception e) {

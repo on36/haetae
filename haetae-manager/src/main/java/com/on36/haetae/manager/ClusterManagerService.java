@@ -10,7 +10,7 @@ import com.on36.haetae.tools.utils.ProccesUtil;
  * @author zhanghr
  * @date 2016年3月11日
  */
-public class ManagerService {
+public class ClusterManagerService {
 
 	@Get("/add")
 	public Map<String, Object> add(Context context) {

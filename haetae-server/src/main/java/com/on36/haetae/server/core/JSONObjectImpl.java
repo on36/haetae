@@ -1,5 +1,7 @@
 package com.on36.haetae.server.core;
 
+import java.util.List;
+
 import com.on36.haetae.api.JSONObject;
 import com.on36.haetae.server.utils.JSONUtils;
 
@@ -16,34 +18,38 @@ public class JSONObjectImpl implements JSONObject {
 	}
 
 	@Override
-	public String getString(String element) {
-		return (String) JSONUtils.getString(jsonValue, element);
+	public String get(String element) {
+		return (String) JSONUtils.get(jsonValue, element);
 	}
 
 	@Override
 	public int getInt(String element) {
-		return ((Number) JSONUtils.getString(jsonValue, element)).intValue();
+		return ((Number) JSONUtils.get(jsonValue, element)).intValue();
 	}
 
 	@Override
 	public long getLong(String element) {
-		return ((Number) JSONUtils.getString(jsonValue, element)).longValue();
+		return ((Number) JSONUtils.get(jsonValue, element)).longValue();
 	}
 	
 	@Override
 	public float getFloat(String element) {
-		return ((Number) JSONUtils.getString(jsonValue, element)).floatValue();
+		return ((Number) JSONUtils.get(jsonValue, element)).floatValue();
 	}
 
 	@Override
 	public boolean getBoolean(String element) {
-		return (boolean) JSONUtils.getString(jsonValue, element);
+		return (boolean) JSONUtils.get(jsonValue, element);
+	}
+	
+	@Override
+	public JSONObject getObject(String element) {
+		return new JSONObjectImpl(JSONUtils.get(jsonValue, element).toString());
 	}
 
-
-	public static void main(String[] args) {
-		String json = "{'name':'zhangsan','sex':'femail','age':28.1,'success':false,'info':{'address':'shanghai'}}";
-		JSONObjectImpl joi = new JSONObjectImpl(json);
-		System.out.println(joi.getFloat("age"));
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> List<T> getList(String element) {
+		return (List<T>) JSONUtils.get(jsonValue, element);
 	}
 }

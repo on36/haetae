@@ -1,6 +1,12 @@
 package com.on36.haetae.server.utils;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -8,7 +14,7 @@ import com.google.gson.JsonPrimitive;
 
 public class JSONUtils {
 
-	private static Gson gson = new Gson();
+	private static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 	private static JsonParser parser = new JsonParser();
 
 	public static String toJson(Object src) {
@@ -22,13 +28,13 @@ public class JSONUtils {
 	}
 
 	/**
-	 * 获取json属性值 ，不支持嵌套属性和数组
+	 * 通过JSON元素属性获取属性值
 	 * 
 	 * @param json
 	 * @param elements
 	 * @return
 	 */
-	public static Object getString(String json, String element) {
+	public static Object get(String json, String element) {
 		JsonObject jo = parser.parse(json).getAsJsonObject();
 		JsonElement je = jo.get(element);
 		Object value = null;
@@ -41,7 +47,29 @@ public class JSONUtils {
 			else if (jp.isString())
 				value = jp.getAsString();
 		} else if (je.isJsonArray()) {
-			// TODO 数组解析
+			JsonArray jsonArray = je.getAsJsonArray();
+			Iterator<JsonElement> eles = jsonArray.iterator();
+			List eleValues = null;
+			while (eles.hasNext()) {
+				JsonElement jele = eles.next();
+				if (jele.isJsonPrimitive()) {
+					JsonPrimitive jpele = jele.getAsJsonPrimitive();
+					if (jpele.isNumber()) {
+						if(eleValues == null)
+							eleValues = new ArrayList<Number>();
+						Number evalue = jpele.getAsNumber();
+						eleValues.add(evalue);
+					} else if (jpele.isString()) {
+						if(eleValues == null)
+							eleValues = new ArrayList<String>();
+						String evalue = jpele.getAsString();
+						eleValues.add(evalue);
+					}
+				}
+			}
+			value = eleValues;
+		} else if (je.isJsonObject()) {
+			value = je.toString();
 		}
 		return value;
 	}

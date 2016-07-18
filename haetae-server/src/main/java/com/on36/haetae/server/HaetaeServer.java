@@ -28,12 +28,20 @@ import io.netty.handler.codec.http.HttpMethod;
  */
 public class HaetaeServer {
 
+	enum MODE {
+		REGISTER, // 注册模式，通过基础注册服务
+		CLASSES, // 类模式，通过外部CLASS定义接口注册服务
+		MIX// 混合模式
+	}
+
 	private final Container container;
 	private final Server server;
 	private final DisruptorManager disruptorManager;
 	private final Scheduler scheduler;
 	private final MessageThread msgThread;
 	private final List<String> clazzes;
+	private MODE runningMode = MODE.REGISTER;
+
 	public static ExecutorService threadPools;
 
 	private Configuration conf = Configuration.create();
@@ -57,6 +65,9 @@ public class HaetaeServer {
 			conf.set("httpServer.path.root", rootPath);
 
 		this.clazzes = clazzes;
+		if (this.clazzes != null)
+			runningMode = MODE.CLASSES;
+
 		threadPools = Executors.newCachedThreadPool();
 
 		container = new HaetaeContainer();
@@ -69,34 +80,42 @@ public class HaetaeServer {
 	public void start() {
 		try {
 
-			if (clazzes == null || clazzes.size() == 0)
-				throw new Exception("there is no found any service class");
-			else {
-				for (String classString : clazzes) {
-					Class<?> clazz = this.getClass().getClassLoader()
-							.loadClass(classString);
-					Method[] methods = clazz.getDeclaredMethods();
-					Object object = null;
+			switch (runningMode) {
+			case CLASSES:
+				if (clazzes == null || clazzes.size() == 0)
+					throw new Exception(
+							"there is no found any service class at running mode:"
+									+ runningMode);
+				else {
+					for (String classString : clazzes) {
+						Class<?> clazz = this.getClass().getClassLoader()
+								.loadClass(classString);
+						Method[] methods = clazz.getDeclaredMethods();
+						Object object = null;
 
-					for (Method method : methods) {
-						Class<?>[] clazzs = method.getParameterTypes();
-						if (clazzs.length == 1 && clazzs[0].getName()
-								.equals(Context.class.getName())) {
+						for (Method method : methods) {
+							Class<?>[] clazzs = method.getParameterTypes();
+							if (clazzs.length == 1 && clazzs[0].getName()
+									.equals(Context.class.getName())) {
 
-							Post post = method.getAnnotation(Post.class);
-							Get get = method.getAnnotation(Get.class);
-							if (object == null)
-								object = clazz.newInstance();
-							if (post != null) {
-								if (find(post.value()) == null)
-									register(post).with(object, method);
-							} else if (get != null) {
-								if (find(get.value()) == null)
-									register(get).with(object, method);
+								Post post = method.getAnnotation(Post.class);
+								Get get = method.getAnnotation(Get.class);
+								if (object == null)
+									object = clazz.newInstance();
+								if (post != null) {
+									if (find(post.value()) == null)
+										register(post).with(object, method);
+								} else if (get != null) {
+									if (find(get.value()) == null)
+										register(get).with(object, method);
+								}
 							}
 						}
 					}
 				}
+				break;
+			default:
+				break;
 			}
 
 			server.start();
@@ -109,9 +128,6 @@ public class HaetaeServer {
 	}
 
 	public void stop() {
-		if (server == null) {
-			throw new IllegalStateException("server has not been started");
-		}
 		disruptorManager.close();
 		msgThread.close();
 		threadPools.shutdown();
@@ -128,7 +144,10 @@ public class HaetaeServer {
 	 * @return
 	 */
 	public RequestHandler register(String resource, HttpMethod method) {
-
+		
+		if (runningMode == MODE.CLASSES)
+			runningMode = MODE.MIX;
+		
 		return register(resource, "1.0", method, null);
 	}
 
@@ -143,7 +162,7 @@ public class HaetaeServer {
 	 *            服务请求的方法类型 如GET、POST
 	 * @return
 	 */
-	public RequestHandler register(String resource, String version,
+	private RequestHandler register(String resource, String version,
 			HttpMethod method, String contentType) {
 
 		RequestHandlerImpl handler = new RequestHandlerImpl(scheduler);
@@ -160,7 +179,8 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(Get get) {
 
-		return register(get.value(), get.version(), HttpMethod.GET, MediaType.TEXT_JSON.value());
+		return register(get.value(), get.version(), HttpMethod.GET,
+				MediaType.TEXT_JSON.value());
 	}
 
 	public RequestHandler register(Get get, String contentType) {
@@ -178,7 +198,8 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(Post post) {
 
-		return register(post.value(), post.version(), HttpMethod.POST, MediaType.TEXT_JSON.value());
+		return register(post.value(), post.version(), HttpMethod.POST,
+				MediaType.TEXT_JSON.value());
 	}
 
 	public RequestHandler register(Post post, String contentType) {
