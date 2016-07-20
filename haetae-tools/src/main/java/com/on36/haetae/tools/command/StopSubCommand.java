@@ -3,7 +3,7 @@ package com.on36.haetae.tools.command;
 import org.apache.commons.cli.Options;
 
 import com.on36.haetae.tools.SubCommand;
-import com.on36.haetae.tools.utils.ProccesUtil;
+import com.on36.haetae.tools.utils.ProcessUtil;
 
 /**
  * @author zhanghr
@@ -35,7 +35,7 @@ public class StopSubCommand implements SubCommand {
 			port = Integer.parseInt(args[0]);
 		else 
 			System.out.println("No specify port, using default port 8080");
-		ProccesUtil.killProcess(true,port);
+		ProcessUtil.killProcess(true,port);
 	}
 
 }

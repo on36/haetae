@@ -3,7 +3,7 @@ package com.on36.haetae.tools.command;
 import org.apache.commons.cli.Options;
 
 import com.on36.haetae.tools.SubCommand;
-import com.on36.haetae.tools.utils.ProccesUtil;
+import com.on36.haetae.tools.utils.ProcessUtil;
 
 /**
  * @author zhanghr
@@ -23,7 +23,8 @@ public class LauncherSubCommand implements SubCommand {
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
-		options.addOption("h", "help", false, "usage: haetae launcher <arg>; default:1015");
+		options.addOption("h", "help", false,
+				"usage: haetae launcher <arg>; default:1015");
 		return options;
 	}
 
@@ -31,8 +32,7 @@ public class LauncherSubCommand implements SubCommand {
 	public void execute(String... args) {
 		if (args == null)
 			args = new String[0];
-		ProccesUtil.execJava("com.on36.haetae.tools.updater.HaetaeLauncher",true,
-				args);
+		ProcessUtil.execHaetaeServer(true, args);
 	}
 
 }

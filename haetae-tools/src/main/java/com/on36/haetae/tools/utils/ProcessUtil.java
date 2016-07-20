@@ -2,6 +2,7 @@ package com.on36.haetae.tools.utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import java.util.regex.Pattern;
  * @author zhanghr
  * @date 2016年3月3日
  */
-public class ProccesUtil {
+public class ProcessUtil {
 
 	private static long PROCCESS_TIMEOUT_SECONDS = 10;
 	private static String COMMAND_EXIT = "exit\n";
@@ -39,6 +40,12 @@ public class ProccesUtil {
 		return exec(false, autoExited, list);
 	}
 
+	public static Map<String, Object> execHaetaeServer(boolean autoExited,
+			String... args) {
+		return execJava("com.on36.haetae.tools.server.HaetaeServerStartup",
+				autoExited, args);
+	}
+
 	public static Map<String, Object> exec(boolean autoClosed,
 			boolean autoExited, String... args) {
 		return exec(autoClosed, autoExited, Arrays.asList(args));
@@ -49,6 +56,7 @@ public class ProccesUtil {
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		int resultCode = -1;
+		int pid = -1;
 		Future<?> future = null;
 		Process process = null;
 		ProcessTask task = null;
@@ -66,6 +74,15 @@ public class ProccesUtil {
 			future = es.submit(task);
 			future.get(PROCCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 			resultCode = process.exitValue();
+
+			Class<?> processClass = process.getClass();
+			String className = processClass.getName();
+			if (className.equals("java.lang.UNIXProcess")) {
+				Field pidField = processClass.getDeclaredField("pid");
+				pidField.setAccessible(true);
+				Object value = pidField.get(process);
+				pid = (int) value;
+			}
 		} catch (Exception e) {
 			if (future != null) {
 				future.cancel(true);
@@ -82,11 +99,30 @@ public class ProccesUtil {
 		map.put("success", resultCode == -1 ? true : false);
 		if (resultCode == -1) {
 			map.put("message", "OK");
-			map.put("pid", task.pid());
+			map.put("pid", pid > 0 ? pid : task.pid());
 			map.put("port", task.port());
 		} else
 			map.put("message", task.printf());
 		return map;
+	}
+
+	public static String execAndAutoCloseble(String... args) {
+		try {
+			StringBuffer sb = new StringBuffer();
+			ProcessBuilder pb = new ProcessBuilder(Arrays.asList(args));
+			pb.redirectErrorStream(true);
+			Process process = pb.start();
+			process.waitFor();
+			Scanner scanner = new Scanner(process.getInputStream());
+			while (scanner.hasNextLine()) {
+				sb.append(scanner.nextLine());
+			}
+			scanner.close();
+			return sb.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static Map<String, Object> killProcess(boolean autoExited,
@@ -109,7 +145,7 @@ public class ProccesUtil {
 		private InputStream inputStream;
 
 		private StringBuffer sb = null;
-		
+
 		private int port = -1;
 		private int pid = -1;
 
@@ -125,9 +161,9 @@ public class ProccesUtil {
 				Scanner scanner = new Scanner(inputStream);
 				while (scanner.hasNextLine()) {
 					s = scanner.nextLine();
-					if(pid < 0)
+					if (pid < 0)
 						pid = getElementValue(s, "Pid");
-					if(port < 0)
+					if (port < 0)
 						port = getElementValue(s, "Port");
 					System.out.println(s);
 					sb.append(s);
@@ -142,9 +178,11 @@ public class ProccesUtil {
 		public String printf() {
 			return sb.toString();
 		}
+
 		public int port() {
 			return port;
 		}
+
 		public int pid() {
 			return pid;
 		}

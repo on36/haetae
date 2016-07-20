@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
-import com.on36.haetae.tools.utils.ProccesUtil;
+import com.on36.haetae.tools.utils.ProcessUtil;
 
 /**
  * @author zhanghr
@@ -34,7 +34,7 @@ public class ClusterManagerService {
 			args[0] = "-p";
 			args[1] = port;
 		}
-		Map<String, Object> result = ProccesUtil.execJava(
+		Map<String, Object> result = ProcessUtil.execJava(
 				"com.on36.haetae.tools.server.HaetaeServerStartup", false,
 				args);
 

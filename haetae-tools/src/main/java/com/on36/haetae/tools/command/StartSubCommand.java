@@ -3,7 +3,7 @@ package com.on36.haetae.tools.command;
 import org.apache.commons.cli.Options;
 
 import com.on36.haetae.tools.SubCommand;
-import com.on36.haetae.tools.utils.ProccesUtil;
+import com.on36.haetae.tools.utils.ProcessUtil;
 
 /**
  * @author zhanghr
@@ -41,6 +41,6 @@ public class StartSubCommand implements SubCommand {
 	public void execute(String... args) {
 		if (args == null)
 			args = new String[0];
-		 ProccesUtil.execJava("com.on36.haetae.tools.server.HaetaeServerStartup",true, args);
+		ProcessUtil.execHaetaeServer(true, args);
 	}
 }

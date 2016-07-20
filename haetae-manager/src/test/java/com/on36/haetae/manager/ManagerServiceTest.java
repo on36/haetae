@@ -1,6 +1,6 @@
 package com.on36.haetae.manager;
 
-import com.on36.haetae.tools.utils.ProccesUtil;
+import com.on36.haetae.tools.utils.ProcessUtil;
 
 /**
  * @author zhanghr
@@ -9,10 +9,10 @@ import com.on36.haetae.tools.utils.ProccesUtil;
 public class ManagerServiceTest {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(ProccesUtil.execJava(
+		System.out.println(ProcessUtil.execJava(
 				"com.on36.haetae.tools.server.HaetaeServerTest",false, args));
 		Thread.sleep(5000);
-		System.out.println(ProccesUtil.execJava(
+		System.out.println(ProcessUtil.execJava(
 				"com.on36.haetae.tools.server.HaetaeServerTest",false, args));
 	}
 

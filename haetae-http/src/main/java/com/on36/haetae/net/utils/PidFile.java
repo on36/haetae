@@ -7,6 +7,8 @@ import java.lang.management.ManagementFactory;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
+import com.on36.haetae.http.route.RouteHelper;
+
 public class PidFile extends Thread {
 
 	private String name;
@@ -54,6 +56,7 @@ public class PidFile extends Thread {
 			pidDir = haeataePath + File.separator + "prccess";
 		}
 		pidFilesb.append(pidDir).append(File.separator).append(name)
+				.append(RouteHelper.PATH_ELEMENT_ROOT.replace("/", ""))
 				.append(".pid");
 		try {
 			File existsFile = new File(pidDir);
@@ -98,6 +101,7 @@ public class PidFile extends Thread {
 			pidDir = haeataePath + File.separator + "prccess";
 		}
 		pidFilesb.append(pidDir).append(File.separator).append(name)
+				.append(RouteHelper.PATH_ELEMENT_ROOT.replace("/", ""))
 				.append(".pid");
 		String pidFileName = pidFilesb.toString();
 
