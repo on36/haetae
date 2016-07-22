@@ -106,10 +106,10 @@ public class ProcessUtil {
 		return map;
 	}
 
-	public static String execAndAutoCloseble(String... args) {
+	public static String execAndAutoCloseble(List<String> args) {
 		try {
 			StringBuffer sb = new StringBuffer();
-			ProcessBuilder pb = new ProcessBuilder(Arrays.asList(args));
+			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
 			process.waitFor();
@@ -123,6 +123,10 @@ public class ProcessUtil {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static String execAndAutoCloseble(String... args) {
+		return execAndAutoCloseble(Arrays.asList(args));
 	}
 
 	public static Map<String, Object> killProcess(boolean autoExited,

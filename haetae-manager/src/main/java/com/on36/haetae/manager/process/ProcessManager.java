@@ -1,5 +1,6 @@
 package com.on36.haetae.manager.process;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +11,11 @@ public interface ProcessManager {
 
 	Map<String, Object> process(String...args);
 
-	int killProcess(int pid);
+	int killProcess(int port);
 
+	int killProcess(String port);
+	
 	int killProcess(ProcessTO process);
+	
+	List<ProcessTO> listProcess();
 }

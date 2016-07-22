@@ -9,7 +9,8 @@ import java.net.UnknownHostException;
  */
 public class ProcessTO {
 
-	private String name;
+	private String host;
+	private String root;
 	private int pid;
 	private int port;
 	private String packageName;
@@ -23,12 +24,14 @@ public class ProcessTO {
 	 * @param packageName
 	 * @param coords
 	 */
-	public ProcessTO(int pid, int port, String packageName, String coords) {
+	public ProcessTO(int pid, int port, String root, String packageName,
+			String coords) {
 		super();
 		try {
-			this.name = InetAddress.getLocalHost().getHostName() + ":" + port;
+			this.host = InetAddress.getLocalHost().getHostName() + ":" + port;
 			this.pid = pid;
 			this.port = port;
+			this.root = root;
 			this.packageName = packageName;
 			this.coords = coords;
 			this.createTime = System.currentTimeMillis();
@@ -39,18 +42,33 @@ public class ProcessTO {
 	}
 
 	/**
-	 * @return the name
+	 * @return the host
 	 */
-	public String getName() {
-		return name;
+	public String getHost() {
+		return host;
 	}
 
 	/**
-	 * @param name
-	 *            the name to set
+	 * @param host
+	 *            the host to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * @return the root
+	 */
+	public String getRoot() {
+		return root;
+	}
+
+	/**
+	 * @param root
+	 *            the root to set
+	 */
+	public void setRoot(String root) {
+		this.root = root;
 	}
 
 	/**

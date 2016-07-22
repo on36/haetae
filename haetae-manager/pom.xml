@@ -6,14 +6,12 @@
 	<parent>
 		<groupId>com.on36.haetae</groupId>
 		<artifactId>haetae</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${project.version}</version>
 	</parent>
 	<artifactId>haetae-manager</artifactId>
 	<name>haetae-manager</name>
 	<url>http://maven.apache.org</url>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -22,18 +20,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
-			<artifactId>haetae-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-server</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-tools</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>

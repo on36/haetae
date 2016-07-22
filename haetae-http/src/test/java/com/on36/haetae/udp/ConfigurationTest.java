@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.on36.haetae.http.Configuration;
+import com.on36.haetae.common.conf.Configuration;
 
 /**
  * @author zhanghr

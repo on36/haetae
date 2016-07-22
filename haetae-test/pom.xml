@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.on36.haetae</groupId>
 		<artifactId>haetae</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${project.version}</version>
 	</parent>
 	<artifactId>haetae-test</artifactId>
 	<name>haetae-test</name>

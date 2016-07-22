@@ -6,14 +6,12 @@
 	<parent>
 		<groupId>com.on36.haetae</groupId>
 		<artifactId>haetae</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${project.version}</version>
 	</parent>
 	<artifactId>haetae-hotswap</artifactId>
 	<name>haetae-hotswap</name>
 	<url>http://maven.apache.org</url>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

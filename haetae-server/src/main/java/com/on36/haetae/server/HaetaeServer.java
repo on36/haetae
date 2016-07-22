@@ -9,7 +9,7 @@ import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.api.http.MediaType;
-import com.on36.haetae.http.Configuration;
+import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.Server;

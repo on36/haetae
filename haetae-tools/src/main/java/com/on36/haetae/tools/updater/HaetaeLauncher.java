@@ -17,7 +17,7 @@ public class HaetaeLauncher {
 
 	public static void main(String[] args) {
 		try {
-			int port = 1015;
+			int port = 1025;
 			if (args != null && args.length >= 1)
 				port = Integer.parseInt(args[0]);
 			

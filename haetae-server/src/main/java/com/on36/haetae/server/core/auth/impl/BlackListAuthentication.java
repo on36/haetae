@@ -15,7 +15,7 @@ import com.on36.haetae.server.core.auth.IAuthentication;
 
 public class BlackListAuthentication implements IAuthentication {
 
-	private final static int MAX_BLACK_REQUEST_PER_IP = 100;
+	private final static int MAX_REQUEST_PER_IP_PER_SECOND = 100;//每个IP每秒最大流量
 	private final Map<String, AtomicLong> lastTime = new ConcurrentHashMap<String, AtomicLong>();
 	private final Map<String, AtomicInteger> curTimes = new ConcurrentHashMap<String, AtomicInteger>();
 
@@ -62,10 +62,10 @@ public class BlackListAuthentication implements IAuthentication {
 			curTimes.put(remoteIp, new AtomicInteger(1));
 		} else {
 			long last = lastTime.get(remoteIp).longValue();
+			if (curTimes.get(remoteIp).intValue() > MAX_REQUEST_PER_IP_PER_SECOND)
+				return false;
 			if ((current - last) < 1000) {
 				curTimes.get(remoteIp).incrementAndGet();
-				if (curTimes.get(remoteIp).intValue() > MAX_BLACK_REQUEST_PER_IP)
-					blackList.add(remoteIp);
 			} else {
 				lastTime.get(remoteIp).set(current);
 				curTimes.get(remoteIp).set(1);

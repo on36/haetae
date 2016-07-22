@@ -1,5 +1,8 @@
 package com.on36.haetae.manager.process.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.on36.haetae.manager.process.BaseProcessManager;
 import com.on36.haetae.tools.utils.ProcessUtil;
 
@@ -10,8 +13,10 @@ import com.on36.haetae.tools.utils.ProcessUtil;
 public class ProcessManagerUnixImpl extends BaseProcessManager {
 
 	@Override
-	public String killPid(int pid) {
-		return "kill -9 " + pid;
+	protected List<String> killPid(int pid) {
+		List<String> commands = new ArrayList<String>();
+		commands.add("kill -9 " + pid);
+		return commands;
 	}
 
 	@Override

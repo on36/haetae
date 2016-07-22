@@ -4,7 +4,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.on36.haetae.net.utils.PidFile;
+import com.on36.haetae.common.pid.PidFile;
+import com.on36.haetae.http.route.RouteHelper;
 
 /**
  * @author zhanghr
@@ -37,7 +38,7 @@ public class Banner {
 			e.printStackTrace();
 		} finally {
 			try {
-				new PidFile(port+"");
+				new PidFile(port,RouteHelper.PATH_ELEMENT_ROOT);
 				reader.close();
 				is.close();
 			} catch (Exception e) {

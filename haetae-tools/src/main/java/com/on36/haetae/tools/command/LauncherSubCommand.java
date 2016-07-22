@@ -32,7 +32,8 @@ public class LauncherSubCommand implements SubCommand {
 	public void execute(String... args) {
 		if (args == null)
 			args = new String[0];
-		ProcessUtil.execHaetaeServer(true, args);
+		ProcessUtil.execJava("com.on36.haetae.tools.updater.HaetaeLauncher",
+				true, args);
 	}
 
 }

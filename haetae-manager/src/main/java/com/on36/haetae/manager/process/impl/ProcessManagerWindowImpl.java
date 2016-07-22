@@ -1,5 +1,8 @@
 package com.on36.haetae.manager.process.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.on36.haetae.manager.process.BaseProcessManager;
 import com.on36.haetae.tools.utils.ProcessUtil;
 
@@ -10,8 +13,12 @@ import com.on36.haetae.tools.utils.ProcessUtil;
 public class ProcessManagerWindowImpl extends BaseProcessManager {
 
 	@Override
-	public String killPid(int pid) {
-		return "taskkill /PID " + pid + " /f";
+	protected List<String> killPid(int pid) {
+		List<String> commands = new ArrayList<String>();
+		commands.add("cmd.exe");
+		commands.add("/c");
+		commands.add("taskkill /PID " + pid + " /f");
+		return commands;
 	}
 
 	@Override
@@ -27,10 +34,5 @@ public class ProcessManagerWindowImpl extends BaseProcessManager {
 				return Integer.parseInt(arr[length - 1]);
 		}
 		return -1;
-	}
-
-	public static void main(String[] args) {
-		ProcessManagerWindowImpl window = new ProcessManagerWindowImpl();
-		System.out.println(window.getPid(49889));
 	}
 }

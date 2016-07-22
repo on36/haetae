@@ -1,4 +1,4 @@
-package com.on36.haetae.http;
+package com.on36.haetae.common.conf;
 
 import java.util.ArrayList;
 import java.util.Arrays;

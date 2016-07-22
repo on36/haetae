@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import com.on36.haetae.http.Configuration;
+import com.on36.haetae.common.conf.Configuration;
 
 public class RouteHelper {
 

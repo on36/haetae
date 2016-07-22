@@ -1,6 +1,6 @@
 package com.on36.haetae.server;
 
-import com.on36.haetae.http.Configuration;
+import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.net.udp.Message;
 import com.on36.haetae.net.udp.Message.Title;
 import com.on36.haetae.net.udp.Scheduler;

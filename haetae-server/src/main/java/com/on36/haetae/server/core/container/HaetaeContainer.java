@@ -28,11 +28,12 @@ public class HaetaeContainer implements Container {
 	private final RequestResolver requestResolver = new RequestResolver(this);
 
 	private final SessionManager sessionManager = new SessionManager();
-	
+
 	public void handle(HttpRequestExt request, HttpResponse response) {
 
 		RequestHandlerImpl handler = null;
 		Context context = null;
+		long start = System.currentTimeMillis();
 		try {
 			String responseContentType = MediaType.TEXT_JSON.value();
 			ResponseBody responseBody = new StringResponseBody("");
@@ -65,8 +66,7 @@ public class HaetaeContainer implements Container {
 			}
 
 			/* create context */
-			context = new SimpleContext(request, resolved.route,
-					session, this);
+			context = new SimpleContext(request, resolved.route, session, this);
 
 			/* set the response body */
 			ResponseBody handlerBody = handler.body(context);
@@ -77,8 +77,8 @@ public class HaetaeContainer implements Container {
 			/* set the response status code */
 			int responseStatus = handler.statusCode();
 			if (responseStatus > -1)
-				handlerStatusCode = HttpResponseStatus.valueOf(resolved.handler
-						.statusCode());
+				handlerStatusCode = HttpResponseStatus
+						.valueOf(resolved.handler.statusCode());
 
 			if (handlerStatusCode.code() == -1) {
 				throw new RuntimeException(
@@ -106,10 +106,10 @@ public class HaetaeContainer implements Container {
 					new StringResponseBody(e.getMessage()));
 		} finally {
 			long end = System.currentTimeMillis();
-			long elapsedTime = end - request.getStartHandleTime();
+			long elapsedTime = end - start;
 			if (handler != null)
 				handler.stats(response, elapsedTime, context);
-				
+
 		}
 	}
 
@@ -130,9 +130,11 @@ public class HaetaeContainer implements Container {
 			String resource, String version) {
 		return addHandler(handler, method, resource, version, null);
 	}
+
 	public boolean addHandler(RequestHandler handler, HttpMethod method,
 			String resource, String version, String contentType) {
-		return requestResolver.addHandler(handler, method, resource, version,contentType);
+		return requestResolver.addHandler(handler, method, resource, version,
+				contentType);
 	}
 
 	public boolean addHandler(RequestHandler handler, String resource) {

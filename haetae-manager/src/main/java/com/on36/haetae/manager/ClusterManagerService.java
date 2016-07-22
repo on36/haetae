@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
-import com.on36.haetae.tools.utils.ProcessUtil;
+import com.on36.haetae.manager.process.ProcessManagerFactory;
 
 /**
  * @author zhanghr
@@ -34,16 +34,16 @@ public class ClusterManagerService {
 			args[0] = "-p";
 			args[1] = port;
 		}
-		Map<String, Object> result = ProcessUtil.execJava(
-				"com.on36.haetae.tools.server.HaetaeServerStartup", false,
-				args);
+		Map<String, Object> result = ProcessManagerFactory.getProcessManager().process(args);
 
 		return result;
 	}
 
-	@Get("/del")
+	@Get("/kill")
 	public String del(Context context) {
-		return "del-" + context.getRequestParameter("key");
+		String port = context.getRequestParameter("port");
+		int result = ProcessManagerFactory.getProcessManager().killProcess(port);
+		return "kill-" + result;
 	}
 
 	@Get("/update")

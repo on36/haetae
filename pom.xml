@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.on36.haetae</groupId>
 	<artifactId>haetae</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>haetae-http</module>
@@ -15,13 +15,12 @@
 		<module>haetae-test</module>
 		<module>haetae-tools</module>
 		<module>haetae-sample</module>
-		<module>haeatae-orm</module>
 		<module>haetae-common</module>
 		<module>haetae-manager</module>
 		<module>haetae-assembly</module>
 	</modules>
-
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
 		<junit.version>4.11</junit.version>
 		<netty.version>4.0.36.Final</netty.version>
@@ -148,6 +147,7 @@
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>2.4</version>
 				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>

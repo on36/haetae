@@ -16,11 +16,11 @@ public class ServerTest {
 
 	public static void main(String[] args) throws Exception {
 		
-		int port = 1015;
+		int port = 1025;
 		if(args != null && args.length == 1)
 			port = Integer.parseInt(args[0]);
 
-		HaetaeServer server = new HaetaeServer(port,"/manager");
+		HaetaeServer server = new HaetaeServer(port,"/_cluster");
 
 		Class<?> clazz = ClusterManagerService.class;
 		Method[] methods = clazz.getDeclaredMethods();

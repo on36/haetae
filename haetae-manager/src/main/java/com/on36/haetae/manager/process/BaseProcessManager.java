@@ -20,7 +20,7 @@ public abstract class BaseProcessManager implements ProcessManager {
 		if (true == (Boolean) result.get("success")) {
 			int port = (int) result.get("port");
 			int pid = (int) result.get("pid");
-			processMap.put(port, new ProcessTO(pid, port, null, null));
+			processMap.put(port, new ProcessTO(pid, port, null, null, null));
 		}
 		return result;
 	}
@@ -29,11 +29,15 @@ public abstract class BaseProcessManager implements ProcessManager {
 	public int killProcess(int port) {
 		int pid = getPid(port);
 		if (pid > 0) {
-			String command = killPid(pid);
-			ProcessUtil.exec(true, false, command);
+			ProcessUtil.execAndAutoCloseble(killPid(pid));
 			return 1;
 		}
-		return 0;
+		return -1;
+	}
+
+	@Override
+	public int killProcess(String port) {
+		return killProcess(Integer.parseInt(port));
 	}
 
 	@Override
@@ -41,11 +45,17 @@ public abstract class BaseProcessManager implements ProcessManager {
 		return killProcess(process.getPort());
 	}
 
-	protected abstract String killPid(int pid);
+	@Override
+	public List<ProcessTO> listProcess() {
+
+		return null;
+	}
+
+	protected abstract List<String> killPid(int pid);
 
 	protected abstract int findPid(int port);
 
-	public int getPid(int port) {
+	protected int getPid(int port) {
 		if (getProcess(port) != null)
 			return getProcess(port).getPid();
 		return findPid(port);
