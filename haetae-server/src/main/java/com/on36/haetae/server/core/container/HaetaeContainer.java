@@ -3,9 +3,6 @@ package com.on36.haetae.server.core.container;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
@@ -19,9 +16,14 @@ import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.SimpleContext;
+import com.on36.haetae.server.core.body.ErrorResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
 import com.on36.haetae.server.core.body.StringResponseBody;
 import com.on36.haetae.server.core.manager.SessionManager;
+
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class HaetaeContainer implements Container {
 
@@ -103,7 +105,7 @@ public class HaetaeContainer implements Container {
 		} catch (Throwable e) {
 			response.setStatus(INTERNAL_SERVER_ERROR);
 			sendAndCommitResponse(response, MediaType.TEXT_JSON.value(),
-					new StringResponseBody(e.getMessage()));
+					new ErrorResponseBody(e));
 		} finally {
 			long end = System.currentTimeMillis();
 			long elapsedTime = end - start;

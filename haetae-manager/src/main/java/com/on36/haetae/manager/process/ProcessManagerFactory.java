@@ -14,10 +14,11 @@ public class ProcessManagerFactory {
 
 	public static ProcessManager getProcessManager() {
 		String osName = System.getProperty("os.name");
-		if (osName.indexOf("Windows") == -1) {
-			return unix;
-		} else {
+		if (osName.indexOf("Windowss") > -1) {
 			return window;
-		}
+		} else if (osName.indexOf("Linux") > -1) {
+			return unix;
+		} else
+			throw new RuntimeException("not support operate system : " + osName);
 	}
 }

@@ -5,14 +5,13 @@ import java.lang.reflect.Method;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
-import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.server.HaetaeServer;
 
 /**
  * @author zhanghr
  * @date 2016年1月3日
  */
-public class ServerTest {
+public class ClusterManagerServerTest {
 
 	public static void main(String[] args) throws Exception {
 		
@@ -36,10 +35,10 @@ public class ServerTest {
 					object = clazz.newInstance();
 				if (post != null) {
 					if (server.find(post.value()) == null)
-						server.register(post,MediaType.TEXT_HTML.value()).with(object, method);
+						server.register(post).with(object, method);
 				} else if (get != null) {
 					if (server.find(get.value()) == null)
-						server.register(get,MediaType.TEXT_HTML.value()).with(object, method);
+						server.register(get).with(object, method);
 				}
 			}
 		}

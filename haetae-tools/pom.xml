@@ -20,6 +20,12 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-runner -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-runner</artifactId>
+			<version>9.3.11.M0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>commons-cli</groupId>

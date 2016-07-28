@@ -2,6 +2,7 @@ package com.on36.haetae.server.core;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.FOUND;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -230,6 +232,12 @@ public class RequestHandlerImpl implements RequestHandler {
 		} catch (TimeoutException | InterruptedException e) {
 			future.cancel(true);
 			return new TimeoutResponseBody();
+		} catch (ExecutionException ee) {
+			Throwable cause = ee.getCause();
+			if (cause instanceof InvocationTargetException) {
+				InvocationTargetException target = (InvocationTargetException) cause;
+				throw (Exception)target.getTargetException();
+			}
 		} finally {
 
 		}
@@ -248,29 +256,6 @@ public class RequestHandlerImpl implements RequestHandler {
 
 			trace(elapsedTime, requestId, resource, deep);
 		}
-	}
-
-	private Object html(Object result, Context context) {
-		if (result == null)
-			return "";
-		else if (result instanceof String) {
-			String html = null;
-			String contentType = context.getContenType();
-			if (MediaType.APPLICATION_JSON.value().equals(contentType)
-					|| MediaType.TEXT_JSON.value().equals(contentType)) {
-				return result;
-			} else {
-				html = (String) result;
-				html = html.replace("\t", "&nbsp;&nbsp;");// 替换跳格
-				html = html.replace(" ", "&nbsp;");// 替换空格
-				html = html.replace("\n", "<br />");// 替换空格
-				StringBuffer sb = new StringBuffer("<html><body>");
-				sb.append(html);
-				sb.append("</body></html>");
-				return sb.toString();
-			}
-		} else
-			return result;
 	}
 
 	private void trace(long elapsedTime, String requestId, String resource,
@@ -349,10 +334,10 @@ public class RequestHandlerImpl implements RequestHandler {
 	public boolean validation(HttpRequestExt request, HttpResponse response) {
 
 		if (auth) {
-			for(IAuthentication authentication : authList) {
-			boolean result = authentication.auth(request, response);
-			if (!result)
-				return result;
+			for (IAuthentication authentication : authList) {
+				boolean result = authentication.auth(request, response);
+				if (!result)
+					return result;
 			}
 		}
 		return true;

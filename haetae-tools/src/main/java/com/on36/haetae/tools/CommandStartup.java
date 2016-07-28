@@ -10,10 +10,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
+import com.on36.haetae.tools.command.LauncherSubCommand;
 import com.on36.haetae.tools.command.StartSubCommand;
 import com.on36.haetae.tools.command.StopSubCommand;
 import com.on36.haetae.tools.command.TestSubCommand;
-import com.on36.haetae.tools.command.LauncherSubCommand;
+import com.on36.haetae.tools.command.WebServerSubCommand;
 import com.on36.haetae.tools.utils.ServerUtil;
 
 /**
@@ -29,6 +30,7 @@ public class CommandStartup {
 		initCommand(new StopSubCommand());
 		initCommand(new TestSubCommand());
 		initCommand(new LauncherSubCommand());
+		initCommand(new WebServerSubCommand());
 	}
 
 	public static void initCommand(SubCommand command) {
@@ -61,7 +63,7 @@ public class CommandStartup {
 				}
 			case 1:
 			default:
-				if (args[0].equals("help") || args[0].equals("?")) {
+				if (args[0].equals("-h") || args[0].equals("--help") || args[0].equals("help") || args[0].equals("?")) {
 					printHelp();
 					break;
 				}

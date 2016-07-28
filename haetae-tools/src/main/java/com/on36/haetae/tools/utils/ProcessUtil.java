@@ -40,6 +40,11 @@ public class ProcessUtil {
 		return exec(false, autoExited, list);
 	}
 
+	public static Map<String, Object> execWeb(boolean autoExited,
+			String... args) {
+		return execJava("com.on36.haetae.tools.server.HaetaeWebServer",
+				autoExited, args);
+	}
 	public static Map<String, Object> execHaetaeServer(boolean autoExited,
 			String... args) {
 		return execJava("com.on36.haetae.tools.server.HaetaeServerStartup",

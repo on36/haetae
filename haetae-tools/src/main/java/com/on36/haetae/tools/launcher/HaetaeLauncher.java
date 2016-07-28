@@ -1,4 +1,4 @@
-package com.on36.haetae.tools.updater;
+package com.on36.haetae.tools.launcher;
 
 import java.lang.reflect.Method;
 import java.util.List;

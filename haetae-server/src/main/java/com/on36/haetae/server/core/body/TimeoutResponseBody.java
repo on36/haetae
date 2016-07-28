@@ -10,7 +10,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 public class TimeoutResponseBody extends StringResponseBody {
 
 	public TimeoutResponseBody() {
-		super("request time out");
+		super("Request Timeout");
 	}
 	
 	@Override
@@ -20,7 +20,7 @@ public class TimeoutResponseBody extends StringResponseBody {
 
 	@Override
 	public void sendAndCommit(HttpResponse response, String contentType) {
-		response.setStatus(HttpResponseStatus.BAD_REQUEST);
+		response.setStatus(HttpResponseStatus.REQUEST_TIMEOUT);
 		super.sendAndCommit(response, contentType);
 	}
 
