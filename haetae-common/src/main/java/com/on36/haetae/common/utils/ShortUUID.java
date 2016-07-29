@@ -1,4 +1,4 @@
-package com.on36.haetae.server.utils;
+package com.on36.haetae.common.utils;
 
 import java.math.BigInteger;
 import java.util.Arrays;

@@ -1,6 +1,6 @@
 package com.on36.haetae.server.core.body;
 
-import com.on36.haetae.server.utils.JSONUtils;
+import com.on36.haetae.common.utils.JSONUtils;
 
 public class EntityResponseBody extends StringResponseBody {
 

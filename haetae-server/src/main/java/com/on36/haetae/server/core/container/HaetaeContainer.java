@@ -104,7 +104,7 @@ public class HaetaeContainer implements Container {
 
 		} catch (Throwable e) {
 			response.setStatus(INTERNAL_SERVER_ERROR);
-			sendAndCommitResponse(response, MediaType.TEXT_JSON.value(),
+			sendAndCommitResponse(response, MediaType.TEXT_PLAIN.value(),
 					new ErrorResponseBody(e));
 		} finally {
 			long end = System.currentTimeMillis();

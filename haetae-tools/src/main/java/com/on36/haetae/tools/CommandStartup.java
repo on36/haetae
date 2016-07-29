@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.on36.haetae.tools;
 
 import java.util.ArrayList;

@@ -18,6 +18,7 @@
 		<module>haetae-common</module>
 		<module>haetae-manager</module>
 		<module>haetae-assembly</module>
+		<module>haetae-register</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,6 +32,8 @@
 		<aether.version>1.1.0</aether.version>
 		<maven.version>3.3.9</maven.version>
 		<guava.version>18.0</guava.version>
+
+		<jetty.runner.version>9.3.11.M0</jetty.runner.version>
 
 	</properties>
 
@@ -103,13 +106,23 @@
 				<artifactId>aether-transport-http</artifactId>
 				<version>${aether.version}</version>
 			</dependency>
-
 			<dependency>
 				<groupId>org.apache.maven</groupId>
 				<artifactId>maven-aether-provider</artifactId>
 				<version>${maven.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-runner</artifactId>
+				<version>${jetty.runner.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>*</groupId>
+						<artifactId>*</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

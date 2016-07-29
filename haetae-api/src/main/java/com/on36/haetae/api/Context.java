@@ -1,5 +1,6 @@
 package com.on36.haetae.api;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.on36.haetae.api.http.Session;
@@ -14,18 +15,25 @@ public interface Context {
 	long getStartHandleTime();
 
 	/**
-	 * 返回请求ID
+	 * 返回请求链ID
 	 * 
 	 * @return
 	 */
-	String getRequestId();
+	String getTraceId();
 
 	/**
-	 * 返回请求深度
+	 * 返回请求链当前父节点ID
 	 * 
 	 * @return
 	 */
-	String getRequestDeep();
+	String getParentId();
+	
+	/**
+	 * 返回请求链当前节点ID
+	 * 
+	 * @return
+	 */
+	String getSpanId();
 
 	/**
 	 * 请求URI路径
@@ -49,6 +57,13 @@ public interface Context {
 	 * @return
 	 */
 	Set<String> getRequestParameterNames();
+	
+	/**
+	 * 返回所有请求参数key-value的集合
+	 * 
+	 * @return
+	 */
+	Map<String, String> getRequestParameters();
 
 	/**
 	 * 返回捕获匹配的参数值，如 /user/:id 需要获取:id的值

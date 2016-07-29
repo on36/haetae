@@ -30,7 +30,7 @@ public class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
 		p.addLast(new HttpServerCodec());
 		p.addLast(new HttpObjectAggregator(10 * 1024));// max content length
 		if (compressior)
-			p.addLast(new HttpContentCompressor(1));
+			p.addLast(new HttpContentCompressor(6));
 		p.addLast(new HttpServerHandler(container));
 	}
 }

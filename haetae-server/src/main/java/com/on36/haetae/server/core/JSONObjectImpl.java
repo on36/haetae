@@ -3,7 +3,7 @@ package com.on36.haetae.server.core;
 import java.util.List;
 
 import com.on36.haetae.api.JSONObject;
-import com.on36.haetae.server.utils.JSONUtils;
+import com.on36.haetae.common.utils.JSONUtils;
 
 /**
  * @author zhanghr

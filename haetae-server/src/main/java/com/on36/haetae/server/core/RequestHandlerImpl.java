@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.core.HttpHandler;
-import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.request.HttpRequestExt;
@@ -236,7 +235,7 @@ public class RequestHandlerImpl implements RequestHandler {
 			Throwable cause = ee.getCause();
 			if (cause instanceof InvocationTargetException) {
 				InvocationTargetException target = (InvocationTargetException) cause;
-				throw (Exception)target.getTargetException();
+				throw (Exception) target.getTargetException();
 			}
 		} finally {
 
@@ -247,19 +246,21 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public String body(Context context, String resource) throws Exception {
 		long start = System.currentTimeMillis();
+		((SimpleContext) context).setDeepAviable(true);
+		String traceId = context.getTraceId();
+		String parenId = context.getParentId();
+		String spanId = context.getSpanId();
 		try {
 			return body(context).content();
 		} finally {
 			long elapsedTime = System.currentTimeMillis() - start;
-			String requestId = context.getRequestId();
-			String deep = ((SimpleContext) context).nextDeep();
-
-			trace(elapsedTime, requestId, resource, deep);
+			((SimpleContext) context).setDeepAviable(false);
+			trace(elapsedTime, resource, traceId, parenId, spanId);
 		}
 	}
 
-	private void trace(long elapsedTime, String requestId, String resource,
-			String deep) {
+	private void trace(long elapsedTime, String resource, String traceId,
+			String parenId, String spanId) {
 		String className = "com.on36.haetae.server.core.RequestHandlerImpl";
 		String methodName = "body";
 		if (getCustomHandler() != null) {
@@ -270,8 +271,8 @@ public class RequestHandlerImpl implements RequestHandler {
 			methodName = method.getName();
 		}
 
-		String info = requestId + "|" + deep + "|" + className + "|"
-				+ methodName + "|" + resource + "|" + elapsedTime + "ms";
+		String info = traceId + "|" + parenId + "|" + spanId + "|" + className
+				+ "|" + methodName + "|" + resource + "|" + elapsedTime + "ms";
 		scheduler.trace(info);
 	}
 
@@ -279,12 +280,14 @@ public class RequestHandlerImpl implements RequestHandler {
 			Context context) {
 
 		if (context != null) {
-			String requestId = context.getRequestId();
-			String deep = context.getRequestDeep();
+			String traceId = context.getTraceId();
+			String parenId = context.getParentId();
+			String spanId = context.getSpanId();
+			
 			String resource = context.getPath()
 					.replace(RouteHelper.PATH_ELEMENT_ROOT, "");
 			if (resource.length() > 1)
-				trace(elapsedTime, requestId, resource, deep);
+				trace(elapsedTime, resource, traceId, parenId, spanId);
 			else
 				return;
 		}

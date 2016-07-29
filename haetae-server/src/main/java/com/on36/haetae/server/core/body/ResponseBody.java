@@ -16,6 +16,6 @@ public abstract class ResponseBody {
     
     protected void addStandardHeaders(HttpResponse response, String responseContentType) {
         response.headers().set(CONTENT_TYPE, responseContentType);
-        response.headers().set(SERVER, "Haetae/" +Version.CURRENT_VERSION+ "(Netty 4.0.36.Final)");
+        response.headers().set(SERVER, "Haetae/" +Version.CURRENT_VERSION);
     }
 }

@@ -1,13 +1,5 @@
 package com.on36.haetae.server.core;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http.multipart.Attribute;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
-import io.netty.handler.codec.http.multipart.InterfaceHttpData;
-import io.netty.util.CharsetUtil;
-
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -19,18 +11,25 @@ import com.on36.haetae.api.Context;
 import com.on36.haetae.api.JSONObject;
 import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.api.http.Session;
+import com.on36.haetae.common.utils.JSONUtils;
+import com.on36.haetae.common.utils.ShortUUID;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.Route;
 import com.on36.haetae.server.core.interpolation.ResponseBodyInterpolator;
-import com.on36.haetae.server.utils.Deep;
-import com.on36.haetae.server.utils.JSONUtils;
-import com.on36.haetae.server.utils.ShortUUID;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.multipart.Attribute;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.util.CharsetUtil;
 
 public class SimpleContext implements Context {
 
-	private static final String HEADER_REQUEST_ID = "Haetae-Request-Id";
-	private static final String HEADER_REQUEST_DEEP = "Haetae-Request-Deep";
+	private static final String HEADER_TRACE_ID = "Haetae-Trace-Id";
+	private static final String HEADER_PARENT_ID = "Haetae-Parent-ID";
 
 	private final HttpRequestExt request;
 
@@ -40,9 +39,11 @@ public class SimpleContext implements Context {
 
 	private final Container container;
 
-	private String requestId;
-
-	private Deep deep;
+	private String traceId;
+	private String parentId;
+	private String spanId;
+	private int deep = 0;
+	private boolean deepAviable = false;
 
 	private Map<String, String> parmMap = new HashMap<String, String>();
 
@@ -55,13 +56,14 @@ public class SimpleContext implements Context {
 		this.route = route;
 		this.session = session;
 		this.container = container;
-		this.requestId = getHeaderValue(HEADER_REQUEST_ID);
+		this.traceId = getHeaderValue(HEADER_TRACE_ID);
+		this.parentId = getHeaderValue(HEADER_PARENT_ID);
 		try {
-			if (this.requestId == null) {
-				this.requestId = new ShortUUID.Builder().build().toString();
-				this.deep = new Deep();
+			if (this.traceId == null) {
+				this.parentId = this.spanId = this.traceId = new ShortUUID.Builder()
+						.build().toString();
 			} else {
-				this.deep = new Deep(getHeaderValue(HEADER_REQUEST_DEEP));
+				this.spanId = new ShortUUID.Builder().build().toString();
 			}
 			path = new URI(this.request.getUri()).getPath();
 			parse();
@@ -70,16 +72,24 @@ public class SimpleContext implements Context {
 		}
 	}
 
-	public String getRequestId() {
-		return requestId;
+	public String getTraceId() {
+		return traceId;
 	}
 
-	public String getRequestDeep() {
-		return deep.getDeep();
+	public String getParentId() {
+		return parentId;
 	}
 
-	public String nextDeep() {
-		return deep.next();
+	public String getSpanId() {
+		if (deepAviable)
+			return spanId + "_" + deep;
+		return spanId;
+	}
+
+	void setDeepAviable(boolean value) {
+		this.deepAviable = value;
+		if (deepAviable)
+			deep++;
 	}
 
 	public long getStartHandleTime() {
@@ -136,6 +146,10 @@ public class SimpleContext implements Context {
 		return parmMap.keySet();
 	}
 
+	public Map<String, String> getRequestParameters() {
+		return parmMap;
+	}
+
 	public Session getSession() {
 		return session;
 	}
@@ -162,7 +176,7 @@ public class SimpleContext implements Context {
 
 	@Override
 	public JSONObject getBodyAsJSONObject() {
-		
+
 		return new JSONObjectImpl(getBodyAsString());
 	}
 

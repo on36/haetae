@@ -12,8 +12,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.on36.haetae.api.http.Session;
+import com.on36.haetae.common.utils.ShortUUID;
 import com.on36.haetae.http.request.HttpRequestExt;
-import com.on36.haetae.server.utils.ShortUUID;
 
 public class SessionManager {
 

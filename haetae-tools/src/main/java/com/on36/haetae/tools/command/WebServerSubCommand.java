@@ -26,6 +26,7 @@ public class WebServerSubCommand implements SubCommand {
 		options.addOption(null, "config", true, "_configFiles: conf/jetty.xml");
 		options.addOption(null, "port", true, "port default: 8080");
 		options.addOption(null, "path", true, "a context path");
+		options.addOption(null, "log", true, "output a log file name");
 		options.addOption(null, "context", true,
 				"WAR file, web app dir or context xml file");
 		options.addOption("h", "help", false, "help information");
