@@ -42,7 +42,6 @@ TODO LIST
 -----------------------------------
 
 ### 直接写一个haetae服务测试
-public class ServerTest {
 
 	public class ServerTest {
 		public static void main(String[] args) throws Exception {
