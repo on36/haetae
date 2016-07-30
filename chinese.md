@@ -44,41 +44,42 @@ TODO LIST
 ### 直接写一个haetae服务测试
 public class ServerTest {
 
-	public static void main(String[] args) throws Exception {
+	public class ServerTest {
+		public static void main(String[] args) throws Exception {
 
-		int port = 8080;
-		if (args != null && args.length == 1)
-			port = Integer.parseInt(args[0]);
+			int port = 8080;
+			if (args != null && args.length == 1)
+				port = Integer.parseInt(args[0]);
 		
-		HaetaeServer server = new HaetaeServer(port, 128);
-		server.register("/hello").with("Hello xiongdi!").auth(false);
-		server.register("name/:name<[A-Za-z]+>").with("Hello :name");
-		server.register("/multi/*/*").with("Hello *[0] *[1]");
-		server.register("/greeting").with("Hello [request$User-Agent]");
-		server.register("/control").with("Hello control!").every(30,
+			HaetaeServer server = new HaetaeServer(port, 128);
+			server.register("/hello").with("Hello xiongdi!").auth(false);
+			server.register("name/:name<[A-Za-z]+>").with("Hello :name");
+			server.register("/multi/*/*").with("Hello *[0] *[1]");
+			server.register("/greeting").with("Hello [request$User-Agent]");
+			server.register("/control").with("Hello control!").every(30,
 				TimeUnit.SECONDS, 10);
-		server.register("/skip").withRedirect("http://www.baidu.com");
-		server.register("/black").with("Hello black!").ban("172.31.25.40",
+			server.register("/skip").withRedirect("http://www.baidu.com");
+			server.register("/black").with("Hello black!").ban("172.31.25.40",
 				"127.0.0.1");
-		server.register("/white").with("Hello white!").permit("172.31.25.40",
+			server.register("/white").with("Hello white!").permit("172.31.25.40",
 				"127.0.0.1");
-		server.register("/whitecontrol").with("Hello white!")
+			server.register("/whitecontrol").with("Hello white!")
 				.permit("127.0.0.1", ServiceLevel.LEVEL_50);
-		server.register("/body", HttpMethod.POST)
+			server.register("/body", HttpMethod.POST)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) {
 						return context.getBodyAsString();
 					}
 				});
-		server.register("/custom", HttpMethod.POST)
+			server.register("/custom", HttpMethod.POST)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) {
 						return context.getRequestParameter("user");
 					}
 				});
-		server.register("/customobject", HttpMethod.POST)
+			server.register("/customobject", HttpMethod.POST)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
@@ -87,7 +88,7 @@ public class ServerTest {
 						return context.getURI("/hello");
 					}
 				});
-		server.register("/timeout", HttpMethod.GET).timeout(1, TimeUnit.SECONDS)
+			server.register("/timeout", HttpMethod.GET).timeout(1, TimeUnit.SECONDS)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
@@ -98,7 +99,7 @@ public class ServerTest {
 						return context.getURI("/hello");
 					}
 				});
-		server.register("/custombody/*/*", HttpMethod.POST)
+			server.register("/custombody/*/*", HttpMethod.POST)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
@@ -106,10 +107,10 @@ public class ServerTest {
 					}
 				});
 
-		server.start();
+			server.start();
+	 	}
 	}
-}
-    
+
  待添加。。
 
 
