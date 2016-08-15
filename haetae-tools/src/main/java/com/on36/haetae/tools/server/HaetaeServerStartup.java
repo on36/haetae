@@ -32,6 +32,8 @@ public class HaetaeServerStartup {
 		Options options = new Options();
 		options.addOption("s", "source", true,
 				"optional value:directory,maven; default: directory");
+		options.addOption("", "source", true,
+				"optional value:directory,maven; default: directory");
 		options.addOption("c", "coords", true,
 				"maven coords, example: com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT");
 		options.addOption("pn", "package", true,

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Properties;
 
 /***
- * 配置信息类
+ * 文本文件配置信息类
  * 
  * @author zhanghr
  * 
@@ -199,7 +199,7 @@ public class Configuration {
 		if (value == null)
 			return result;
 		String[] values = value.split(",");
-		result = new ArrayList<Integer>();
+		result = new ArrayList<Integer>(values.length);
 		for (String v : values)
 			result.add(Integer.parseInt(v));
 		return result;

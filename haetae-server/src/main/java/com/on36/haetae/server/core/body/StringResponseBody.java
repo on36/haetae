@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class StringResponseBody extends ResponseBody {
 
-	private String body;
+	private String body = "";
 
 	public StringResponseBody(String body) {
 		this.body = body;

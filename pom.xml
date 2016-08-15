@@ -18,13 +18,20 @@
 		<module>haetae-common</module>
 		<module>haetae-manager</module>
 		<module>haetae-assembly</module>
-		<module>haetae-register</module>
+		<module>haetae-rtsp</module>
+		<module>haetae-config</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.7</java.version>
-		<junit.version>4.11</junit.version>
+		<java.version>1.8</java.version>
+		<junit.version>4.12</junit.version>
+		<slf4j.version>1.7.13</slf4j.version>
+		<log4j.version>1.2.17</log4j.version>
+
+		<zookeeper.version>3.4.8</zookeeper.version>
+		<mapdb.version>1.0.9</mapdb.version>
 		<netty.version>4.0.36.Final</netty.version>
+		<asynchttpclient.version>2.0.11</asynchttpclient.version>
 		<disruptor.version>3.3.2</disruptor.version>
 		<common-cli.version>1.3.1</common-cli.version>
 		<gson.version>2.6.2</gson.version>
@@ -44,6 +51,32 @@
 				<artifactId>junit</artifactId>
 				<scope>test</scope>
 				<version>${junit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>${log4j.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.zookeeper</groupId>
+				<artifactId>zookeeper</artifactId>
+				<version>${zookeeper.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mapdb</groupId>
+				<artifactId>mapdb</artifactId>
+				<version>${mapdb.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
@@ -120,6 +153,41 @@
 					<exclusion>
 						<groupId>*</groupId>
 						<artifactId>*</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.asynchttpclient</groupId>
+				<artifactId>async-http-client</artifactId>
+				<version>${asynchttpclient.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.asynchttpclient</groupId>
+						<artifactId>netty-codec-dns</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty-codec</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty-codec-http</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty-common</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty-buffer</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty-handler</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty-transport</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>

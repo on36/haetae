@@ -14,7 +14,8 @@ import com.google.gson.JsonPrimitive;
 
 public class JSONUtils {
 
-	private static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+	private static Gson gson = new GsonBuilder()
+			.setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 	private static JsonParser parser = new JsonParser();
 
 	public static String toJson(Object src) {
@@ -25,6 +26,30 @@ public class JSONUtils {
 	public static <T> T fromJson(Class<T> clazz, String json) {
 
 		return gson.fromJson(json, clazz);
+	}
+
+	public static <T> List<T> fromJsonToList(Class<T> clazz, String json) {
+		System.out.println(json);
+		JsonArray jsonArray = parser.parse(json).getAsJsonArray();
+		Iterator<JsonElement> eles = jsonArray.iterator();
+		if (!eles.hasNext())
+			return null;
+		List<T> eleValues = new ArrayList<T>();
+		while (eles.hasNext()) {
+			JsonElement jele = eles.next();
+			if (jele.isJsonPrimitive()) {
+				JsonPrimitive jpele = jele.getAsJsonPrimitive();
+				if (jpele.isNumber()) {
+					Number evalue = jpele.getAsNumber();
+					eleValues.add((T) evalue);
+				} else if (jpele.isString()) {
+					String evalue = jpele.getAsString();
+					eleValues.add((T) evalue);
+				}
+			} else
+				eleValues.add(gson.fromJson(jele, clazz));
+		}
+		return eleValues;
 	}
 
 	/**
@@ -55,12 +80,12 @@ public class JSONUtils {
 				if (jele.isJsonPrimitive()) {
 					JsonPrimitive jpele = jele.getAsJsonPrimitive();
 					if (jpele.isNumber()) {
-						if(eleValues == null)
+						if (eleValues == null)
 							eleValues = new ArrayList<Number>();
 						Number evalue = jpele.getAsNumber();
 						eleValues.add(evalue);
 					} else if (jpele.isString()) {
-						if(eleValues == null)
+						if (eleValues == null)
 							eleValues = new ArrayList<String>();
 						String evalue = jpele.getAsString();
 						eleValues.add(evalue);

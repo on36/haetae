@@ -140,7 +140,7 @@ public interface RequestHandler {
 	RequestHandler permit(String ip, ServiceLevel level);
 
 	/**
-	 * 增加白名单的IP限制，设置一秒最大请求数.
+	 * 增加白名单的IP限制，设置一秒最大请求数;但是不能超过every设置的流量限量，否则以every设置为准.
 	 * 
 	 * @param ip
 	 *            ip地址
@@ -151,7 +151,7 @@ public interface RequestHandler {
 	RequestHandler permit(String ip, int times);
 
 	/**
-	 * 增加白名单的IP限制，设置单位时间内的服务等级.
+	 * 增加白名单的IP限制，设置单位时间内的服务等级;但是不能超过every设置的流量限量，否则以every设置为准.
 	 * 
 	 * @param ip
 	 *            ip地址
@@ -167,7 +167,7 @@ public interface RequestHandler {
 			TimeUnit periodUnit);
 
 	/**
-	 * 增加白名单的IP限制，设置单位时间内的最大请求数.
+	 * 增加白名单的IP限制，设置单位时间内的最大请求数;但是不能超过every设置的流量限量，否则以every设置为准.
 	 * 
 	 * @param ip
 	 *            ip地址

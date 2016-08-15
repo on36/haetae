@@ -3,6 +3,7 @@ package com.on36.haetae.tools.utils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,13 +26,20 @@ public class ProcessUtil {
 	private static long PROCCESS_TIMEOUT_SECONDS = 10;
 	private static String COMMAND_EXIT = "exit\n";
 	private static String COMMAND_LINE = "\n";
+	private static int startingHeapSizeInMegabytes = 48;
+	private static int maximumHeapSizeInMegabytes = 128;
 
 	private static ExecutorService es = Executors.newCachedThreadPool();
 
-	public static Map<String, Object> execJava(String className,
+	public static Map<String, Object> execJava(String javaRunTime,
+			String className, int minHeapSize, int maxHeapSize,
 			boolean autoExited, String... args) {
 		List<String> list = new ArrayList<String>(4);
-		list.add("java");
+		list.add(javaRunTime);
+		list.add(MessageFormat.format("-Xms{0}M", String.valueOf(
+				minHeapSize > 0 ? minHeapSize : startingHeapSizeInMegabytes)));
+		list.add(MessageFormat.format("-Xmx{0}M", String.valueOf(
+				maxHeapSize > 0 ? maxHeapSize : maximumHeapSizeInMegabytes)));
 		list.add("-cp");
 		list.add(System.getProperty("java.class.path"));
 		list.add(className);
@@ -40,11 +48,17 @@ public class ProcessUtil {
 		return exec(false, autoExited, list);
 	}
 
+	public static Map<String, Object> execJava(String className,
+			boolean autoExited, String... args) {
+		return execJava("java", className, 0, 0, autoExited, args);
+	}
+
 	public static Map<String, Object> execWeb(boolean autoExited,
 			String... args) {
 		return execJava("com.on36.haetae.tools.server.HaetaeWebServer",
 				autoExited, args);
 	}
+
 	public static Map<String, Object> execHaetaeServer(boolean autoExited,
 			String... args) {
 		return execJava("com.on36.haetae.tools.server.HaetaeServerStartup",

@@ -5,7 +5,7 @@ import com.on36.haetae.manager.process.impl.ProcessManagerWindowImpl;
 
 /**
  * @author zhanghr
- * @date 2016年7月20日
+ * @date 2016年3月20日
  */
 public class ProcessManagerFactory {
 

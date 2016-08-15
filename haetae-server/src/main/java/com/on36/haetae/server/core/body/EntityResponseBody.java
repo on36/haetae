@@ -12,7 +12,7 @@ public class EntityResponseBody extends StringResponseBody {
 
 		String body = null;
 		if (entity == null)
-			body = "nothing";
+			body = "success";
 		else if (entity.getClass().isPrimitive())
 			body = entity.toString();
 		else if (entity instanceof String)

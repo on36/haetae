@@ -98,32 +98,4 @@ public class ServerTest {
 		}
 		server.start();
 	}
-
-	class User {
-		private String val;
-		private String value;
-
-		public String getVal() {
-			return val;
-		}
-
-		public void setVal(String val) {
-			this.val = val;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-
-		public User(String val, String value) {
-			super();
-			this.val = val;
-			this.value = value;
-		}
-	}
-
 }

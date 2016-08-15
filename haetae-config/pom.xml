@@ -8,24 +8,13 @@
 		<artifactId>haetae</artifactId>
 		<version>${project.version}</version>
 	</parent>
-	<artifactId>haetae-common</artifactId>
-	<name>haetae-common</name>
+	<artifactId>haetae-config</artifactId>
+	<name>haetae-config</name>
 	<url>http://maven.apache.org</url>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
-		</dependency>
-	</dependencies>
+	<packaging>pom</packaging>
+	<modules>
+		<module>haetae-config-agent</module>
+		<module>haetae-config-client</module>
+	</modules>
 </project>
