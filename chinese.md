@@ -170,8 +170,25 @@ TODO LIST
 			server.start();
 		}
 	}
+或者
 
-方法二 ，从maven仓库下载动态启动
+	public class ServerTest {
+
+		public static void main(String[] args) throws Exception {
+
+			int port = 8080;
+			if (args != null && args.length == 1)
+				port = Integer.parseInt(args[0]);
+		
+			List<String> clazzes = new ArrayList<>();
+			clazzes.add("com.on36.haetae.test.UserService");
+			HaetaeServer server = new HaetaeServer(port, 128, null, clazzes);
+		
+			server.start();
+		}
+	}
+
+方法二 ，从maven仓库下动态启动
 
  待添加。。
 
