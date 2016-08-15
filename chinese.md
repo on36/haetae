@@ -41,7 +41,7 @@ TODO LIST
 使用指导
 -----------------------------------
 
-### 直接写一个haetae服务测试
+### 基于基本haetae服务测试
 
 	public class ServerTest {
 		public static void main(String[] args) throws Exception {
@@ -109,6 +109,69 @@ TODO LIST
 			server.start();
 	 	}
 	}
+
+### 基于微服务测试
+
+服务端
+
+	public class UserService {
+
+		@Get(value="/user/add",version="1.1")
+		public String addUser(Context context) {
+
+			return "lisi";
+		}
+
+		@Get("/user/remove/:id")
+		public String removeUser(Context context) {
+
+			return context.getCapturedParameter(":id");
+		}
+		@Get("/user/list/*/*")
+		public String list(Context context) {
+		
+			return context.getCapturedParameter("*[0]");
+		}
+		@Get("/user/hello")
+		public String hello(Context context) {
+		
+			return "hello";
+		}
+	}
+启动方式
+-----------------------------------
+方法一，直接依赖启动
+
+	public class ServerTest {
+
+		public static void main(String[] args) throws Exception {
+
+			int port = 8080;
+			if (args != null && args.length == 1)
+				port = Integer.parseInt(args[0]);
+
+			HaetaeServer server = new HaetaeServer(port, 128);
+			Class<?> clazz = UserService.class;
+			Method[] methods = clazz.getDeclaredMethods();
+
+			for (Method method : methods) {
+				Class<?>[] clazzs = method.getParameterTypes();
+				if (clazzs.length == 1
+						&& clazzs[0].getName().equals(Context.class.getName())) {
+
+					Post post = method.getAnnotation(Post.class);
+					Get get = method.getAnnotation(Get.class);
+					if (post != null)
+						server.register(post).with(clazz.newInstance(), method);
+					else
+						server.register(get).with(clazz.newInstance(), method);
+				}
+			}
+			server.start();
+		}
+	}
+
+方法二 ，从maven仓库下载动态启动
 
  待添加。。
 
