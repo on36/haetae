@@ -1,4 +1,4 @@
-package com.on36.haeate.common.zk.server;
+package com.on36.haetae.common.zk.server;
 
 import org.apache.zookeeper.server.ServerConfig;
 import org.apache.zookeeper.server.ZooKeeperServerMain;

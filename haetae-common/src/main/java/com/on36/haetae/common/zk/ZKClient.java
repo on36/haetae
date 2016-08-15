@@ -1,4 +1,4 @@
-package com.on36.haeate.common.zk;
+package com.on36.haetae.common.zk;
 
 import java.util.ArrayList;
 import java.util.Collections;
