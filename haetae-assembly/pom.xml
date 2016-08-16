@@ -28,6 +28,11 @@
 			<artifactId>haetae-test</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-config-agent</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

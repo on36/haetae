@@ -7,6 +7,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 
+import com.on36.haetae.tools.command.ConfigAgentSubCommand;
 import com.on36.haetae.tools.command.LauncherSubCommand;
 import com.on36.haetae.tools.command.StartSubCommand;
 import com.on36.haetae.tools.command.StopSubCommand;
@@ -27,6 +28,7 @@ public class CommandStartup {
 		initCommand(new StopSubCommand());
 		initCommand(new TestSubCommand());
 		initCommand(new LauncherSubCommand());
+		initCommand(new ConfigAgentSubCommand());
 		initCommand(new WebServerSubCommand());
 	}
 

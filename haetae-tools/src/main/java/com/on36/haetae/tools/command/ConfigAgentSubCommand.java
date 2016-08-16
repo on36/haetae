@@ -9,22 +9,22 @@ import com.on36.haetae.tools.utils.ProcessUtil;
  * @author zhanghr
  * @date 2016年3月8日
  */
-public class LauncherSubCommand implements SubCommand {
+public class ConfigAgentSubCommand implements SubCommand {
 
 	@Override
 	public String commandName() {
-		return "launcher";
+		return "agent";
 	}
 
 	@Override
 	public String commandDesc() {
-		return "start a haeatae launcher";
+		return "start a haeatae config agent";
 	}
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
 		options.addOption("h", "help", false,
-				"usage: haetae launcher <arg>; default:1015");
+				"usage: haetae agent <arg>; default:1984");
 		return options;
 	}
 
@@ -32,7 +32,7 @@ public class LauncherSubCommand implements SubCommand {
 	public void execute(String... args) {
 		if (args == null)
 			args = new String[0];
-		ProcessUtil.execJava("com.on36.haetae.tools.launcher.HaetaeLauncher",
+		ProcessUtil.execJava("com.on36.haetae.tools.launcher.HaetaeConfigAgent",
 				true, args);
 	}
 

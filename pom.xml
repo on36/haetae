@@ -17,9 +17,8 @@
 		<module>haetae-sample</module>
 		<module>haetae-common</module>
 		<module>haetae-manager</module>
-		<module>haetae-assembly</module>
-		<module>haetae-rtsp</module>
 		<module>haetae-config</module>
+		<module>haetae-assembly</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -30,7 +29,7 @@
 
 		<zookeeper.version>3.4.8</zookeeper.version>
 		<mapdb.version>1.0.9</mapdb.version>
-		<netty.version>4.0.36.Final</netty.version>
+		<netty.version>4.0.40.Final</netty.version>
 		<asynchttpclient.version>2.0.11</asynchttpclient.version>
 		<disruptor.version>3.3.2</disruptor.version>
 		<common-cli.version>1.3.1</common-cli.version>
@@ -40,7 +39,7 @@
 		<maven.version>3.3.9</maven.version>
 		<guava.version>18.0</guava.version>
 
-		<jetty.runner.version>9.3.11.M0</jetty.runner.version>
+		<jetty.runner.version>9.3.11.v20160721</jetty.runner.version>
 
 	</properties>
 
@@ -72,6 +71,16 @@
 				<groupId>org.apache.zookeeper</groupId>
 				<artifactId>zookeeper</artifactId>
 				<version>${zookeeper.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>io.netty</groupId>
+						<artifactId>netty</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>jline</groupId>
+						<artifactId>jline</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.mapdb</groupId>
@@ -151,8 +160,36 @@
 				<version>${jetty.runner.version}</version>
 				<exclusions>
 					<exclusion>
-						<groupId>*</groupId>
+						<groupId>org.mortbay.jasper</groupId>
+						<artifactId>apache-jsp</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.eclipse.jetty.websocket</groupId>
 						<artifactId>*</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.eclipse.jetty.toolchain</groupId>
+						<artifactId>jetty-schemas</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.eclipse.jetty</groupId>
+						<artifactId>*</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.taglibs</groupId>
+						<artifactId>taglibs-standard-spec</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.apache.taglibs</groupId>
+						<artifactId>taglibs-standard-impl</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.servlet</groupId>
+						<artifactId>javax.servlet-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>javax.annotation</groupId>
+						<artifactId>javax.annotation-api</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -228,7 +265,15 @@
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>2.4</version>
 				</plugin>
-
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<configuration>
+						<excludes>
+							<exclude>**/log4j.properties</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

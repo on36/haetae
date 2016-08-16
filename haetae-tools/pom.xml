@@ -20,16 +20,6 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-runner</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -39,6 +29,10 @@
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-hotswap</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-runner</artifactId>
 		</dependency>
 	</dependencies>
 </project>

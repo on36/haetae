@@ -29,11 +29,23 @@
 				<exclude>com.on36.haetae:haetae-http:jar</exclude>
 				<exclude>com.on36.haetae:haetae-manager:jar</exclude>
 				<exclude>com.on36.haetae:haetae-server:jar</exclude>
-				<exclude>com.on36.haetae:haetae-common:jar</exclude>
 				<exclude>com.on36.haetae:haetae-test:jar</exclude>
+				<exclude>com.on36.haetae:haetae-config-agent:jar</exclude>
 				<exclude>io.netty:netty-all:jar</exclude>
 				<exclude>com.lmax:disruptor:jar</exclude>
 				<exclude>com.google.code.gson:gson:jar</exclude>
+
+				<exclude>org.eclipse.jetty.websocket:*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-s*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-a*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-h*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-i*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-j*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-p*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-u*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-w*:jar</exclude>
+				<exclude>org.eclipse.jetty:jetty-x*:jar</exclude>
+				<exclude>org.eclipse.jetty:apache-*:jar</exclude>
 			</excludes>
 		</dependencySet>
 		<dependencySet>
@@ -46,8 +58,8 @@
 				<include>com.on36.haetae:haetae-http:jar</include>
 				<include>com.on36.haetae:haetae-manager:jar</include>
 				<include>com.on36.haetae:haetae-server:jar</include>
-				<include>com.on36.haetae:haetae-common:jar</include>
 				<include>com.on36.haetae:haetae-test:jar</include>
+				<include>com.on36.haetae:haetae-config-agent:jar</include>
 				<include>io.netty:netty-all:jar</include>
 				<include>com.lmax:disruptor:jar</include>
 				<include>com.google.code.gson:gson:jar</include>

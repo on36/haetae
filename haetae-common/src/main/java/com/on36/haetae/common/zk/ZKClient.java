@@ -18,11 +18,11 @@ import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
+import com.on36.haetae.common.log.Logger;
+import com.on36.haetae.common.log.LoggerFactory;
 
 /**
  * @author zhanghr
