@@ -49,8 +49,8 @@ USAGE GUIDE
 
 					public String handle(Context context) throws Exception {
 						// User user = context.getBody(User.class);
-						context.getURI("/custom");
-						return context.getURI("/hello");
+						JSONObject jo = context.getBodyAsJSONObject();
+						return jo.get("val");
 					}
 				});
 			server.register("/timeout", HttpMethod.GET).timeout(1, TimeUnit.SECONDS)

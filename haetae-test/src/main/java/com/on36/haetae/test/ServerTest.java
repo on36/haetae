@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 import com.on36.haetae.api.Context;
+import com.on36.haetae.api.JSONObject;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.api.core.HttpHandler;
@@ -57,8 +58,9 @@ public class ServerTest {
 
 					public String handle(Context context) throws Exception {
 						// User user = context.getBody(User.class);
-						context.getURI("/custom");
-						return context.getURI("/hello");
+						JSONObject jo = context.getBodyAsJSONObject();
+						
+						return jo.get("val");
 					}
 				});
 		server.register("/timeout", HttpMethod.GET).timeout(1, TimeUnit.SECONDS)
