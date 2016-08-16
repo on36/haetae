@@ -5,6 +5,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 import com.on36.haetae.common.conf.Configuration;
+import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.http.Banner;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.Environment;
@@ -67,7 +68,8 @@ public class HTTPServer implements Server {
 
 		if (channel == null || !channel.isActive()) {
 			final SslContext sslCtx;
-			boolean ssl = getConfig().getBoolean("httpServer.ssl", false);
+			boolean ssl = getConfig().getBoolean(Constant.K_SERVER_SSL_ENABLED,
+					Constant.V_SERVER_SSL_ENABLED);
 			if (ssl) {
 				SelfSignedCertificate ssc = new SelfSignedCertificate(
 						"on36.com");
@@ -80,18 +82,22 @@ public class HTTPServer implements Server {
 			// Configure the server.
 			EventLoopGroup bossGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
-							: getConfig().getInt("httpServer.threadpool.size",
-									threadPoolSize));
+							: getConfig().getInt(
+									Constant.K_SERVER_THREADPOOL_SIZE,
+									Constant.V_SERVER_THREADPOOL_SIZE));
 			EventLoopGroup workerGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
-							: getConfig().getInt("httpServer.threadpool.size",
-									threadPoolSize));
+							: getConfig().getInt(
+									Constant.K_SERVER_THREADPOOL_SIZE,
+									Constant.V_SERVER_THREADPOOL_SIZE));
 			try {
 				ServerBootstrap b = new ServerBootstrap();
 				b.option(ChannelOption.SO_BACKLOG,
-						getConfig().getInt("httpServer.soBacklog", 1024));
+						getConfig().getInt(Constant.K_SERVER_SOBACKLOG,
+								Constant.V_SERVER_SOBACKLOG));
 				b.option(ChannelOption.SO_REUSEADDR, true);
-				b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
+				b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS,
+						Constant.V_SERVER_CONNECTTIMEOUT_MILLIS);
 				b.option(ChannelOption.ALLOCATOR,
 						PooledByteBufAllocator.DEFAULT);
 				// b.childOption(ChannelOption.AUTO_READ, false);

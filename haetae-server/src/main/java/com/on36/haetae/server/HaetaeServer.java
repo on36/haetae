@@ -10,6 +10,7 @@ import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.common.conf.Configuration;
+import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.Server;
@@ -38,7 +39,7 @@ public class HaetaeServer {
 	private final Server server;
 	private final DisruptorManager disruptorManager;
 	private final Scheduler scheduler;
-	private final MessageThread msgThread;
+	private final Heartbeat msgThread;
 	private final List<String> clazzes;
 	private MODE runningMode = MODE.REGISTER;
 
@@ -62,7 +63,9 @@ public class HaetaeServer {
 			List<String> clazzes) {
 		conf.addResource("haetae.conf");
 		if (rootPath != null)
-			conf.set("httpServer.path.root", rootPath);
+			conf.set(Constant.K_SERVER_ROOT_PATH, rootPath);
+
+		String root = conf.getString(Constant.K_SERVER_ROOT_PATH,Constant.V_SERVER_ROOT_PATH);
 
 		this.clazzes = clazzes;
 		if (this.clazzes != null)
@@ -74,7 +77,7 @@ public class HaetaeServer {
 		server = new HTTPServer(port, threadPoolSize, container);
 		disruptorManager = new DisruptorManager(threadPools);
 		scheduler = new MessageScheduler(disruptorManager);
-		msgThread = new MessageThread(scheduler);
+		msgThread = new Heartbeat(root, port);
 	}
 
 	public void start() {
@@ -118,8 +121,8 @@ public class HaetaeServer {
 				break;
 			}
 
-			server.start();
 			threadPools.submit(msgThread);
+			server.start();
 		} catch (Exception e) {
 			e.printStackTrace();
 
@@ -144,10 +147,10 @@ public class HaetaeServer {
 	 * @return
 	 */
 	public RequestHandler register(String resource, HttpMethod method) {
-		
+
 		if (runningMode == MODE.CLASSES)
 			runningMode = MODE.MIX;
-		
+
 		return register(resource, "1.0", method, null);
 	}
 

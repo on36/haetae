@@ -1,4 +1,4 @@
-package com.on36.haetae.net.utils;
+package com.on36.haetae.common.utils;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

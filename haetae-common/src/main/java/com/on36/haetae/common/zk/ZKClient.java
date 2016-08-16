@@ -21,6 +21,9 @@ import org.apache.zookeeper.server.auth.DigestAuthenticationProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.on36.haetae.common.conf.Configuration;
+import com.on36.haetae.common.conf.Constant;
+
 /**
  * @author zhanghr
  * @date 2016年4月12日
@@ -48,11 +51,18 @@ public abstract class ZKClient implements Watcher {
 	}
 
 	public ZKClient(String connectString, String digest) {
-		this(connectString, 5000, digest);
+		this(connectString,
+				Configuration.create().getInt(
+						Constant.K_ZOOKEEPER_SESSION_TIMEOUT,
+						Constant.V_ZOOKEEPER_SESSION_TIMEOUT),
+				digest);
 	}
 
 	public ZKClient(String connectString) {
-		this(connectString, "guest:guest123");
+		this(connectString,
+				Configuration.create().getString(
+						Constant.K_ZOOKEEPER_AUTH_DIGEST,
+						Constant.V_ZOOKEEPER_AUTH_DIGEST));
 	}
 
 	/**
@@ -109,6 +119,15 @@ public abstract class ZKClient implements Watcher {
 	public void close() throws InterruptedException {
 		if (zk != null)
 			zk.close();
+	}
+
+	/**
+	 * 返回当前连接的session id
+	 * 
+	 * @return
+	 */
+	public long getSesssionId() {
+		return zk.getSessionId();
 	}
 
 	/**
@@ -190,7 +209,7 @@ public abstract class ZKClient implements Watcher {
 	}
 
 	/**
-	 * 创建一个临时序列目录,数据值为null.
+	 * 创建一个临时目录,数据值为null.
 	 * 
 	 * @param path
 	 *            目录

@@ -26,5 +26,10 @@
 			<artifactId>haetae-interpolatd</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-config-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

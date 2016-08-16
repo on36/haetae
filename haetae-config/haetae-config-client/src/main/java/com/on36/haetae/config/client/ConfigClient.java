@@ -218,4 +218,25 @@ public class ConfigClient {
 		}
 		return null;
 	}
+
+	/**
+	 * 测试一个服务地址
+	 * @param address
+	 * @return
+	 */
+	public static boolean host(String address) {
+		if (address == null)
+			return false;
+		try {
+			Response resp = asyncHttpClient.preparePost(getURI("/host"))
+					.addQueryParam("address", address).execute().get();
+			if (resp.getStatusCode() == 200)
+				return true;
+			else
+				System.out.println(resp.getResponseBody().trim());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 }

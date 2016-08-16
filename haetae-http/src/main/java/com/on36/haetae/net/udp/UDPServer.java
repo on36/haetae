@@ -8,7 +8,7 @@ import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
-import com.on36.haetae.net.utils.NetworkUtils;
+import com.on36.haetae.common.utils.NetworkUtils;
 
 /**
  * @author zhanghr

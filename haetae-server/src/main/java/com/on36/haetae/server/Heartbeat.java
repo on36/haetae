@@ -1,27 +1,27 @@
 package com.on36.haetae.server;
 
 import com.on36.haetae.common.conf.Configuration;
-import com.on36.haetae.net.udp.Message;
-import com.on36.haetae.net.udp.Message.Title;
-import com.on36.haetae.net.udp.Scheduler;
-import com.on36.haetae.net.utils.NetworkUtils;
+import com.on36.haetae.common.conf.Constant;
+import com.on36.haetae.common.utils.NetworkUtils;
+import com.on36.haetae.config.client.ConfigClient;
 
 /**
  * @author zhanghr
  * @date 2016年1月12日
  */
-public class Heartbeat extends Thread {
+public class Heartbeat implements Runnable {
 
 	private final int port;
-	private final Scheduler scheduler;
+
+	private final String root;
 
 	private boolean running = true;
 
 	private static String mineEndPoint;
 
-	public Heartbeat(Scheduler scheduler, int port) {
+	public Heartbeat(String root, int port) {
 		this.port = port;
-		this.scheduler = scheduler;
+		this.root = root;
 	}
 
 	public static String myself() {
@@ -30,16 +30,21 @@ public class Heartbeat extends Thread {
 
 	@Override
 	public void run() {
-		mineEndPoint = NetworkUtils.getLocalIP() + ":" + port;
-		long period = Configuration.create().getLong("httpServer.heartbeat.period", 3000);
+		mineEndPoint = root + NetworkUtils.getLocalIP() + ":" + port;
+		long period = Configuration.create().getLong(
+				Constant.K_SERVER_HEARTBEAT_PERIOD,
+				Constant.V_SERVER_HEARTBEAT_PERIOD);
 		while (running) {
 			try {
-				scheduler.send(Message.newMessage(Title.ENDPOINT,
-						mineEndPoint.getBytes("UTF-8")));
-				Thread.sleep(period);//3秒一次心跳信息
+				ConfigClient.host(mineEndPoint);
+				Thread.sleep(period);// 休眠一次
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	public void close() {
+		running = false;
 	}
 }

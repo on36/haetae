@@ -10,7 +10,7 @@ import com.on36.haetae.api.annotation.Get;
 
 public class UserService {
 
-	@Get("/user/add")
+	@Get(value="/user/add",version="1.1")
 	public String addUser(Context context) {
 
 		return "lisi";

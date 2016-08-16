@@ -45,6 +45,7 @@ public class StatisticsHandler implements HttpHandler<Object> {
 		sb.append("<table cellspacing=\"0\" cellpadding=\"0\">");
 		sb.append("<tr height=\"30\">");
 		sb.append("<td class=\"column\">path</td>");
+		sb.append("<td class=\"column\">version</td>");
 		sb.append("<td class=\"column\">method</td>");
 		sb.append("<td class=\"column\">success</td>");
 		sb.append("<td class=\"column\">failure</td>");
@@ -57,6 +58,7 @@ public class StatisticsHandler implements HttpHandler<Object> {
 			for (Object obj : stats) {
 				Statistics stat = (Statistics) obj;
 				sb.append("<tr><td>" + stat.getPath() + "</td>");
+				sb.append("<td>" + stat.getVersion() + "</td>");
 				sb.append("<td>" + stat.getMethod() + "</td>");
 				sb.append("<td>" + stat.getSuccessCount() + "</td>");
 				sb.append("<td>" + stat.getFailureCount() + "</td>");

@@ -3,6 +3,7 @@ package com.on36.haetae.server.core.stats;
 public class Statistics implements Comparable<Statistics>{
 
 	private String path;
+	private String version;
 	private String method;
 
 	private int successCount;
@@ -35,6 +36,14 @@ public class Statistics implements Comparable<Statistics>{
 
 	public void setCurRPS(int curRPS) {
 		this.curRPS = curRPS;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
 	}
 
 	public int getMaxRPS() {
@@ -105,6 +114,7 @@ public class Statistics implements Comparable<Statistics>{
 	public String toString() {
 		StringBuffer sb = new StringBuffer("{");
 		sb.append("path:" + path + ", ");
+		sb.append("version:" + version + ", ");
 		sb.append("method:" + method + ", ");
 		sb.append("success:" + successCount + ", ");
 		sb.append("failure:" + failureCount + ", ");

@@ -76,7 +76,7 @@ public class RequestResolver {
 					+ resource + "], adding operation is not allowed!");
 		}
 		route = new Route(path);
-		HandlerKey key = new HandlerKey(method.name(), route, contentType);
+		HandlerKey key = new HandlerKey(method.name(), route, contentType, version);
 		handlerKetMap.put(route.getResourcePath() + "-" + method.name(), key);
 		handlerMap.put(key, (RequestHandlerImpl) handler);
 		router.add(route);
@@ -178,6 +178,7 @@ public class RequestResolver {
 					? resourcePath.replace(PATH_ELEMENT_ROOT, "")
 					: resourcePath);
 			stat.setMethod(entry.getKey().getMethod());
+			stat.setVersion(entry.getKey().getVersion());
 			stats.add(stat);
 		}
 		Collections.sort(stats);
