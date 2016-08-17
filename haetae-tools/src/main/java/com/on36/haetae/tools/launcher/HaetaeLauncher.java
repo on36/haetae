@@ -20,14 +20,17 @@ public class HaetaeLauncher {
 			int port = 1025;
 			if (args != null && args.length >= 1)
 				port = Integer.parseInt(args[0]);
-			
+
 			ClassLoader classLoader = cl.load();
 			Class<?> haetaeServerClass = classLoader
 					.loadClass("com.on36.haetae.server.HaetaeServer");
-			
-			List<String> clazzs = ClassPathPackageScanner.scan(classLoader, "com.on36.haetae.manager");
+
+			List<String> clazzs = ClassPathPackageScanner.scan(classLoader,
+					"com.on36.haetae.manager");
+			clazzs.add("com.on36.haetae.config.agent.ConfigAgentService");
 			Object obj = haetaeServerClass
-					.getConstructor(int.class, int.class, String.class, List.class)
+					.getConstructor(int.class, int.class, String.class,
+							List.class)
 					.newInstance(port, 0, "/_cluster", clazzs);
 			Method method = haetaeServerClass.getMethod("start");
 			method.invoke(obj);

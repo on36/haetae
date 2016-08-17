@@ -149,7 +149,7 @@ public class ConfigAgentService {
 			throw new Exception("route should not be null");
 	}
 
-	@Post("/host")
+	@Post("/host/set")
 	public void registerHost(Context context) throws Exception {
 		String address = context.getRequestParameter("address");
 		if (address != null) {

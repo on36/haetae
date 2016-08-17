@@ -400,7 +400,7 @@ public abstract class ZKClient implements Watcher {
 				return p;
 			} catch (NodeExistsException e) {
 				running = false;
-				throw new Exception("there is already such node name of ["
+				throw new Exception("There is already such node name of ["
 						+ path + "], create failed!", e);
 			} catch (ConnectionLossException e) {
 				running = true;
@@ -462,7 +462,7 @@ public abstract class ZKClient implements Watcher {
 				reconnect(retries--, e);
 			} catch (NoNodeException e) {
 				running = false;
-				LOG.info("there is no such node name of [" + path
+				LOG.info("There is no such node name of [" + path
 						+ "], delete failed", e);
 			} catch (Exception e) {
 				running = false;
@@ -600,7 +600,7 @@ public abstract class ZKClient implements Watcher {
 				reconnect(retries--, e);
 			} catch (NoNodeException e) {
 				running = false;
-				throw new Exception("there is no such node name of [" + path
+				throw new Exception("There is no such node name of [" + path
 						+ "], getChildren failed", e);
 			} catch (Exception e) {
 				running = false;
@@ -680,7 +680,7 @@ public abstract class ZKClient implements Watcher {
 				reconnect(retries--, e);
 			} catch (NoNodeException e) {
 				running = false;
-				throw new Exception("there is no such node name of [" + path
+				throw new Exception("There is no such node name of [" + path
 						+ "], setData failed", e);
 			} catch (Exception e) {
 				running = false;
@@ -829,7 +829,7 @@ public abstract class ZKClient implements Watcher {
 				reconnect(retries--, e);
 			} catch (NoNodeException e) {
 				running = false;
-				throw new Exception("there is no such node name of [" + path
+				throw new Exception("There is no such node name of [" + path
 						+ "], getData failed", e);
 			} catch (Exception e) {
 				running = false;

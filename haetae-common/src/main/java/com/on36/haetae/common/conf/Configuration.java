@@ -39,7 +39,7 @@ public class Configuration {
 		try {
 			properties.load(classLoader.getResourceAsStream(name));
 		} catch (Exception e) {
-			System.out.println("there is no found resource file of the name ["
+			System.out.println("There is no found resource file of the name ["
 					+ name + "]");
 		}
 	}

@@ -21,7 +21,7 @@ public class ConfigClient {
 
 	private static String getURI(String path) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("http://localhost:1984/_config");
+		sb.append("http://localhost:1025/_cluster");
 		sb.append(path);
 		return sb.toString();
 	}
@@ -228,7 +228,7 @@ public class ConfigClient {
 		if (address == null)
 			return false;
 		try {
-			Response resp = asyncHttpClient.preparePost(getURI("/host"))
+			Response resp = asyncHttpClient.preparePost(getURI("/host/set"))
 					.addQueryParam("address", address).execute().get();
 			if (resp.getStatusCode() == 200)
 				return true;

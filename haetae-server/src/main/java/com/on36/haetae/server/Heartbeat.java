@@ -36,8 +36,8 @@ public class Heartbeat implements Runnable {
 				Constant.V_SERVER_HEARTBEAT_PERIOD);
 		while (running) {
 			try {
-				ConfigClient.host(root + "/" + mineEndPoint);
 				Thread.sleep(period);// 休眠一次
+				ConfigClient.host(root + "/" + mineEndPoint);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
