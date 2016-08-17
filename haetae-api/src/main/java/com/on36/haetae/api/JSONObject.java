@@ -1,5 +1,6 @@
 package com.on36.haetae.api;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,7 +19,9 @@ public interface JSONObject {
 
 	boolean getBoolean(String element);
 	
-	public <T> List<T> getList(String element);
-	
+	public Date getDate(String element);
+
+	public <T> List<T> getList(Class<T> clazz, String element);
+
 	public JSONObject getObject(String element);
 }

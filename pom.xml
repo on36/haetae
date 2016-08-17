@@ -160,36 +160,8 @@
 				<version>${jetty.runner.version}</version>
 				<exclusions>
 					<exclusion>
-						<groupId>org.mortbay.jasper</groupId>
-						<artifactId>apache-jsp</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.eclipse.jetty.websocket</groupId>
+						<groupId>*</groupId>
 						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.eclipse.jetty.toolchain</groupId>
-						<artifactId>jetty-schemas</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.eclipse.jetty</groupId>
-						<artifactId>*</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.apache.taglibs</groupId>
-						<artifactId>taglibs-standard-spec</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.apache.taglibs</groupId>
-						<artifactId>taglibs-standard-impl</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>javax.servlet-api</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.annotation</groupId>
-						<artifactId>javax.annotation-api</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -224,7 +196,19 @@
 					</exclusion>
 					<exclusion>
 						<groupId>io.netty</groupId>
+						<artifactId>netty-transport-native-epoll</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>io.netty</groupId>
 						<artifactId>netty-transport</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.javassist</groupId>
+						<artifactId>javassist</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.typesafe.netty</groupId>
+						<artifactId>netty-reactive-streams</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>

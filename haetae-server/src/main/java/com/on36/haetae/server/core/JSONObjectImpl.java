@@ -1,5 +1,6 @@
 package com.on36.haetae.server.core;
 
+import java.util.Date;
 import java.util.List;
 
 import com.on36.haetae.api.JSONObject;
@@ -7,7 +8,7 @@ import com.on36.haetae.common.utils.JSONUtils;
 
 /**
  * @author zhanghr
- * @date 2016年7月16日
+ * @date 2016年3月16日
  */
 public class JSONObjectImpl implements JSONObject {
 
@@ -19,37 +20,42 @@ public class JSONObjectImpl implements JSONObject {
 
 	@Override
 	public String get(String element) {
-		return (String) JSONUtils.get(jsonValue, element);
+		return JSONUtils.get(String.class, jsonValue, element);
 	}
 
 	@Override
 	public int getInt(String element) {
-		return ((Number) JSONUtils.get(jsonValue, element)).intValue();
+		return JSONUtils.get(int.class, jsonValue, element);
 	}
 
 	@Override
 	public long getLong(String element) {
-		return ((Number) JSONUtils.get(jsonValue, element)).longValue();
+		return JSONUtils.get(long.class, jsonValue, element);
 	}
-	
+
 	@Override
 	public float getFloat(String element) {
-		return ((Number) JSONUtils.get(jsonValue, element)).floatValue();
+		return JSONUtils.get(float.class, jsonValue, element);
 	}
 
 	@Override
 	public boolean getBoolean(String element) {
-		return (boolean) JSONUtils.get(jsonValue, element);
+		return JSONUtils.get(Boolean.class, jsonValue, element);
 	}
 	
 	@Override
-	public JSONObject getObject(String element) {
-		return new JSONObjectImpl(JSONUtils.get(jsonValue, element).toString());
+	public Date getDate(String element) {
+		return JSONUtils.get(Date.class, jsonValue, element);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> List<T> getList(String element) {
-		return (List<T>) JSONUtils.get(jsonValue, element);
+	public JSONObject getObject(String element) {
+		return new JSONObjectImpl(
+				JSONUtils.get(String.class, jsonValue, element));
+	}
+
+	@Override
+	public <T> List<T> getList(Class<T> clazz, String element) {
+		return JSONUtils.fromJsonToList(clazz, jsonValue, element);
 	}
 }

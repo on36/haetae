@@ -95,6 +95,12 @@ public class ConfigAgentService {
 		}
 	}
 
+	private String checkPrefix(String data) {
+		if(data.startsWith("/"))
+			return data;
+		else
+			return "/"+data;
+	}
 	@Post("/property/set")
 	public void setProperty(Context context) throws Exception {
 		Map<String, String> map = context.getRequestParameters();
@@ -105,7 +111,7 @@ public class ConfigAgentService {
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
-			String path = app + "/property/" + key;
+			String path = app + "/property" + checkPrefix(key);
 			if (!client.exists(path))
 				client.create(path, value, true);
 			else
@@ -117,7 +123,7 @@ public class ConfigAgentService {
 	public String getProperty(Context context) throws Exception {
 		String key = context.getRequestParameter("key");
 		if (key != null) {
-			String path = app + "/property/" + key;
+			String path = app + "/property" + checkPrefix(key);
 			String result = propMap.get(path);
 			if (result == null) {
 				result = client.getData2String(path, true);
@@ -132,7 +138,7 @@ public class ConfigAgentService {
 	public List<String> getServices(Context context) throws Exception {
 		String route = context.getRequestParameter("route");
 		if (route != null) {
-			String path = app + "/services" + route;
+			String path = app + "/services" + checkPrefix(route);
 			List<String> result = servicesMap.get(path);
 			if (result == null) {
 				result = client.getChildren(path, true);
@@ -147,7 +153,7 @@ public class ConfigAgentService {
 	public void registerHost(Context context) throws Exception {
 		String address = context.getRequestParameter("address");
 		if (address != null) {
-			String path = app + "/hosts/" + address;
+			String path = app + "/hosts" + checkPrefix(address);
 			Stat stat = client.exists(path, false);
 			if (stat == null)
 				client.createEphemeral(path, true);

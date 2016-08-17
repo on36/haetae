@@ -29,11 +29,14 @@ public class ConfigClientTest {
 	@Test
 	public void testGet() {
 		String result = ConfigClient.get("nihao");
-		assertEquals("world", result);
+		assertEquals("worldsss", result);
 	}
+
 	@Test
 	public void testList() {
-		List<String> result = ConfigClient.getList("/user/list/:name<[A-Za-z]+>");
+		List<String> result = ConfigClient
+				.getList("/user/list/:name<[A-Za-z]+>");
 		assertEquals("10.4.123.34:8080", result.get(1));
 	}
+
 }

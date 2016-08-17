@@ -30,13 +30,13 @@ public class Heartbeat implements Runnable {
 
 	@Override
 	public void run() {
-		mineEndPoint = root + NetworkUtils.getLocalIP() + ":" + port;
+		mineEndPoint = NetworkUtils.getLocalIP() + ":" + port;
 		long period = Configuration.create().getLong(
 				Constant.K_SERVER_HEARTBEAT_PERIOD,
 				Constant.V_SERVER_HEARTBEAT_PERIOD);
 		while (running) {
 			try {
-				ConfigClient.host(mineEndPoint);
+				ConfigClient.host(root + "/" + mineEndPoint);
 				Thread.sleep(period);// 休眠一次
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -1,6 +1,10 @@
 package com.on36.haetae.common.utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,84 +22,172 @@ public class JSONUtils {
 			.setDateFormat("yyyy-MM-dd HH:mm:ss").create();
 	private static JsonParser parser = new JsonParser();
 
+	/**
+	 * 将一个对象转换成JSON字符串.
+	 * 
+	 * @param src
+	 * @return
+	 */
 	public static String toJson(Object src) {
 
 		return gson.toJson(src);
 	}
 
+	/**
+	 * 将一个JSON字符串解析成对象.
+	 * 
+	 * @param clazz
+	 * @param json
+	 * @return
+	 */
 	public static <T> T fromJson(Class<T> clazz, String json) {
 
 		return gson.fromJson(json, clazz);
 	}
 
-	public static <T> List<T> fromJsonToList(Class<T> clazz, String json) {
-		System.out.println(json);
-		JsonArray jsonArray = parser.parse(json).getAsJsonArray();
-		Iterator<JsonElement> eles = jsonArray.iterator();
+	/**
+	 * 将一个数组JSON解析成List对象
+	 * 
+	 * @param clazz
+	 * @param json
+	 * @return
+	 */
+	public static <T> List<T> fromJsonToList(Class<T> clazz, String jsonArray) {
+		JsonArray jsonArrayObject = parser.parse(jsonArray).getAsJsonArray();
+		Iterator<JsonElement> eles = jsonArrayObject.iterator();
 		if (!eles.hasNext())
 			return null;
 		List<T> eleValues = new ArrayList<T>();
 		while (eles.hasNext()) {
 			JsonElement jele = eles.next();
-			if (jele.isJsonPrimitive()) {
-				JsonPrimitive jpele = jele.getAsJsonPrimitive();
-				if (jpele.isNumber()) {
-					Number evalue = jpele.getAsNumber();
-					eleValues.add((T) evalue);
-				} else if (jpele.isString()) {
-					String evalue = jpele.getAsString();
-					eleValues.add((T) evalue);
-				}
-			} else
+			if (jele.isJsonPrimitive())
+				eleValues.add(get(clazz, jele));
+			else
 				eleValues.add(gson.fromJson(jele, clazz));
 		}
-		return eleValues;
+		return eleValues.size() > 0 ? eleValues : null;
+
 	}
 
 	/**
-	 * 通过JSON元素属性获取属性值
+	 * 通过JSON元素属性获取属性值，该属性值必须是数组，针对数组解析
+	 * 
+	 * @param clazz
+	 * @param json
+	 * @param elements
+	 * @return
+	 */
+	public static <T> List<T> fromJsonToList(Class<T> clazz, String json,
+			String element) {
+		JsonObject jo = parser.parse(json).getAsJsonObject();
+		JsonElement je = jo.get(element);
+		String jsonArray = je.getAsJsonArray().toString();
+
+		return fromJsonToList(clazz, jsonArray);
+	}
+
+	/**
+	 * 通过JSON元素属性获取属性值，不解析数组
 	 * 
 	 * @param json
 	 * @param elements
 	 * @return
 	 */
-	public static Object get(String json, String element) {
+	public static <T> T get(Class<T> clazz, String json, String element) {
 		JsonObject jo = parser.parse(json).getAsJsonObject();
 		JsonElement je = jo.get(element);
+		return get(clazz, je);
+	}
+
+	private static <T> T get(Class<T> clazz, JsonElement je) {
 		Object value = null;
 		if (je.isJsonPrimitive()) {
 			JsonPrimitive jp = je.getAsJsonPrimitive();
 			if (jp.isBoolean())
 				value = jp.getAsBoolean();
-			else if (jp.isNumber())
-				value = jp.getAsNumber();
-			else if (jp.isString())
-				value = jp.getAsString();
-		} else if (je.isJsonArray()) {
-			JsonArray jsonArray = je.getAsJsonArray();
-			Iterator<JsonElement> eles = jsonArray.iterator();
-			List eleValues = null;
-			while (eles.hasNext()) {
-				JsonElement jele = eles.next();
-				if (jele.isJsonPrimitive()) {
-					JsonPrimitive jpele = jele.getAsJsonPrimitive();
-					if (jpele.isNumber()) {
-						if (eleValues == null)
-							eleValues = new ArrayList<Number>();
-						Number evalue = jpele.getAsNumber();
-						eleValues.add(evalue);
-					} else if (jpele.isString()) {
-						if (eleValues == null)
-							eleValues = new ArrayList<String>();
-						String evalue = jpele.getAsString();
-						eleValues.add(evalue);
-					}
+			else if (jp.isNumber()) {
+				if (clazz.getSimpleName().equals("Integer")
+						|| clazz.getSimpleName().equals("int")) {
+					value = jp.getAsNumber().intValue();
+				} else if (clazz.getSimpleName().toLowerCase().equals("long")) {
+					value = jp.getAsNumber().longValue();
+				} else if (clazz.getSimpleName().toLowerCase()
+						.equals("float")) {
+					value = jp.getAsNumber().floatValue();
+				} else if (clazz.getSimpleName().toLowerCase()
+						.equals("double")) {
+					value = jp.getAsNumber().doubleValue();
 				}
+			} else if (jp.isString()) {
+				if (clazz.getSimpleName().toLowerCase().equals("date") || clazz
+						.getSimpleName().toLowerCase().equals("timestamp"))
+					value = gson.fromJson(je, clazz);
+				else
+					value = jp.getAsString();
 			}
-			value = eleValues;
-		} else if (je.isJsonObject()) {
-			value = je.toString();
-		}
-		return value;
+		} else if (je.isJsonObject())
+			if (clazz.getSimpleName().toLowerCase().equals("string"))
+				value = je.toString();
+			else
+				value = gson.fromJson(je, clazz);
+
+		return (T) value;
 	}
+
+	// public static final Date castToDate(Object value) {
+	// if (value == null) {
+	// return null;
+	// }
+	//
+	// if (value instanceof Calendar) {
+	// return ((Calendar) value).getTime();
+	// }
+	//
+	// if (value instanceof Date) {
+	// return (Date) value;
+	// }
+	//
+	// long longValue = -1;
+	//
+	// if (value instanceof Number) {
+	// longValue = ((Number) value).longValue();
+	// }
+	//
+	// if (value instanceof String) {
+	// String strVal = (String) value;
+	//
+	// if (strVal.indexOf('-') != -1) {
+	// String format;
+	// if (strVal.length() == JSON.DEFFAULT_DATE_FORMAT.length()) {
+	// format = JSON.DEFFAULT_DATE_FORMAT;
+	// } else if (strVal.length() == 10) {
+	// format = "yyyy-MM-dd";
+	// } else if (strVal.length() == "yyyy-MM-dd HH:mm:ss".length()) {
+	// format = "yyyy-MM-dd HH:mm:ss";
+	// } else {
+	// format = "yyyy-MM-dd HH:mm:ss.SSS";
+	// }
+	//
+	// SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+	// try {
+	// return (Date) dateFormat.parse(strVal);
+	// } catch (ParseException e) {
+	// throw new Exception(
+	// "can not cast to Date, value : " + strVal);
+	// }
+	// }
+	//
+	// if (strVal.length() == 0) {
+	// return null;
+	// }
+	//
+	// longValue = Long.parseLong(strVal);
+	// }
+	//
+	// if (longValue < 0) {
+	// throw new Exception("can not cast to Date, value : " + value);
+	// }
+	//
+	// return new Date(longValue);
+	// }
 }

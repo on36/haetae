@@ -13,6 +13,9 @@ SET CLASSPATH=;
 for /r %AGENT_LIB% %%i in (*.jar) do (
  call set CLASSPATH=%%CLASSPATH%%;%%i
 )
+
+call set CLASSPATH=%%CLASSPATH%%;../conf
+
 @rem get arguments
 @rem echo %CLASSPATH%
 
