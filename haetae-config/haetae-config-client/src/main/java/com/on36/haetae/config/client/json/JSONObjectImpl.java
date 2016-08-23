@@ -1,10 +1,11 @@
-package com.on36.haetae.server.core;
+package com.on36.haetae.config.client.json;
 
 import java.util.Date;
 import java.util.List;
 
 import com.on36.haetae.api.JSONObject;
-import com.on36.haetae.common.utils.JSONUtils;
+import com.on36.haetae.config.client.json.util.JSONUtils;
+
 
 /**
  * @author zhanghr

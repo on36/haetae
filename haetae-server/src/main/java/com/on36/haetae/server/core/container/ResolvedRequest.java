@@ -8,8 +8,9 @@ import com.on36.haetae.server.core.RequestHandlerImpl;
 
 public class ResolvedRequest {
 
-    public Route route;
-    public RequestHandlerImpl handler;
-    public HandlerKey key;
-    public HttpResponseStatus errorStatus;
+	public Route route;
+	public RequestHandlerImpl handler;
+	public HandlerKey key;
+	public HttpResponseStatus errorStatus;
+	public String contentType;
 }

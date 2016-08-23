@@ -65,7 +65,8 @@ public class HaetaeServer {
 		if (rootPath != null)
 			conf.set(Constant.K_SERVER_ROOT_PATH, rootPath);
 
-		String root = conf.getString(Constant.K_SERVER_ROOT_PATH,Constant.V_SERVER_ROOT_PATH);
+		String root = conf.getString(Constant.K_SERVER_ROOT_PATH,
+				Constant.V_SERVER_ROOT_PATH);
 
 		this.clazzes = clazzes;
 		if (this.clazzes != null)

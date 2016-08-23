@@ -1,6 +1,6 @@
 package com.on36.haetae.config.client;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -38,5 +38,4 @@ public class ConfigClientTest {
 				.getList("/user/list/:name<[A-Za-z]+>");
 		assertEquals("10.4.123.34:8080", result.get(1));
 	}
-
 }

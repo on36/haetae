@@ -22,19 +22,10 @@
 		</dependency>
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
-			<artifactId>haetae-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.asynchttpclient</groupId>
-			<artifactId>async-http-client</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>

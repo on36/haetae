@@ -2,6 +2,7 @@ package com.on36.haetae.server.core.stats;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.on36.haetae.api.Context;
@@ -20,27 +21,51 @@ public class StatisticsHandler implements HttpHandler<Object> {
 	@Override
 	public Object handle(Context context) {
 		String contentType = context.getHeaderValue(CONTENT_TYPE);
+		String field = context.getRequestParameter("field");
 		List<?> stats = container.getStatistics();
 		if (MediaType.APPLICATION_JSON.value().equals(contentType)
-				|| MediaType.TEXT_JSON.value().equals(contentType))
-			return stats;
+				|| MediaType.TEXT_JSON.value().equals(contentType)) {
+			if (field == null)
+				return stats;
+			return filterStats(stats, field);
+		}
 		return createHTML(stats);
+	}
+
+	private List<String> filterStats(List<?> stats, String filed) {
+		if (stats.size() > 0) {
+			List<String> result = new ArrayList<>(stats.size());
+			for (Object obj : stats) {
+				Statistics stat = (Statistics) obj;
+				if ("path".equals(filed)) {
+					result.add(stat.getPath());
+				}
+			}
+
+			return result;
+		}
+		return null;
 	}
 
 	private String createHTML(List<?> stats) {
 		StringBuffer sb = new StringBuffer(
 				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
 		sb.append("<html><head>");
-		sb.append("<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />");
+		sb.append(
+				"<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />");
 		sb.append("<title>Haetae Statistics</title>");
 		sb.append("<style type=\"text/css\">");
 		sb.append("h1 {font-size: 22px;line-height: normal;margin:2 auto;}");
 		sb.append("h2 {font-size: 12px;line-height: normal;margin:2 auto;}");
-		sb.append("table {border-top: 1px solid #ffffff;border-right: 1px solid #ffffff;font: 12px/1.4 Arial, sans-serif;margin:0 auto;}");
-		sb.append("td {background-color: #ece9d8;padding: 2px 5px;text-align: left;border-left: 1px solid #ffffff;border-bottom: 1px solid #ffffff;border-collapse:collapse;}");
-		sb.append("td.column {background-color: #0000bb;padding: 2px 4px 2px 4px;color: #ffffff;font-size: 13px;line-height: normal;}");
+		sb.append(
+				"table {border-top: 1px solid #ffffff;border-right: 1px solid #ffffff;font: 12px/1.4 Arial, sans-serif;margin:0 auto;}");
+		sb.append(
+				"td {background-color: #ece9d8;padding: 2px 5px;text-align: left;border-left: 1px solid #ffffff;border-bottom: 1px solid #ffffff;border-collapse:collapse;}");
+		sb.append(
+				"td.column {background-color: #0000bb;padding: 2px 4px 2px 4px;color: #ffffff;font-size: 13px;line-height: normal;}");
 		sb.append("</style></head>");
-		sb.append("<body style=\"margin:auto;width:1024px;text-align:center;\">");
+		sb.append(
+				"<body style=\"margin:auto;width:1024px;text-align:center;\">");
 		sb.append("<h1>Haetae Performance</h1>");
 		sb.append("<table cellspacing=\"0\" cellpadding=\"0\">");
 		sb.append("<tr height=\"30\">");

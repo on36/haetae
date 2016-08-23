@@ -12,7 +12,6 @@ public class UserService {
 
 	@Get(value="/user/add",version="1.1")
 	public String addUser(Context context) {
-
 		return "lisi";
 	}
 

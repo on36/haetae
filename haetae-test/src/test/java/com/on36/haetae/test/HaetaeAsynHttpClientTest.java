@@ -78,7 +78,7 @@ public class HaetaeAsynHttpClientTest {
 
 			String result = resp.getResponseBody().trim();
 			System.out.println(result);
-			Assert.assertEquals("Hello control!", result);
+			Assert.assertEquals("{\"status\":200,\"message\":\"OK\",\"result\":\"Hello control!\"}", result);
 			asyncHttpClient.close();
 		}
 	}

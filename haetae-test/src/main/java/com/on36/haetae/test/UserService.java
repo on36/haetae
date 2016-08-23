@@ -22,6 +22,7 @@ public class UserService {
 
 		return context.getCapturedParameter(":id");
 	}
+	
 	@Get("/user/list/*/*")
 	public String list(Context context) {
 		

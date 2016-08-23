@@ -10,12 +10,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 public class TimeoutResponseBody extends StringResponseBody {
 
 	public TimeoutResponseBody() {
-		super("Request Timeout");
-	}
-	
-	@Override
-	public boolean hasContent() {
-		return true;
+		super(null);
 	}
 
 	@Override

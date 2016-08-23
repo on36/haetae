@@ -72,7 +72,7 @@ public class HaetaeContainer implements Container {
 
 			/* set the response body */
 			ResponseBody handlerBody = handler.body(context);
-			if (handlerBody != null && handlerBody.hasContent()) {
+			if (handlerBody != null) {
 				responseBody = handlerBody;
 			}
 
@@ -92,6 +92,8 @@ public class HaetaeContainer implements Container {
 			String handlerContentType = resolved.key.contentType();
 			if (handlerContentType != null)
 				responseContentType = handlerContentType;
+			if (resolved.contentType != null)
+				responseContentType = resolved.contentType;
 
 			/* set any headers */
 			Set<SimpleImmutableEntry<String, String>> headers = handler
@@ -104,7 +106,7 @@ public class HaetaeContainer implements Container {
 
 		} catch (Throwable e) {
 			response.setStatus(INTERNAL_SERVER_ERROR);
-			sendAndCommitResponse(response, MediaType.TEXT_PLAIN.value(),
+			sendAndCommitResponse(response, MediaType.TEXT_JSON.value(),
 					new ErrorResponseBody(e));
 		} finally {
 			long end = System.currentTimeMillis();

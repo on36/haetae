@@ -206,10 +206,6 @@
 						<groupId>org.javassist</groupId>
 						<artifactId>javassist</artifactId>
 					</exclusion>
-					<exclusion>
-						<groupId>com.typesafe.netty</groupId>
-						<artifactId>netty-reactive-streams</artifactId>
-					</exclusion>
 				</exclusions>
 			</dependency>
 		</dependencies>

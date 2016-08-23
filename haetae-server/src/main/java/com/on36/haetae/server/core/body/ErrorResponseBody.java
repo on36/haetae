@@ -27,7 +27,4 @@ public class ErrorResponseBody extends StringResponseBody {
 			p.close();
 		}
 	}
-	public static void main(String[] args) {
-		System.out.println(print(new Exception("not support system")));
-	}
 }

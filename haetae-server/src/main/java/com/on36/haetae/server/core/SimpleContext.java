@@ -11,8 +11,10 @@ import com.on36.haetae.api.Context;
 import com.on36.haetae.api.JSONObject;
 import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.api.http.Session;
-import com.on36.haetae.common.utils.JSONUtils;
 import com.on36.haetae.common.utils.ShortUUID;
+import com.on36.haetae.config.client.HttpClient;
+import com.on36.haetae.config.client.json.JSONObjectImpl;
+import com.on36.haetae.config.client.json.util.JSONUtils;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.Route;
@@ -46,8 +48,11 @@ public class SimpleContext implements Context {
 	private boolean deepAviable = false;
 
 	private Map<String, String> parmMap = new HashMap<String, String>();
+	private Map<String, String> extraParamMap = null;
+	private String extraBody = null;
 
 	private String path;
+	private JSONObject jsonObject;
 
 	public SimpleContext(HttpRequestExt request, Route route, Session session,
 			Container container) {
@@ -139,14 +144,20 @@ public class SimpleContext implements Context {
 	}
 
 	public String getRequestParameter(String param) {
+		if (deepAviable)
+			return this.extraParamMap.get(param);
 		return parmMap.get(param);
 	}
 
 	public Set<String> getRequestParameterNames() {
+		if (deepAviable)
+			return this.extraParamMap.keySet();
 		return parmMap.keySet();
 	}
 
 	public Map<String, String> getRequestParameters() {
+		if (deepAviable)
+			return this.extraParamMap;
 		return parmMap;
 	}
 
@@ -166,6 +177,8 @@ public class SimpleContext implements Context {
 	}
 
 	public String getBodyAsString() {
+		if (deepAviable)
+			return this.extraBody;
 
 		ByteBuf content = request.content();
 		if (content.isReadable()) {
@@ -176,8 +189,9 @@ public class SimpleContext implements Context {
 
 	@Override
 	public JSONObject getBodyAsJSONObject() {
-
-		return new JSONObjectImpl(getBodyAsString());
+		if (jsonObject == null)
+			jsonObject = new JSONObjectImpl(getBodyAsString());
+		return jsonObject;
 	}
 
 	@Override
@@ -194,15 +208,89 @@ public class SimpleContext implements Context {
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
-			// TODO 增加外部访问HTTP
+			return HttpClient.get(resource);
 		}
-		return null;
+	}
+
+	@Override
+	public String getURI(String resource, Map<String, String> queryParam)
+			throws Exception {
+		this.extraParamMap = queryParam;
+		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
+				.findHandler(resource);
+		if (requestHandler != null) {
+			return requestHandler.body(this, resource);
+		} else {
+			return HttpClient.get(resource, queryParam);
+		}
 	}
 
 	@Override
 	public <T> T getURI(String resource, Class<T> clazz) throws Exception {
 
 		String result = getURI(resource);
+		if (result != null)
+			return JSONUtils.fromJson(clazz, result);
+		return null;
+	}
+
+	@Override
+	public String postURI(String resource) throws Exception {
+		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
+				.findHandler(resource);
+		if (requestHandler != null) {
+			return requestHandler.body(this, resource);
+		} else {
+			return HttpClient.post(resource);
+		}
+	}
+
+	@Override
+	public String postURI(String resource, String body) throws Exception {
+		this.extraBody = body;
+		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
+				.findHandler(resource);
+		if (requestHandler != null) {
+			return requestHandler.body(this, resource);
+		} else {
+			return HttpClient.postBody(resource, body);
+		}
+	}
+
+	@Override
+	public String postURI(String resource, Map<String, String> queryParam)
+			throws Exception {
+		this.extraParamMap = queryParam;
+		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
+				.findHandler(resource);
+		if (requestHandler != null) {
+			return requestHandler.body(this, resource);
+		} else {
+			return HttpClient.post(resource, queryParam);
+		}
+	}
+
+	@Override
+	public <T> T postURI(String resource, Class<T> clazz) throws Exception {
+		String result = postURI(resource);
+		if (result != null)
+			return JSONUtils.fromJson(clazz, result);
+		return null;
+	}
+
+	@Override
+	public <T> T postURI(String resource, String body, Class<T> clazz)
+			throws Exception {
+		String result = postURI(resource, body);
+		if (result != null)
+			return JSONUtils.fromJson(clazz, result);
+		return null;
+	}
+
+	@Override
+	public <T> T postURI(String resource, Map<String, String> queryParam,
+			Class<T> clazz) throws Exception {
+		String result = postURI(resource, queryParam);
 		if (result != null)
 			return JSONUtils.fromJson(clazz, result);
 		return null;

@@ -96,11 +96,12 @@ public class ConfigAgentService {
 	}
 
 	private String checkPrefix(String data) {
-		if(data.startsWith("/"))
+		if (data.startsWith("/"))
 			return data;
 		else
-			return "/"+data;
+			return "/" + data;
 	}
+
 	@Post("/property/set")
 	public void setProperty(Context context) throws Exception {
 		Map<String, String> map = context.getRequestParameters();
@@ -149,17 +150,34 @@ public class ConfigAgentService {
 			throw new Exception("route should not be null");
 	}
 
-	@Post("/host/set")
-	public void registerHost(Context context) throws Exception {
+	@Post("/service/register")
+	public void registerServices(Context context) throws Exception {
 		String address = context.getRequestParameter("address");
 		if (address != null) {
-			String path = app + "/hosts" + checkPrefix(address);
+			String path = app + "/services" + checkPrefix(address);
 			Stat stat = client.exists(path, false);
 			if (stat == null)
 				client.createEphemeral(path, true);
 			else if (stat.getEphemeralOwner() != client.getSesssionId()) {
 				client.delete(path);
 				client.createEphemeral(path, true);
+			}
+		} else
+			throw new Exception("address should not be null");
+	}
+
+	@Post("/node/register")
+	public void registerNode(Context context) throws Exception {
+		String address = context.getRequestParameter("address");
+		String data = context.getRequestParameter("data");
+		if (address != null) {
+			String path = app + "/nodes" + checkPrefix(address);
+			Stat stat = client.exists(path, false);
+			if (stat == null)
+				client.createEphemeral(path, data, true);
+			else if (stat.getEphemeralOwner() != client.getSesssionId()) {
+				client.delete(path);
+				client.createEphemeral(path, data, true);
 			}
 		} else
 			throw new Exception("address should not be null");

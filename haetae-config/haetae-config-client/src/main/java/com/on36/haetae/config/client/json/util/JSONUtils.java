@@ -1,10 +1,6 @@
-package com.on36.haetae.common.utils;
+package com.on36.haetae.config.client.json.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -133,61 +129,4 @@ public class JSONUtils {
 
 		return (T) value;
 	}
-
-	// public static final Date castToDate(Object value) {
-	// if (value == null) {
-	// return null;
-	// }
-	//
-	// if (value instanceof Calendar) {
-	// return ((Calendar) value).getTime();
-	// }
-	//
-	// if (value instanceof Date) {
-	// return (Date) value;
-	// }
-	//
-	// long longValue = -1;
-	//
-	// if (value instanceof Number) {
-	// longValue = ((Number) value).longValue();
-	// }
-	//
-	// if (value instanceof String) {
-	// String strVal = (String) value;
-	//
-	// if (strVal.indexOf('-') != -1) {
-	// String format;
-	// if (strVal.length() == JSON.DEFFAULT_DATE_FORMAT.length()) {
-	// format = JSON.DEFFAULT_DATE_FORMAT;
-	// } else if (strVal.length() == 10) {
-	// format = "yyyy-MM-dd";
-	// } else if (strVal.length() == "yyyy-MM-dd HH:mm:ss".length()) {
-	// format = "yyyy-MM-dd HH:mm:ss";
-	// } else {
-	// format = "yyyy-MM-dd HH:mm:ss.SSS";
-	// }
-	//
-	// SimpleDateFormat dateFormat = new SimpleDateFormat(format);
-	// try {
-	// return (Date) dateFormat.parse(strVal);
-	// } catch (ParseException e) {
-	// throw new Exception(
-	// "can not cast to Date, value : " + strVal);
-	// }
-	// }
-	//
-	// if (strVal.length() == 0) {
-	// return null;
-	// }
-	//
-	// longValue = Long.parseLong(strVal);
-	// }
-	//
-	// if (longValue < 0) {
-	// throw new Exception("can not cast to Date, value : " + value);
-	// }
-	//
-	// return new Date(longValue);
-	// }
 }

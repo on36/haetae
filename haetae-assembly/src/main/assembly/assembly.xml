@@ -41,6 +41,7 @@
 				<exclude>org.asynchttpclient:netty-resolver-dns:jar</exclude>
 				<exclude>org.asynchttpclient:netty-resolver:jar</exclude>
 				<exclude>org.reactivestreams:reactive-streams:jar</exclude>
+				<exclude>com.typesafe.netty:netty-reactive-streams:jar</exclude>
 				<exclude>org.mapdb:mapdb:jar</exclude>
 
 				<exclude>org.eclipse.jetty.websocket:*:jar</exclude>
@@ -83,6 +84,7 @@
 				<include>org.asynchttpclient:netty-resolver-dns:jar</include>
 				<include>org.asynchttpclient:netty-resolver:jar</include>
 				<include>org.reactivestreams:reactive-streams:jar</include>
+				<include>com.typesafe.netty:netty-reactive-streams:jar</include>
 				<include>org.mapdb:mapdb:jar</include>
 			</includes>
 		</dependencySet>

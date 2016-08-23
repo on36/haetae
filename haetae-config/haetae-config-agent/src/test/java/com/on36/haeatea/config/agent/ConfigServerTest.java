@@ -18,7 +18,7 @@ public class ConfigServerTest {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		HaetaeServer server = new HaetaeServer(1984, "/_config");
+		HaetaeServer server = new HaetaeServer(1025, "/_cluster");
 
 		Class<?> clazz = ConfigAgentService.class;
 		Method[] methods = clazz.getDeclaredMethods();

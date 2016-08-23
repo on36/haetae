@@ -129,7 +129,8 @@ public interface Context {
 	 * @throws Exception
 	 */
 	String getURI(String resource) throws Exception;
-
+	String getURI(String resource,Map<String, String> queryParam) throws Exception;
+	
 	/**
 	 * 调用其他请求，如果结果数据是JSON对象格式，返回获取请求体的值对象，否则抛出异常
 	 * 
@@ -141,5 +142,30 @@ public interface Context {
 	 * @throws Exception
 	 */
 	<T> T getURI(String resource, Class<T> clazz) throws Exception;
+	/**
+	 * 调用其他请求，返回字符串结果
+	 * 
+	 * @param resource
+	 *            请求的URI路径
+	 * @return
+	 * @throws Exception
+	 */
+	String postURI(String resource) throws Exception;
+	String postURI(String resource,String body) throws Exception;
+	String postURI(String resource,Map<String, String> queryParam) throws Exception;
+
+	/**
+	 * 调用其他请求，如果结果数据是JSON对象格式，返回获取请求体的值对象，否则抛出异常
+	 * 
+	 * @param resource
+	 *            请求的URI路径
+	 * @param clazz
+	 *            返回对象类型
+	 * @return
+	 * @throws Exception
+	 */
+	<T> T postURI(String resource, Class<T> clazz) throws Exception;
+	<T> T postURI(String resource, String body, Class<T> clazz) throws Exception;
+	<T> T postURI(String resource, Map<String, String> queryParam, Class<T> clazz) throws Exception;
 
 }

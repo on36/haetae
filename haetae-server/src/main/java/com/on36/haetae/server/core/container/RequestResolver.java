@@ -76,7 +76,8 @@ public class RequestResolver {
 					+ resource + "], adding operation is not allowed!");
 		}
 		route = new Route(path);
-		HandlerKey key = new HandlerKey(method.name(), route, contentType, version);
+		HandlerKey key = new HandlerKey(method.name(), route, contentType,
+				version);
 		handlerKetMap.put(route.getResourcePath() + "-" + method.name(), key);
 		handlerMap.put(key, (RequestHandlerImpl) handler);
 		router.add(route);
@@ -148,9 +149,11 @@ public class RequestResolver {
 			resolved.handler = rootHandler;
 			resolved.route = Route.PATH_ROOT;
 			resolved.key = rootHandlerKey;
+			if (contentType != null)
+				resolved.contentType = contentType;
 		} else {
-			HandlerKey key = handlerKetMap.get(
-					route.getResourcePath() + "-" + method);
+			HandlerKey key = handlerKetMap
+					.get(route.getResourcePath() + "-" + method);
 
 			RequestHandlerImpl handler = handlerMap.get(key);
 			if (handler == null) {
@@ -158,7 +161,7 @@ public class RequestResolver {
 				return resolved;
 			}
 			if (contentType != null)
-				key.setContentType(contentType);
+				resolved.contentType = contentType;
 
 			resolved.handler = handler;
 			resolved.route = route;

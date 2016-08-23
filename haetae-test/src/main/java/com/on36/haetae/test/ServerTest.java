@@ -27,7 +27,7 @@ public class ServerTest {
 		
 		HaetaeServer server = new HaetaeServer(port, 128);
 		server.register("/hello").with("Hello xiongdi!").auth(false);
-		server.register("name/:name<[A-Za-z]+>").with("Hello :name");
+		server.register("/name/:name<[A-Za-z]+>").with("Hello :name");
 		server.register("/multi/*/*").with("Hello *[0] *[1]");
 		server.register("/greeting").with("Hello [request$User-Agent]");
 		server.register("/control").with("Hello control!").every(30,
@@ -58,9 +58,9 @@ public class ServerTest {
 
 					public String handle(Context context) throws Exception {
 						// User user = context.getBody(User.class);
-						JSONObject jo = context.getBodyAsJSONObject();
+						String jo = context.getBodyAsString();
 						
-						return jo.get("val");
+						return jo;
 					}
 				});
 		server.register("/timeout", HttpMethod.GET).timeout(1, TimeUnit.SECONDS)

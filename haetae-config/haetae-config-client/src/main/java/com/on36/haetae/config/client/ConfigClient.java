@@ -8,7 +8,7 @@ import org.asynchttpclient.BoundRequestBuilder;
 import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.asynchttpclient.Response;
 
-import com.on36.haetae.common.utils.JSONUtils;
+import com.on36.haetae.config.client.json.util.JSONUtils;
 
 /**
  * 分布式配置代理客户端访问类
@@ -211,8 +211,11 @@ public class ConfigClient {
 			if (resp.getStatusCode() == 200)
 				return JSONUtils.fromJsonToList(String.class,
 						resp.getResponseBody().trim());
-			else
-				System.out.println(resp.getResponseBody().trim());
+			else {
+				String result = resp.getResponseBody().trim();
+				System.out.println(result);
+				System.out.println(JSONUtils.get(String.class, result, "result"));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -220,16 +223,42 @@ public class ConfigClient {
 	}
 
 	/**
-	 * 测试一个服务地址
+	 * 注册一个服务地址
+	 * 
 	 * @param address
 	 * @return
 	 */
-	public static boolean host(String address) {
+	public static boolean registerService(String address) {
 		if (address == null)
 			return false;
 		try {
-			Response resp = asyncHttpClient.preparePost(getURI("/host/set"))
+			Response resp = asyncHttpClient
+					.preparePost(getURI("/service/register"))
 					.addQueryParam("address", address).execute().get();
+			if (resp.getStatusCode() == 200)
+				return true;
+			else
+				System.out.println(resp.getResponseBody().trim());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * 注册一个cluster manager
+	 * 
+	 * @param address
+	 * @return
+	 */
+	public static boolean registerNode(String address, String data) {
+		if (address == null)
+			return false;
+		try {
+			Response resp = asyncHttpClient
+					.preparePost(getURI("/node/register"))
+					.addQueryParam("address", address)
+					.addQueryParam("data", data).execute().get();
 			if (resp.getStatusCode() == 200)
 				return true;
 			else
