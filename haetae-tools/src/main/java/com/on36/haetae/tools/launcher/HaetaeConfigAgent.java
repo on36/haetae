@@ -29,8 +29,8 @@ public class HaetaeConfigAgent {
 					"com.on36.haetae.config.agent");
 			Object obj = haetaeServerClass
 					.getConstructor(int.class, int.class, String.class,
-							List.class)
-					.newInstance(port, 0, "/_config", clazzs);
+							List.class, ClassLoader.class)
+					.newInstance(port, 0, "/config", clazzs, classLoader);
 			Method method = haetaeServerClass.getMethod("start");
 			method.invoke(obj);
 		} catch (Exception e) {

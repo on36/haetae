@@ -24,24 +24,9 @@
 			<outputDirectory>lib</outputDirectory>
 			<scope>runtime</scope>
 			<excludes>
-				<exclude>com.on36.haetae:haetae-api:jar</exclude>
-				<exclude>com.on36.haetae:haetae-interpolatd:jar</exclude>
-				<exclude>com.on36.haetae:haetae-http:jar</exclude>
-				<exclude>com.on36.haetae:haetae-manager:jar</exclude>
-				<exclude>com.on36.haetae:haetae-server:jar</exclude>
 				<exclude>com.on36.haetae:haetae-test:jar</exclude>
-				<exclude>com.on36.haetae:haetae-common:jar</exclude>
+				<exclude>com.on36.haetae:haetae-manager:jar</exclude>
 				<exclude>com.on36.haetae:haetae-config-agent:jar</exclude>
-				<exclude>com.on36.haetae:haetae-config-client:jar</exclude>
-				<exclude>io.netty:netty-all:jar</exclude>
-				<exclude>com.lmax:disruptor:jar</exclude>
-				<exclude>com.google.code.gson:gson:jar</exclude>
-				<exclude>org.apache.zookeeper:zookeeper:jar</exclude>
-				<exclude>org.asynchttpclient:async-http-client:jar</exclude>
-				<exclude>org.asynchttpclient:netty-resolver-dns:jar</exclude>
-				<exclude>org.asynchttpclient:netty-resolver:jar</exclude>
-				<exclude>org.reactivestreams:reactive-streams:jar</exclude>
-				<exclude>com.typesafe.netty:netty-reactive-streams:jar</exclude>
 				<exclude>org.mapdb:mapdb:jar</exclude>
 
 				<exclude>org.eclipse.jetty.websocket:*:jar</exclude>
@@ -67,24 +52,9 @@
 			<outputDirectory>ext</outputDirectory>
 			<scope>runtime</scope>
 			<includes>
-				<include>com.on36.haetae:haetae-api:jar</include>
-				<include>com.on36.haetae:haetae-interpolatd:jar</include>
-				<include>com.on36.haetae:haetae-http:jar</include>
 				<include>com.on36.haetae:haetae-manager:jar</include>
-				<include>com.on36.haetae:haetae-server:jar</include>
 				<include>com.on36.haetae:haetae-test:jar</include>
-				<include>com.on36.haetae:haetae-common:jar</include>
 				<include>com.on36.haetae:haetae-config-agent:jar</include>
-				<include>com.on36.haetae:haetae-config-client:jar</include>
-				<include>io.netty:netty-all:jar</include>
-				<include>com.lmax:disruptor:jar</include>
-				<include>com.google.code.gson:gson:jar</include>
-				<include>org.apache.zookeeper:zookeeper:jar</include>
-				<include>org.asynchttpclient:async-http-client:jar</include>
-				<include>org.asynchttpclient:netty-resolver-dns:jar</include>
-				<include>org.asynchttpclient:netty-resolver:jar</include>
-				<include>org.reactivestreams:reactive-streams:jar</include>
-				<include>com.typesafe.netty:netty-reactive-streams:jar</include>
 				<include>org.mapdb:mapdb:jar</include>
 			</includes>
 		</dependencySet>

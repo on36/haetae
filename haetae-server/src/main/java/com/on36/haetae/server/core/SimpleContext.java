@@ -208,7 +208,7 @@ public class SimpleContext implements Context {
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
-			return HttpClient.get(resource);
+			return HttpClient.getInstance().get(resource);
 		}
 	}
 
@@ -221,7 +221,7 @@ public class SimpleContext implements Context {
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
-			return HttpClient.get(resource, queryParam);
+			return HttpClient.getInstance().get(resource, queryParam);
 		}
 	}
 
@@ -241,7 +241,7 @@ public class SimpleContext implements Context {
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
-			return HttpClient.post(resource);
+			return HttpClient.getInstance().post(resource);
 		}
 	}
 
@@ -253,7 +253,7 @@ public class SimpleContext implements Context {
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
-			return HttpClient.postBody(resource, body);
+			return HttpClient.getInstance().postBody(resource, body);
 		}
 	}
 
@@ -266,7 +266,7 @@ public class SimpleContext implements Context {
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
-			return HttpClient.post(resource, queryParam);
+			return HttpClient.getInstance().post(resource, queryParam);
 		}
 	}
 

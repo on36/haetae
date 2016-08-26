@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.on36.haetae.api.http.MediaType;
@@ -29,8 +30,8 @@ public class RequestResolver {
 
 	private final Router router = new TreeRouter();
 
-	private final Map<HandlerKey, RequestHandlerImpl> handlerMap = new ConcurrentHashMap<HandlerKey, RequestHandlerImpl>();
-	private final Map<String, HandlerKey> handlerKetMap = new ConcurrentHashMap<String, HandlerKey>();
+	private final Map<HandlerKey, TreeMap<String, RequestHandlerImpl>> handlerMap = new ConcurrentHashMap<HandlerKey, TreeMap<String, RequestHandlerImpl>>();
+	private final Map<String, HandlerKey> handlerKeyMap = new ConcurrentHashMap<String, HandlerKey>();
 
 	private final HandlerKey rootHandlerKey;
 	private final RequestHandlerImpl rootHandler;
@@ -78,8 +79,13 @@ public class RequestResolver {
 		route = new Route(path);
 		HandlerKey key = new HandlerKey(method.name(), route, contentType,
 				version);
-		handlerKetMap.put(route.getResourcePath() + "-" + method.name(), key);
-		handlerMap.put(key, (RequestHandlerImpl) handler);
+		handlerKeyMap.put(route.getResourcePath() + "-" + method.name(), key);
+		if (!handlerMap.containsKey(key))
+			handlerMap.put(key, new TreeMap<String, RequestHandlerImpl>(
+					new VersionComparator()));
+		TreeMap<String, RequestHandlerImpl> slot = handlerMap.get(key);
+		slot.put(version, (RequestHandlerImpl) handler);
+
 		router.add(route);
 
 		return true;
@@ -96,10 +102,11 @@ public class RequestResolver {
 		Route route = router.route(path);
 		if (route != null) {
 			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
-			RequestHandlerImpl handler = handlerMap.get(key);
+			RequestHandlerImpl handler = handlerMap.get(key).lastEntry()
+					.getValue();
 			if (handler == null) {
 				key = new HandlerKey(HttpMethod.POST.name(), route);
-				return handlerMap.get(key);
+				return handlerMap.get(key).lastEntry().getValue();
 			} else
 				return handler;
 		}
@@ -116,11 +123,11 @@ public class RequestResolver {
 		if (route != null) {
 			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
 			handlerMap.remove(key);
-			handlerKetMap.remove(
+			handlerKeyMap.remove(
 					route.getResourcePath() + "-" + HttpMethod.GET.name());
 			key = new HandlerKey(HttpMethod.POST.name(), route);
 			handlerMap.remove(key);
-			handlerKetMap.remove(
+			handlerKeyMap.remove(
 					route.getResourcePath() + "-" + HttpMethod.POST.name());
 			router.remove(path);
 		}
@@ -152,10 +159,11 @@ public class RequestResolver {
 			if (contentType != null)
 				resolved.contentType = contentType;
 		} else {
-			HandlerKey key = handlerKetMap
+			HandlerKey key = handlerKeyMap
 					.get(route.getResourcePath() + "-" + method);
 
-			RequestHandlerImpl handler = handlerMap.get(key);
+			RequestHandlerImpl handler = handlerMap.get(key).lastEntry()
+					.getValue();
 			if (handler == null) {
 				resolved.errorStatus = SERVICE_UNAVAILABLE;
 				return resolved;
@@ -173,10 +181,11 @@ public class RequestResolver {
 	public List<Statistics> getStatistics() {
 		List<Statistics> stats = new ArrayList<Statistics>();
 
-		for (Map.Entry<HandlerKey, RequestHandlerImpl> entry : handlerMap
+		for (Map.Entry<HandlerKey, TreeMap<String, RequestHandlerImpl>> entry : handlerMap
 				.entrySet()) {
 			String resourcePath = entry.getKey().getRoute().getResourcePath();
-			Statistics stat = entry.getValue().getStatistics();
+			Statistics stat = entry.getValue().lastEntry().getValue()
+					.getStatistics();
 			stat.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT)
 					? resourcePath.replace(PATH_ELEMENT_ROOT, "")
 					: resourcePath);

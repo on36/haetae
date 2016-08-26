@@ -30,8 +30,8 @@ public class HaetaeLauncher {
 			clazzs.add("com.on36.haetae.config.agent.ConfigAgentService");
 			Object obj = haetaeServerClass
 					.getConstructor(int.class, int.class, String.class,
-							List.class)
-					.newInstance(port, 0, "/_cluster", clazzs);
+							List.class, ClassLoader.class)
+					.newInstance(port, 0, "/cluster", clazzs, classLoader);
 			Method method = haetaeServerClass.getMethod("start");
 			method.invoke(obj);
 		} catch (Exception e) {

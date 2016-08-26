@@ -21,10 +21,10 @@ public class PidFile {
 		File haetaeHome = new File(System.getProperty("java.io.tmpdir"),
 				".haetae");
 		try {
-			File tmpFile = File.createTempFile("haeatae", "discovertmp");
+			File tmpFile = File.createTempFile("haetae", "discovertmp");
 			File tmpDir = tmpFile.getParentFile();
 			tmpFile.delete();
-			haetaeHome = new File(tmpDir, ".haeatae");
+			haetaeHome = new File(tmpDir, ".haetae");
 			haetaeHome.mkdir();
 
 			Runtime.getRuntime().addShutdownHook(new Thread() {

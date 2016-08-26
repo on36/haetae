@@ -12,6 +12,7 @@ import com.on36.haetae.tools.command.StartSubCommand;
 import com.on36.haetae.tools.command.StopSubCommand;
 import com.on36.haetae.tools.command.TestSubCommand;
 import com.on36.haetae.tools.command.WebServerSubCommand;
+import com.on36.haetae.tools.command.ZKSubCommand;
 import com.on36.haetae.tools.utils.ServerUtil;
 
 /**
@@ -28,6 +29,7 @@ public class CommandStartup {
 		initCommand(new TestSubCommand());
 		initCommand(new LauncherSubCommand());
 		initCommand(new WebServerSubCommand());
+		initCommand(new ZKSubCommand());
 	}
 
 	public static void initCommand(SubCommand command) {

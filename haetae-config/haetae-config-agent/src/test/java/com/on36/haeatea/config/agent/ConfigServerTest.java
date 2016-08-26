@@ -10,7 +10,7 @@ import com.on36.haetae.server.HaetaeServer;
 
 /**
  * @author zhanghr
- * @date 2016年8月13日 
+ * @date 2016年4月13日 
  */
 public class ConfigServerTest {
 
@@ -18,7 +18,7 @@ public class ConfigServerTest {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		HaetaeServer server = new HaetaeServer(1025, "/_cluster");
+		HaetaeServer server = new HaetaeServer(1025, "/cluster");
 
 		Class<?> clazz = ConfigAgentService.class;
 		Method[] methods = clazz.getDeclaredMethods();

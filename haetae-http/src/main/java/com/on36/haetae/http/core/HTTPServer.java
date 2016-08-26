@@ -36,6 +36,8 @@ public class HTTPServer implements Server {
 
 	private Channel channel;
 
+	public static boolean RUNNING = false;
+
 	public static Configuration getConfig() {
 		return config;
 	}
@@ -100,6 +102,8 @@ public class HTTPServer implements Server {
 						Constant.V_SERVER_CONNECTTIMEOUT_MILLIS);
 				b.option(ChannelOption.ALLOCATOR,
 						PooledByteBufAllocator.DEFAULT);
+				b.childOption(ChannelOption.ALLOCATOR,
+						PooledByteBufAllocator.DEFAULT);
 				// b.childOption(ChannelOption.AUTO_READ, false);
 				b.group(bossGroup, workerGroup)
 						.channel(NioServerSocketChannel.class)
@@ -108,7 +112,7 @@ public class HTTPServer implements Server {
 								new HttpServerInitializer(sslCtx, container));
 
 				channel = b.bind(socketAddress).sync().channel();
-
+				RUNNING = true;
 				Banner.print(socketAddress.getPort());
 				Environment.logEnv();
 
@@ -116,10 +120,20 @@ public class HTTPServer implements Server {
 						.println("Server is now ready to accept connection on ["
 								+ socketAddress + RouteHelper.PATH_ELEMENT_ROOT
 								+ "]");
+				container.getScheduler().trace(this.getClass(),
+						com.on36.haetae.common.log.LogLevel.INFO,
+						"Server is now ready to accept connection on ["
+								+ socketAddress + RouteHelper.PATH_ELEMENT_ROOT
+								+ "]");
 				System.out.close();
 				System.err.close();
 				channel.closeFuture().sync();
 			} catch (Exception e) {
+				container.getScheduler().trace(this.getClass(),
+						com.on36.haetae.common.log.LogLevel.ERROR,
+						"[" + socketAddress + RouteHelper.PATH_ELEMENT_ROOT
+								+ "] start failed",
+						e);
 				throw new Exception(
 						"Address[" + socketAddress + "] already in use: bind");
 			} finally {

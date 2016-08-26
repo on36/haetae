@@ -8,6 +8,7 @@ import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -20,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.core.HttpHandler;
+import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.request.HttpRequestExt;
@@ -254,26 +256,34 @@ public class RequestHandlerImpl implements RequestHandler {
 			return body(context).content();
 		} finally {
 			long elapsedTime = System.currentTimeMillis() - start;
+			trace(elapsedTime, resource, context.getRequestParameters(),
+					traceId, parenId, spanId);
 			((SimpleContext) context).setDeepAviable(false);
-			trace(elapsedTime, resource, traceId, parenId, spanId);
 		}
 	}
 
-	private void trace(long elapsedTime, String resource, String traceId,
-			String parenId, String spanId) {
-		String className = "com.on36.haetae.server.core.RequestHandlerImpl";
+	private void trace(long elapsedTime, String resource,
+			Map<String, String> queryParam, String traceId, String parenId,
+			String spanId) {
+
+		// 过滤掉cluster的性能日志
+		if (resource.startsWith("/cluster"))
+			return;
+
+		Class<?> clazz = this.getClass();
 		String methodName = "body";
 		if (getCustomHandler() != null) {
-			className = getCustomHandler().getClass().getName();
+			clazz = getCustomHandler().getClass();
 			methodName = "handle";
 		} else if (object != null && method != null) {
-			className = object.getClass().getName();
+			clazz = object.getClass();
 			methodName = method.getName();
 		}
-
-		String info = traceId + "|" + parenId + "|" + spanId + "|" + className
-				+ "|" + methodName + "|" + resource + "|" + elapsedTime + "ms";
-		scheduler.trace(info);
+		String message = traceId + "|" + parenId + "|" + spanId + "|"
+				+ methodName + "|" + resource + "|" + queryParam + "|"
+				+ elapsedTime + "ms";
+		if (scheduler != null)
+			scheduler.trace(clazz, LogLevel.INFO, message);
 	}
 
 	public void stats(HttpResponse response, long elapsedTime,
@@ -283,11 +293,11 @@ public class RequestHandlerImpl implements RequestHandler {
 			String traceId = context.getTraceId();
 			String parenId = context.getParentId();
 			String spanId = context.getSpanId();
-			
-			String resource = context.getPath()
-					.replace(RouteHelper.PATH_ELEMENT_ROOT, "");
+
+			String resource = context.getPath();
 			if (resource.length() > 1)
-				trace(elapsedTime, resource, traceId, parenId, spanId);
+				trace(elapsedTime, resource, context.getRequestParameters(),
+						traceId, parenId, spanId);
 			else
 				return;
 		}

@@ -15,15 +15,18 @@ public class ProcessManagerUnixImpl extends BaseProcessManager {
 	@Override
 	protected List<String> killPid(int pid) {
 		List<String> commands = new ArrayList<String>();
-		commands.add("kill -9 " + pid);
+		commands.add("/bin/sh");
+		commands.add("-c");
+		commands.add("kill -15 " + pid);
 		return commands;
 	}
 
 	@Override
 	protected int findPid(int port) {
 		String command = "lsof -i :" + port
-				+ " |grep '(LISTEN)'| awk '{print $2}";
-		String result = ProcessUtil.execAndAutoCloseble(command);
+				+ " |grep '(LISTEN)'| awk '{print $2}'";
+		String result = ProcessUtil.execAndAutoCloseble("/bin/sh", "-c",
+				command);
 		if (result != null)
 			return Integer.parseInt(result);
 		return -1;

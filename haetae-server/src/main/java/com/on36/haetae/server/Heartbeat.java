@@ -4,7 +4,9 @@ import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.utils.NetworkUtils;
 import com.on36.haetae.config.client.ConfigClient;
+import com.on36.haetae.config.client.HttpClient;
 import com.on36.haetae.http.Environment;
+import com.on36.haetae.http.core.HTTPServer;
 
 /**
  * @author zhanghr
@@ -38,8 +40,9 @@ public class Heartbeat implements Runnable {
 		while (running) {
 			try {
 				Thread.sleep(period);// 休眠一次
-				ConfigClient.registerNode(root + "/" + mineEndPoint,
-						Environment.pid());
+				if (HTTPServer.RUNNING)
+					ConfigClient.registerNode(root + "/" + mineEndPoint,
+							Environment.pid());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -48,5 +51,8 @@ public class Heartbeat implements Runnable {
 
 	public void close() {
 		running = false;
+		if (HTTPServer.RUNNING)
+			ConfigClient.unregisterNode(root + "/" + mineEndPoint);
+		HttpClient.getInstance().close();
 	}
 }

@@ -5,12 +5,15 @@ import java.util.concurrent.ExecutorService;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.on36.haetae.net.udp.Message;
 import com.on36.haetae.net.udp.Message.Title;
+import com.on36.haetae.server.core.manager.event.HttpRequestEvent;
+import com.on36.haetae.server.core.manager.event.HttpRequestEventFactory;
 import com.on36.haetae.server.core.manager.event.LogEvent;
 import com.on36.haetae.server.core.manager.event.LogEventFactory;
 import com.on36.haetae.server.core.manager.event.RecievedEvent;
 import com.on36.haetae.server.core.manager.event.RecievedEventFactory;
 import com.on36.haetae.server.core.manager.event.SendEvent;
 import com.on36.haetae.server.core.manager.event.SendEventFactory;
+import com.on36.haetae.server.core.manager.event.handler.HttpRequestEventHandler;
 import com.on36.haetae.server.core.manager.event.handler.LogEventHandler;
 import com.on36.haetae.server.core.manager.event.handler.RecievedEndpointEventHandler;
 import com.on36.haetae.server.core.manager.event.handler.RecievedEventHandler;
@@ -33,6 +36,7 @@ public class DisruptorManager {
 	private Disruptor<RecievedEvent> recievedTestEventDisruptor;
 
 	private Disruptor<LogEvent> logEventDisruptor;
+	private Disruptor<HttpRequestEvent> httpRequestEventDisruptor;
 
 	@SuppressWarnings("unchecked")
 	public DisruptorManager(ExecutorService executorService) {
@@ -61,6 +65,11 @@ public class DisruptorManager {
 				DEFAULT_SMALL_RINGBUFFER_SIZE, disruptorExecutors);
 		this.logEventDisruptor.handleEventsWith(new LogEventHandler());
 		this.logEventDisruptor.start();
+		
+		this.httpRequestEventDisruptor = new Disruptor<>(new HttpRequestEventFactory(),
+				DEFAULT_SMALL_RINGBUFFER_SIZE, disruptorExecutors);
+		this.httpRequestEventDisruptor.handleEventsWith(new HttpRequestEventHandler());
+		this.httpRequestEventDisruptor.start();
 
 		this.recievedTestEventDisruptor = new Disruptor<>(
 				new RecievedEventFactory(), DEFAULT_SMALL_RINGBUFFER_SIZE,
@@ -76,6 +85,9 @@ public class DisruptorManager {
 
 	public Disruptor<LogEvent> getLogEventDisruptor() {
 		return logEventDisruptor;
+	}
+	public Disruptor<HttpRequestEvent> getHttpRequestEventDisruptor() {
+		return httpRequestEventDisruptor;
 	}
 
 	public Disruptor<RecievedEvent> getRecievedEventDisruptor(Message message) {
@@ -93,5 +105,6 @@ public class DisruptorManager {
 		recievedSessionEventDisruptor.shutdown();
 		recievedTestEventDisruptor.shutdown();
 		logEventDisruptor.shutdown();
+		httpRequestEventDisruptor.shutdown();
 	}
 }

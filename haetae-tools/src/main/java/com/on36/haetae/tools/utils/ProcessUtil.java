@@ -2,7 +2,6 @@ package com.on36.haetae.tools.utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,8 +13,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author zhanghr
@@ -73,9 +70,7 @@ public class ProcessUtil {
 	public static Map<String, Object> exec(final boolean autoClosed,
 			final boolean autoExited, final List<String> args) {
 
-		Map<String, Object> map = new HashMap<String, Object>();
 		int resultCode = -1;
-		int pid = -1;
 		Future<?> future = null;
 		Process process = null;
 		ProcessTask task = null;
@@ -91,17 +86,8 @@ public class ProcessUtil {
 			out.close();
 			task = new ProcessTask(process);
 			future = es.submit(task);
-			future.get(PROCCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+			process.waitFor(PROCCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 			resultCode = process.exitValue();
-
-			Class<?> processClass = process.getClass();
-			String className = processClass.getName();
-			if (className.equals("java.lang.UNIXProcess")) {
-				Field pidField = processClass.getDeclaredField("pid");
-				pidField.setAccessible(true);
-				Object value = pidField.get(process);
-				pid = (int) value;
-			}
 		} catch (Exception e) {
 			if (future != null) {
 				future.cancel(true);
@@ -115,14 +101,10 @@ public class ProcessUtil {
 				System.exit(-1);
 			}
 		}
-		map.put("success", resultCode == -1 ? true : false);
-		if (resultCode == -1) {
-			map.put("message", "OK");
-			map.put("pid", pid > 0 ? pid : task.pid());
-			map.put("port", task.port());
-		} else
-			map.put("message", task.printf());
-		return map;
+		Map<String, Object> result = new HashMap<String, Object>();
+		result.put("message", task.printf());
+		result.put("success", resultCode == -1 ? true : false);
+		return result;
 	}
 
 	public static String execAndAutoCloseble(List<String> args) {
@@ -133,7 +115,7 @@ public class ProcessUtil {
 			Process process = pb.start();
 			process.waitFor();
 			Scanner scanner = new Scanner(process.getInputStream());
-			while (scanner.hasNextLine()) {
+			if (scanner.hasNextLine()) {
 				sb.append(scanner.nextLine());
 			}
 			scanner.close();
@@ -151,16 +133,22 @@ public class ProcessUtil {
 	public static Map<String, Object> killProcess(boolean autoExited,
 			int port) {
 
-		String command = null;
-		if (port > 0)
-			command = "kill -9 `lsof -i :" + port
-					+ " |grep '(LISTEN)'| awk '{print $2}'`";
-		else if (port == 0)
-			command = "kill -9 `ps -au |grep java |grep com.on36.haetae.tools.server.HaetaeServerStartup |grep '(LISTEN)'| awk '{print $1}'`";
-		else if (port == -1)
-			command = "kill -9 `ps -au |grep java |grep com.on36.haetae.test.ServerTest |grep '(LISTEN)'| awk '{print $1}'`";
-		System.out.println("executing " + command);
-		return exec(true, autoExited, command);
+		List<String> list = new ArrayList<String>(4);
+		list.add("/bin/sh");
+		list.add("-c");
+		// if (port > 0)
+		list.add("kill -15 `lsof -i :" + port
+				+ " |grep '(LISTEN)'| awk '{print $2}'`");
+		// else if (port == 0)
+		// list.add(
+		// "kill -15 `ps -au |grep java |grep
+		// com.on36.haetae.tools.server.HaetaeServerStartup |grep '(LISTEN)'|
+		// awk '{print $1}'`");
+		// else if (port == -1)
+		// list.add(
+		// "kill -15 `ps -au |grep java |grep com.on36.haetae.test.ServerTest
+		// |grep '(LISTEN)'| awk '{print $1}'`");
+		return exec(true, autoExited, list);
 	}
 
 	static class ProcessTask implements Runnable {
@@ -168,9 +156,6 @@ public class ProcessUtil {
 		private InputStream inputStream;
 
 		private StringBuffer sb = null;
-
-		private int port = -1;
-		private int pid = -1;
 
 		public ProcessTask(Process process) {
 			this.inputStream = process.getInputStream();
@@ -184,10 +169,6 @@ public class ProcessUtil {
 				Scanner scanner = new Scanner(inputStream);
 				while (scanner.hasNextLine()) {
 					s = scanner.nextLine();
-					if (pid < 0)
-						pid = getElementValue(s, "Pid");
-					if (port < 0)
-						port = getElementValue(s, "Port");
 					System.out.println(s);
 					sb.append(s);
 					sb.append(COMMAND_LINE);
@@ -200,23 +181,6 @@ public class ProcessUtil {
 
 		public String printf() {
 			return sb.toString();
-		}
-
-		public int port() {
-			return port;
-		}
-
-		public int pid() {
-			return pid;
-		}
-
-		private int getElementValue(String message, String elementString) {
-			Matcher m = Pattern.compile(elementString + ": " + "([0-9]*)")
-					.matcher(message);
-			if (m.find()) {
-				return Integer.parseInt(m.group(1));
-			}
-			return -1;
 		}
 	}
 }

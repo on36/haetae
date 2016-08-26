@@ -182,4 +182,14 @@ public class ConfigAgentService {
 		} else
 			throw new Exception("address should not be null");
 	}
+
+	@Post("/node/unregister")
+	public void unregisterNode(Context context) throws Exception {
+		String address = context.getRequestParameter("address");
+		if (address != null) {
+			String path = app + "/nodes" + checkPrefix(address);
+			client.delete(path);
+		} else
+			throw new Exception("address should not be null");
+	}
 }

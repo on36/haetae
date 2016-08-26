@@ -19,7 +19,7 @@ public class ClusterManagerServerTest {
 		if(args != null && args.length == 1)
 			port = Integer.parseInt(args[0]);
 
-		HaetaeServer server = new HaetaeServer(port,"/_cluster");
+		HaetaeServer server = new HaetaeServer(port,"/cluster");
 
 		Class<?> clazz = ClusterManagerService.class;
 		Method[] methods = clazz.getDeclaredMethods();

@@ -11,6 +11,7 @@ import com.on36.haetae.api.annotation.Post;
 import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
+import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.Server;
@@ -28,7 +29,6 @@ import io.netty.handler.codec.http.HttpMethod;
  * @date 2015年12月29日
  */
 public class HaetaeServer {
-
 	enum MODE {
 		REGISTER, // 注册模式，通过基础注册服务
 		CLASSES, // 类模式，通过外部CLASS定义接口注册服务
@@ -39,28 +39,32 @@ public class HaetaeServer {
 	private final Server server;
 	private final DisruptorManager disruptorManager;
 	private final Scheduler scheduler;
-	private final Heartbeat msgThread;
+	private final Heartbeat hbThread;
 	private final List<String> clazzes;
+	private final ClassLoader classLoader;
 	private MODE runningMode = MODE.REGISTER;
 
 	public static ExecutorService threadPools;
 
 	private Configuration conf = Configuration.create();
 
+	public HaetaeServer getInstance() {
+		return this;
+	}
 	public HaetaeServer(int port) {
-		this(port, 0, null, null);
+		this(port, 0, null, null, null);
 	}
 
 	public HaetaeServer(int port, int threadPoolSize) {
-		this(port, threadPoolSize, null, null);
+		this(port, threadPoolSize, null, null, null);
 	}
 
 	public HaetaeServer(int port, String rootPath) {
-		this(port, 0, rootPath, null);
+		this(port, 0, rootPath, null, null);
 	}
 
 	public HaetaeServer(int port, int threadPoolSize, String rootPath,
-			List<String> clazzes) {
+			List<String> clazzes, ClassLoader classLoader) {
 		conf.addResource("haetae.conf");
 		if (rootPath != null)
 			conf.set(Constant.K_SERVER_ROOT_PATH, rootPath);
@@ -68,22 +72,32 @@ public class HaetaeServer {
 		String root = conf.getString(Constant.K_SERVER_ROOT_PATH,
 				Constant.V_SERVER_ROOT_PATH);
 
+		String rootName = root.replace("/", "");
+		System.setProperty("log.file.name", "haetae-" + rootName + "-" + port);
+
 		this.clazzes = clazzes;
+		this.classLoader = classLoader;
 		if (this.clazzes != null)
 			runningMode = MODE.CLASSES;
 
 		threadPools = Executors.newCachedThreadPool();
 
-		container = new HaetaeContainer();
-		server = new HTTPServer(port, threadPoolSize, container);
 		disruptorManager = new DisruptorManager(threadPools);
 		scheduler = new MessageScheduler(disruptorManager);
-		msgThread = new Heartbeat(root, port);
+		container = new HaetaeContainer(scheduler);
+		server = new HTTPServer(port, threadPoolSize, container);
+		hbThread = new Heartbeat(root, port);
 	}
 
-	public void start() {
-		try {
+	public void start() throws Exception {
 
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				scheduler.trace(this.getClass(), LogLevel.WARN, "Server is shutsowning....");
+				close();
+			}
+		});
+		try {
 			switch (runningMode) {
 			case CLASSES:
 				if (clazzes == null || clazzes.size() == 0)
@@ -92,8 +106,7 @@ public class HaetaeServer {
 									+ runningMode);
 				else {
 					for (String classString : clazzes) {
-						Class<?> clazz = this.getClass().getClassLoader()
-								.loadClass(classString);
+						Class<?> clazz = classLoader.loadClass(classString);
 						Method[] methods = clazz.getDeclaredMethods();
 						Object object = null;
 
@@ -122,18 +135,17 @@ public class HaetaeServer {
 				break;
 			}
 
-			threadPools.submit(msgThread);
+			threadPools.submit(hbThread);
 			server.start();
 		} catch (Exception e) {
-			e.printStackTrace();
-
-			stop();
+			close();
+			throw e;
 		}
 	}
 
-	public void stop() {
+	public void close() {
+		hbThread.close();
 		disruptorManager.close();
-		msgThread.close();
 		threadPools.shutdown();
 		server.stop();
 	}

@@ -1,5 +1,6 @@
 package com.on36.haetae.tools.server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
@@ -32,8 +33,6 @@ public class HaetaeServerStartup {
 		Options options = new Options();
 		options.addOption("s", "source", true,
 				"optional value:directory,maven; default: directory");
-		options.addOption("", "source", true,
-				"optional value:directory,maven; default: directory");
 		options.addOption("c", "coords", true,
 				"maven coords, example: com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT");
 		options.addOption("pn", "package", true,
@@ -59,16 +58,18 @@ public class HaetaeServerStartup {
 				ClassLoader classLoader = cl.load();
 				Class<?> haetaeServerClass = classLoader
 						.loadClass("com.on36.haetae.server.HaetaeServer");
-
-				List<String> clazzs = ClassPathPackageScanner.scan(classLoader,
-						packageName);
-				Object obj = haetaeServerClass
-						.getConstructor(int.class, int.class, String.class,
-								List.class)
-						.newInstance(port, threadPoolSize, rootPath, clazzs);
+				List<String> clazzStrings = ClassPathPackageScanner
+						.scan(classLoader, packageName);
+				Object obj = haetaeServerClass.getConstructor(int.class,
+						int.class, String.class, List.class, ClassLoader.class)
+						.newInstance(port, threadPoolSize, rootPath,
+								clazzStrings, classLoader);
 				Method method = haetaeServerClass.getMethod("start");
 				method.invoke(obj);
 			}
+		} catch (InvocationTargetException e) {
+			e.getTargetException().printStackTrace();
+			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			print(formatter, options);

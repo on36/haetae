@@ -1,12 +1,18 @@
 package com.on36.haetae.server;
 
 import com.lmax.disruptor.EventTranslator;
+import com.on36.haetae.common.log.LogLevel;
+import com.on36.haetae.http.Container;
 import com.on36.haetae.net.udp.Message;
 import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.core.manager.DisruptorManager;
+import com.on36.haetae.server.core.manager.event.HttpRequestEvent;
 import com.on36.haetae.server.core.manager.event.LogEvent;
 import com.on36.haetae.server.core.manager.event.RecievedEvent;
 import com.on36.haetae.server.core.manager.event.SendEvent;
+
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.HttpRequest;
 
 /**
  * @author zhanghr
@@ -22,10 +28,11 @@ public class MessageScheduler implements Scheduler {
 
 	@Override
 	public void revieve(final Message message) {
-		disruptorManager.getRecievedEventDisruptor(message).publishEvent(
-				new EventTranslator<RecievedEvent>() {
+		disruptorManager.getRecievedEventDisruptor(message)
+				.publishEvent(new EventTranslator<RecievedEvent>() {
 					@Override
-					public void translateTo(RecievedEvent event, long sequence) {
+					public void translateTo(RecievedEvent event,
+							long sequence) {
 						event.setSendMessage(message);
 					}
 				});
@@ -33,8 +40,8 @@ public class MessageScheduler implements Scheduler {
 
 	@Override
 	public void send(final Message message) {
-		disruptorManager.getSendEventDisruptor().publishEvent(
-				new EventTranslator<SendEvent>() {
+		disruptorManager.getSendEventDisruptor()
+				.publishEvent(new EventTranslator<SendEvent>() {
 					@Override
 					public void translateTo(SendEvent event, long sequence) {
 						event.setSendMessage(message);
@@ -43,12 +50,44 @@ public class MessageScheduler implements Scheduler {
 	}
 
 	@Override
-	public void trace(final String info) {
-		disruptorManager.getLogEventDisruptor().publishEvent(
-				new EventTranslator<LogEvent>() {
+	public void trace(final Class<?> clazz, final LogLevel level,
+			final String message) {
+		disruptorManager.getLogEventDisruptor()
+				.publishEvent(new EventTranslator<LogEvent>() {
 					@Override
 					public void translateTo(LogEvent event, long sequence) {
-						event.setInfo(info);
+						event.setLevel(level);
+						event.setClazz(clazz);
+						event.setMessage(message);
+					}
+				});
+	}
+
+	@Override
+	public void trace(final Class<?> clazz, final LogLevel level,
+			final String message, final Throwable e) {
+		disruptorManager.getLogEventDisruptor()
+				.publishEvent(new EventTranslator<LogEvent>() {
+					@Override
+					public void translateTo(LogEvent event, long sequence) {
+						event.setLevel(level);
+						event.setClazz(clazz);
+						event.setMessage(message);
+						event.setExcp(e);
+					}
+				});
+	}
+
+	@Override
+	public void handleHTTPRequest(ChannelHandlerContext ctx,
+			HttpRequest request, Container container) {
+		disruptorManager.getHttpRequestEventDisruptor()
+				.publishEvent(new EventTranslator<HttpRequestEvent>() {
+					@Override
+					public void translateTo(HttpRequestEvent event, long sequence) {
+						event.setContainer(container);
+						event.setContext(ctx);
+						event.setRequest(request);
 					}
 				});
 	}

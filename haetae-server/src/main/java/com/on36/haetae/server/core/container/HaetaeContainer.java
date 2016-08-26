@@ -11,9 +11,13 @@ import java.util.Set;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.api.http.Session;
+import com.on36.haetae.common.log.LogLevel;
+import com.on36.haetae.common.log.Logger;
+import com.on36.haetae.common.log.LoggerFactory;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.request.HttpRequestExt;
+import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.SimpleContext;
 import com.on36.haetae.server.core.body.ErrorResponseBody;
@@ -27,9 +31,21 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class HaetaeContainer implements Container {
 
+	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
 	private final RequestResolver requestResolver = new RequestResolver(this);
 
 	private final SessionManager sessionManager = new SessionManager();
+
+	private Scheduler scheduler;
+
+	public HaetaeContainer(Scheduler scheduler) {
+		this.scheduler = scheduler;
+	}
+
+	public Scheduler getScheduler() {
+		return scheduler;
+	}
 
 	public void handle(HttpRequestExt request, HttpResponse response) {
 
@@ -105,6 +121,9 @@ public class HaetaeContainer implements Container {
 			sendAndCommitResponse(response, responseContentType, responseBody);
 
 		} catch (Throwable e) {
+			scheduler.trace(this.getClass(), LogLevel.ERROR,
+					context.getPath() + "-" + context.getRequestParameters(),
+					e);
 			response.setStatus(INTERNAL_SERVER_ERROR);
 			sendAndCommitResponse(response, MediaType.TEXT_JSON.value(),
 					new ErrorResponseBody(e));
@@ -113,7 +132,6 @@ public class HaetaeContainer implements Container {
 			long elapsedTime = end - start;
 			if (handler != null)
 				handler.stats(response, elapsedTime, context);
-
 		}
 	}
 

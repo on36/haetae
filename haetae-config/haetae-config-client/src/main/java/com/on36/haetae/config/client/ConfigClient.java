@@ -1,12 +1,8 @@
 package com.on36.haetae.config.client;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.BoundRequestBuilder;
-import org.asynchttpclient.DefaultAsyncHttpClient;
-import org.asynchttpclient.Response;
 
 import com.on36.haetae.config.client.json.util.JSONUtils;
 
@@ -17,11 +13,10 @@ import com.on36.haetae.config.client.json.util.JSONUtils;
  * @date 2016年4月14日
  */
 public class ConfigClient {
-	private static AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 
 	private static String getURI(String path) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("http://localhost:1025/_cluster");
+		sb.append("http://localhost:1025/cluster");
 		sb.append(path);
 		return sb.toString();
 	}
@@ -38,17 +33,9 @@ public class ConfigClient {
 	public static boolean set(String key, String value) {
 		if (key == null || value == null)
 			return false;
-		try {
-			Response resp = asyncHttpClient.preparePost(getURI("/property/set"))
-					.addQueryParam(key, value).execute().get();
-			if (resp.getStatusCode() == 200)
-				return true;
-			else
-				System.out.println(resp.getResponseBody().trim());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
+		Map<String, String> map = new HashMap<String, String>();
+		map.put(key, value);
+		return set(map);
 	}
 
 	/**
@@ -62,18 +49,8 @@ public class ConfigClient {
 		if (map == null || map.isEmpty())
 			return false;
 		try {
-			BoundRequestBuilder request = asyncHttpClient
-					.preparePost(getURI("/property/set"));
-			for (Map.Entry<String, String> entry : map.entrySet()) {
-				String key = entry.getKey();
-				String value = entry.getValue();
-				request.addQueryParam(key, value);
-			}
-			Response resp = request.execute().get();
-			if (resp.getStatusCode() == 200)
-				return true;
-			else
-				System.out.println(resp.getResponseBody().trim());
+			HttpClient.getInstance().post(getURI("/property/set"), map);
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -105,12 +82,9 @@ public class ConfigClient {
 		if (key == null)
 			return null;
 		try {
-			Response resp = asyncHttpClient.prepareGet(getURI("/property/get"))
-					.addQueryParam("key", key).execute().get();
-			if (resp.getStatusCode() == 200)
-				return resp.getResponseBody().trim();
-			else
-				System.out.println(resp.getResponseBody().trim());
+			String result = HttpClient.getInstance()
+					.get(getURI("/property/get?key=" + key));
+			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -206,15 +180,13 @@ public class ConfigClient {
 		if (route == null)
 			return null;
 		try {
-			Response resp = asyncHttpClient.prepareGet(getURI("/service/get"))
-					.addQueryParam("route", route).execute().get();
-			if (resp.getStatusCode() == 200)
-				return JSONUtils.fromJsonToList(String.class,
-						resp.getResponseBody().trim());
+			String result = HttpClient.getInstance()
+					.get(getURI("/service/get?route=" + route));
+			if (result == null)
+				return JSONUtils.fromJsonToList(String.class, result);
 			else {
-				String result = resp.getResponseBody().trim();
-				System.out.println(result);
-				System.out.println(JSONUtils.get(String.class, result, "result"));
+				System.out
+						.println(JSONUtils.get(String.class, result, "result"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -232,13 +204,9 @@ public class ConfigClient {
 		if (address == null)
 			return false;
 		try {
-			Response resp = asyncHttpClient
-					.preparePost(getURI("/service/register"))
-					.addQueryParam("address", address).execute().get();
-			if (resp.getStatusCode() == 200)
-				return true;
-			else
-				System.out.println(resp.getResponseBody().trim());
+			HttpClient.getInstance()
+					.post(getURI("/service/register?address=" + address));
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -255,14 +223,28 @@ public class ConfigClient {
 		if (address == null)
 			return false;
 		try {
-			Response resp = asyncHttpClient
-					.preparePost(getURI("/node/register"))
-					.addQueryParam("address", address)
-					.addQueryParam("data", data).execute().get();
-			if (resp.getStatusCode() == 200)
-				return true;
-			else
-				System.out.println(resp.getResponseBody().trim());
+			HttpClient.getInstance().post(getURI(
+					"/node/register?address=" + address + "&data=" + data));
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	/**
+	 * 注册一个cluster manager
+	 * 
+	 * @param address
+	 * @return
+	 */
+	public static boolean unregisterNode(String address) {
+		if (address == null)
+			return false;
+		try {
+			HttpClient.getInstance()
+					.post(getURI("/node/unregister?address=" + address));
+			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

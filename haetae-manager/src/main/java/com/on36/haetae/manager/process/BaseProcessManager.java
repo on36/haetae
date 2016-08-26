@@ -11,18 +11,11 @@ import com.on36.haetae.tools.utils.ProcessUtil;
  * @date 2016年3月19日
  */
 public abstract class BaseProcessManager implements ProcessManager {
-
 	protected Map<Integer, ProcessTO> processMap = new HashMap<Integer, ProcessTO>();
 
 	@Override
 	public Map<String, Object> process(String... args) {
-		Map<String, Object> result = ProcessUtil.execHaetaeServer(false, args);
-		if (true == (Boolean) result.get("success")) {
-			int port = (int) result.get("port");
-			int pid = (int) result.get("pid");
-			processMap.put(port, new ProcessTO(pid, port, null, null, null));
-		}
-		return result;
+		return ProcessUtil.execHaetaeServer(false, args);
 	}
 
 	@Override
@@ -30,7 +23,7 @@ public abstract class BaseProcessManager implements ProcessManager {
 		int pid = getPid(port);
 		if (pid > 0) {
 			ProcessUtil.execAndAutoCloseble(killPid(pid));
-			return 1;
+			return pid;
 		}
 		return -1;
 	}
