@@ -86,7 +86,7 @@ public class ProcessUtil {
 			out.close();
 			task = new ProcessTask(process);
 			future = es.submit(task);
-			process.waitFor(PROCCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+			future.get(PROCCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 			resultCode = process.exitValue();
 		} catch (Exception e) {
 			if (future != null) {
@@ -101,9 +101,14 @@ public class ProcessUtil {
 				System.exit(-1);
 			}
 		}
+		String message = task.printf();
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("message", task.printf());
-		result.put("success", resultCode == -1 ? true : false);
+		result.put("success",
+				message != null
+						? (message.indexOf("java.lang.Exception") > -1 ? false
+								: (resultCode == -1 ? true : false))
+						: (resultCode == -1 ? true : false));
 		return result;
 	}
 

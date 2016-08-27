@@ -35,13 +35,14 @@ public class Configuration {
 		return p;
 	}
 
-	private void loadResource(Properties properties, String name) {
+	private Exception loadResource(Properties properties, String name) {
 		try {
 			properties.load(classLoader.getResourceAsStream(name));
 		} catch (Exception e) {
-			System.out.println("There is no found resource file of the name ["
+			return new Exception("There is no found resource file of the name ["
 					+ name + "]");
 		}
+		return null;
 	}
 
 	/**
@@ -51,8 +52,8 @@ public class Configuration {
 	 *            资源文件名
 	 * @author zhanghr
 	 */
-	public void addResource(String name) {
-		loadResource(prop, name);
+	public Exception addResource(String name) {
+		return loadResource(prop, name);
 	}
 
 	public static Configuration create() {

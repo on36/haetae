@@ -80,7 +80,6 @@ public class HTTPServer implements Server {
 			} else {
 				sslCtx = null;
 			}
-			System.out.println("Starting server...");
 			// Configure the server.
 			EventLoopGroup bossGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
@@ -113,6 +112,7 @@ public class HTTPServer implements Server {
 
 				channel = b.bind(socketAddress).sync().channel();
 				RUNNING = true;
+				System.out.println("Starting server...");
 				Banner.print(socketAddress.getPort());
 				Environment.logEnv();
 
@@ -129,11 +129,6 @@ public class HTTPServer implements Server {
 				System.err.close();
 				channel.closeFuture().sync();
 			} catch (Exception e) {
-				container.getScheduler().trace(this.getClass(),
-						com.on36.haetae.common.log.LogLevel.ERROR,
-						"[" + socketAddress + RouteHelper.PATH_ELEMENT_ROOT
-								+ "] start failed",
-						e);
 				throw new Exception(
 						"Address[" + socketAddress + "] already in use: bind");
 			} finally {

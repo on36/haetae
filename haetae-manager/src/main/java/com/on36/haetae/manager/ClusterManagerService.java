@@ -7,6 +7,7 @@ import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.common.log.Logger;
 import com.on36.haetae.common.log.LoggerFactory;
 import com.on36.haetae.manager.process.ProcessManagerFactory;
+import com.on36.haetae.tools.utils.ThrowableUtils;
 
 /**
  * @author zhanghr
@@ -15,12 +16,17 @@ import com.on36.haetae.manager.process.ProcessManagerFactory;
 public class ClusterManagerService {
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
+	private int defaultPort = 8080;
+
 	@Get("/add")
-	public boolean add(Context context) {
+	public Object add(Context context) throws Exception {
 
 		String port = context.getRequestParameter("port");
 		String packageName = context.getRequestParameter("package");
 		String[] args = null;
+
+		if (port == null)
+			port = defaultPort + "";
 
 		if (port != null && packageName != null) {
 			args = new String[4];
@@ -28,11 +34,7 @@ public class ClusterManagerService {
 			args[1] = port;
 			args[2] = "-pn";
 			args[3] = packageName;
-		} else if (packageName != null) {
-			args = new String[2];
-			args[0] = "-pn";
-			args[1] = packageName;
-		} else if (port != null) {
+		} else {
 			args = new String[2];
 			args[0] = "-p";
 			args[1] = port;
@@ -41,10 +43,13 @@ public class ClusterManagerService {
 				.process(args);
 		boolean success = (boolean) result.get("success");
 		String message = result.get("message").toString();
-		if (!success)
-			LOG.warn(message);
-		else
+		if (!success) {
+			throw new Exception("start failed!",
+					ThrowableUtils.makeThrowable(message));
+		} else {
 			LOG.info(message);
+			defaultPort++;
+		}
 		return success;
 	}
 

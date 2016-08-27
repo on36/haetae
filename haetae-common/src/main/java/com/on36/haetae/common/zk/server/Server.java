@@ -16,8 +16,10 @@ public class Server {
 		try {
 			QuorumPeerConfig qc = new QuorumPeerConfig();
 			qc.parseProperties(Configuration.create().getResource("zoo_sample.conf"));
+			System.out.println("Loading config file [zoo_sample.conf]");
 			ServerConfig config = new ServerConfig();
 			config.readFrom(qc);
+			System.out.println("Starting zookeeper server..");
 			ZooKeeperServerMain server = new ZooKeeperServerMain();
 			server.runFromConfig(config);
 		} catch (Exception e) {

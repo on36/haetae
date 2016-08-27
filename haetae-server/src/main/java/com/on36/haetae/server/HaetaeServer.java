@@ -51,6 +51,7 @@ public class HaetaeServer {
 	public HaetaeServer getInstance() {
 		return this;
 	}
+
 	public HaetaeServer(int port) {
 		this(port, 0, null, null, null);
 	}
@@ -65,7 +66,7 @@ public class HaetaeServer {
 
 	public HaetaeServer(int port, int threadPoolSize, String rootPath,
 			List<String> clazzes, ClassLoader classLoader) {
-		conf.addResource("haetae.conf");
+		Exception excp = conf.addResource("haetae.conf");
 		if (rootPath != null)
 			conf.set(Constant.K_SERVER_ROOT_PATH, rootPath);
 
@@ -87,13 +88,18 @@ public class HaetaeServer {
 		container = new HaetaeContainer(scheduler);
 		server = new HTTPServer(port, threadPoolSize, container);
 		hbThread = new Heartbeat(root, port);
+
+		if (excp != null)
+			scheduler.trace(Configuration.class, LogLevel.WARN,
+					excp.getMessage());
 	}
 
 	public void start() throws Exception {
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				scheduler.trace(this.getClass(), LogLevel.WARN, "Server is shutsowning....");
+				scheduler.trace(this.getClass(), LogLevel.WARN,
+						"Server is shutsowning....");
 				close();
 			}
 		});
