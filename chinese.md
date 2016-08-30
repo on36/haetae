@@ -111,218 +111,8 @@ TODO LIST
 	}
 单元测试
 
-	public class HaetaeAsynHttpClientTest {
-
-		@Test
-		public void testHello() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/hello").execute()
-				.get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("Hello xiongdi!", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testName() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/name/zhangsan")
-				.execute().get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("Hello zhangsan", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testMulti() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/multi/zhangsan/123")
-				.execute().get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("Hello zhangsan 123", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testHeaderValue() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/greeting")
-				.execute().get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("Hello NING/1.0", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testRequestControl() throws Exception {
-
-			int count = 20;
-
-			while (count-- > 0) {
-				AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-				Response resp = asyncHttpClient
-					.prepareGet("http://localhost:8080/services/control")
-					.execute().get();
-
-				String result = resp.getResponseBody().trim();
-				System.out.println(result);
-				Assert.assertEquals("Hello control!", result);
-				asyncHttpClient.close();
-			}
-		}
-
-		@Test
-		public void testBlackList() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/black").execute()
-				.get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("Hello black!", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testWhiteList() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/white").execute()
-				.get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("Hello white!", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testWhiteListAndRequestControl() throws Exception {
-
-			int count = 20;
-
-			while (count-- > 0) {
-				AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-				Response resp = asyncHttpClient
-					.prepareGet("http://localhost:8080/services/whitecontrol")
-					.execute().get();
-
-				String result = resp.getResponseBody().trim();
-				System.out.println(result);
-				Assert.assertEquals("Hello white!", result);
-				asyncHttpClient.close();
-			}
-		}
-
-		@Test
-		public void testBodyParts() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.preparePost("http://localhost:8080/services/custom")
-				.addBodyPart(new StringPart("user", "zhangsan"))
-				.addBodyPart(new StringPart("name", "nihao")).execute().get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("nihao", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testBodyParameter() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.preparePost("http://localhost:8080/services/custom")
-				.addQueryParam("user", "zhangsan").addQueryParam("name", "nihao")
-				.execute().get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("zhangsan", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testSplatParameter() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.preparePost(
-						"http://localhost:8080/services/custom?user=zhangsan&name=nihao")
-				.execute().get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("zhangsan", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testBodyString() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.preparePost("http://localhost:8080/services/body")
-				.setHeader("Content-Type", "application/json")
-				.setBody("{\"val\":\"someJSON\"}").execute().get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("{\"val\":\"someJSON\"}", result);
-			asyncHttpClient.close();
-		}
-		@Test
-		public void testBodyObejct() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.preparePost("http://localhost:8080/services/customobject")
-				.setHeader("Content-Type", "application/json")
-				.setBody("{\"val\":\"someJSON\"}").execute().get();
-		
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("someJSON", result);
-			asyncHttpClient.close();
-		}
-
-		@Test
-		public void testCapturedParameter() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.preparePost(
-						"http://localhost:8080/services/custombody/lisi/zhangsan")
-				.execute().get();
-
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("lisi zhangsan", result);
-			asyncHttpClient.close();
-		}
-		@Test
-		public void testTimeout() throws Exception {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-			Response resp = asyncHttpClient
-				.prepareGet(
-						"http://localhost:8080/services/timeout")
-						.execute().get();
-		
-			String result = resp.getResponseBody().trim();
-			System.out.println(result);
-			Assert.assertEquals("lisi zhangsan", result);
-			asyncHttpClient.close();
-		}
-	}
+1，[点击这里你可以链接到服务类例子](https://github.com/on36/haetae/blob/master/haetae-test/src/main/java/com/on36/haetae/test/ServerTest.java)<br />
+2，[点击这里你可以链接到测试类](https://github.com/on36/haetae/blob/master/haetae-test/src/test/java/com/on36/haetae/test/HaetaeAsynHttpClientTest.java)<br />
 
 ### 基于微服务测试
 
@@ -405,6 +195,99 @@ TODO LIST
 方法二 ，从maven仓库下动态启动
 
  待添加。。
+
+### 超时响应功能
+
+		HaetaeServer server = new HaetaeServer(8080, 8);
+		server.register("/timeout", HttpMethod.GET).timeout(2, TimeUnit.SECONDS)//设置两秒无响应，则请求返回超时
+				.with(new HttpHandler<String>() {
+
+					public String handle(Context context) throws Exception {
+						// User user = context.getBody(User.class);
+						Thread.sleep(5000);
+
+						System.out.println(Thread.currentThread().getName());
+						return "hello";
+					}
+		});
+		server.start();
+请求地址 http://localhost:8080/services/timeout
+
+返回结果：
+
+	{"status":408,"message":"Request Timeout"}
+
+### 黑名单功能
+
+		HaetaeServer server = new HaetaeServer(8080, 8);
+		server.register("/black").with("Hello black!").ban("172.31.25.40",
+				"127.0.0.1");//设置黑名单，禁止IP172.31.25.40和本地127.0.0.1访问/black服务
+		server.start();
+
+请求地址 http://localhost:8080/services/black
+
+黑名单返回结果：
+
+	{"status":403,"message":"Forbidden"}
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"Hello black!"}
+
+### 白名单功能
+
+		HaetaeServer server = new HaetaeServer(8080, 8);
+		server.register("/white").with("Hello white!").permit("172.31.25.40",
+				"127.0.0.1");//设置白名单，只允许IP172.31.25.40和本地127.0.0.1访问/white服务
+		server.start();
+
+请求地址 http://localhost:8080/services/white
+
+非白名单返回结果：
+
+	{"status":403,"message":"Forbidden"}
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"Hello white!"}
+
+### 白名单流量设置功能
+
+		HaetaeServer server = new HaetaeServer(8080, 8);
+		server.register("/whitecontrol").with("Hello white!")
+				.permit("127.0.0.1",10,10,TimeUnit.SECONDS);//设置白名单，限制127.0.0.1地址10秒内只允许10次请求
+		server.start();
+
+请求地址 http://localhost:8080/services/whitecontrol
+
+非白名单返回结果：
+
+	{"status":403,"message":"Forbidden"}
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"Hello white!"}
+
+流量过多返回结果：
+
+	{"status":429,"message":"Too Many Requests"}
+
+### 全局流量设置功能
+
+		HaetaeServer server = new HaetaeServer(8080, 8);
+		server.register("/control").with("Hello control!").every(30,
+				TimeUnit.SECONDS, 10);//限制当前服务10秒内只能有30个请求
+		server.start();
+
+请求地址 http://localhost:8080/services/control
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"Hello control!"}
+
+流量过多返回结果：
+
+	{"status":429,"message":"Too Many Requests"}
 
 
 ### 作者

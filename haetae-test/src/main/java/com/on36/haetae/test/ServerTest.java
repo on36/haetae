@@ -38,7 +38,7 @@ public class ServerTest {
 		server.register("/white").with("Hello white!").permit("172.31.25.40",
 				"127.0.0.1");
 		server.register("/whitecontrol").with("Hello white!")
-				.permit("127.0.0.1");
+				.permit("127.0.0.1",10,10,TimeUnit.SECONDS);
 		server.register("/body", HttpMethod.POST)
 				.with(new HttpHandler<String>() {
 
