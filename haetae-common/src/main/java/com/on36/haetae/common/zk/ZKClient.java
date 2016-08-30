@@ -39,30 +39,37 @@ public abstract class ZKClient implements Watcher {
 
 	private String connectString = "0.0.0.0:2181"; // 默认地址
 	private int sessiontTimeout = 5000;// 默认超时时间
-	private String digest = "guest:guest123";// 默认用户
+	private String digestAdmin = "admin:admin123";// 默认用户
+	private String digestGuest = "guest:guest123";// 默认用户
 
-	private List<ACL> acls = new ArrayList<ACL>(2);
+	private List<ACL> acls = null;
 
-	public ZKClient(String connectString, int sessiontTimeout, String digest) {
+	public ZKClient(String connectString, int sessiontTimeout,
+			String digestAdmin, String digestGuest) {
 		this.connectString = connectString;
 		this.sessiontTimeout = sessiontTimeout;
-		this.digest = digest;
+		this.digestAdmin = digestAdmin;
+		this.digestGuest = digestGuest;
 		connect();
 	}
 
-	public ZKClient(String connectString, String digest) {
+	public ZKClient(String connectString, String digestAdmin,
+			String digestGuest) {
 		this(connectString,
 				Configuration.create().getInt(
 						Constant.K_ZOOKEEPER_SESSION_TIMEOUT,
 						Constant.V_ZOOKEEPER_SESSION_TIMEOUT),
-				digest);
+				digestAdmin, digestGuest);
 	}
 
 	public ZKClient(String connectString) {
 		this(connectString,
 				Configuration.create().getString(
-						Constant.K_ZOOKEEPER_AUTH_DIGEST,
-						Constant.V_ZOOKEEPER_AUTH_DIGEST));
+						Constant.K_ZOOKEEPER_AUTH_DIGEST_ADMIN,
+						Constant.V_ZOOKEEPER_AUTH_DIGEST_ADMIN),
+				Configuration.create().getString(
+						Constant.K_ZOOKEEPER_AUTH_DIGEST_GUEST,
+						Constant.V_ZOOKEEPER_AUTH_DIGEST_GUEST));
 	}
 
 	/**
@@ -97,12 +104,26 @@ public abstract class ZKClient implements Watcher {
 
 		zk = new ZooKeeper(connectString, sessionTime, this);
 
-		if (digest != null) {
-			zk.addAuthInfo("digest", digest.getBytes());
+		if (digestAdmin != null) {
+			acls = new ArrayList<ACL>(2);
+			zk.addAuthInfo("digest", digestAdmin.getBytes());
 			Id id1 = new Id("digest",
-					DigestAuthenticationProvider.generateDigest(digest));
+					DigestAuthenticationProvider.generateDigest(digestAdmin));
 			ACL acl1 = new ACL(ZooDefs.Perms.ALL, id1);
 			acls.add(acl1);
+			if (digestGuest != null) {
+				Id id2 = new Id("digest", DigestAuthenticationProvider
+						.generateDigest(digestGuest));
+				ACL acl2 = new ACL(ZooDefs.Perms.READ, id2);
+				acls.add(acl2);
+			}
+		} else if (digestGuest != null) {
+			acls = new ArrayList<ACL>(1);
+			zk.addAuthInfo("digest", digestGuest.getBytes());
+			Id id2 = new Id("digest",
+					DigestAuthenticationProvider.generateDigest(digestGuest));
+			ACL acl2 = new ACL(ZooDefs.Perms.READ, id2);
+			acls.add(acl2);
 		} else
 			acls = Ids.OPEN_ACL_UNSAFE;
 
@@ -387,7 +408,7 @@ public abstract class ZKClient implements Watcher {
 						} else {
 							Stat stat = exists(subPath, false);
 							if (stat == null) {
-								p = this.zk.create(subPath, null, acls,
+								p = this.zk.create(subPath, null, null,
 										CreateMode.PERSISTENT);
 							}
 						}

@@ -2,6 +2,7 @@ package com.on36.haetae.tools.utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,6 +76,7 @@ public class ProcessUtil {
 		Process process = null;
 		ProcessTask task = null;
 		OutputStream out = null;
+		int pid = -1;
 		try {
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.redirectErrorStream(true);
@@ -87,6 +89,13 @@ public class ProcessUtil {
 			task = new ProcessTask(process);
 			future = es.submit(task);
 			future.get(PROCCESS_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+			Class<?> processClass = process.getClass();
+			String className = processClass.getName();
+			if (className.equals("java.lang.UNIXProcess")) {
+				Field pidField = processClass.getDeclaredField("pid");
+				pidField.setAccessible(true);
+				pid = (int) pidField.get(process);
+			}
 			resultCode = process.exitValue();
 		} catch (Exception e) {
 			if (future != null) {
@@ -104,6 +113,8 @@ public class ProcessUtil {
 		String message = task.printf();
 		Map<String, Object> result = new HashMap<String, Object>();
 		result.put("message", task.printf());
+		if (pid > 0)
+			result.put("pid", pid);
 		result.put("success",
 				message != null
 						? (message.indexOf("java.lang.Exception") > -1 ? false

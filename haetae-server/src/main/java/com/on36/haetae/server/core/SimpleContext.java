@@ -77,6 +77,10 @@ public class SimpleContext implements Context {
 		}
 	}
 
+	public String getClientAddress() {
+		return request.getRemoteAddress() + ":" + request.getRemotePort();
+	}
+
 	public String getTraceId() {
 		return traceId;
 	}
@@ -167,6 +171,10 @@ public class SimpleContext implements Context {
 
 	public String getHeaderValue(String param) {
 		return request.headers().get(param);
+	}
+
+	public long getContentLength() {
+		return request.getContentLength();
 	}
 
 	public String getContenType() {

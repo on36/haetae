@@ -25,6 +25,11 @@ public class LoggerAppender implements Logger {
 	}
 
 	@Override
+	public boolean isDebugEnabled() {
+		return log.isDebugEnabled();
+	}
+
+	@Override
 	public void debug(String message) {
 		log.debug(message);
 	}
@@ -53,4 +58,5 @@ public class LoggerAppender implements Logger {
 	public void warn(String message, Throwable t) {
 		log.warn(message, t);
 	}
+
 }

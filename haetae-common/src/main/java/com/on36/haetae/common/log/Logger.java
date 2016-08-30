@@ -22,6 +22,13 @@ public interface Logger {
 	 * @param t
 	 */
 	void info(String message, Throwable t);
+	
+	/**
+	 * 是否是DEBUG状态
+	 * 
+	 * @return
+	 */
+	boolean isDebugEnabled();
 
 	/**
 	 * 输出debug信息.

@@ -2,7 +2,9 @@ package com.on36.haetae.server.core.manager;
 
 import java.util.concurrent.ExecutorService;
 
+import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
+import com.lmax.disruptor.dsl.ProducerType;
 import com.on36.haetae.net.udp.Message;
 import com.on36.haetae.net.udp.Message.Title;
 import com.on36.haetae.server.core.manager.event.HttpRequestEvent;
@@ -65,10 +67,13 @@ public class DisruptorManager {
 				DEFAULT_SMALL_RINGBUFFER_SIZE, disruptorExecutors);
 		this.logEventDisruptor.handleEventsWith(new LogEventHandler());
 		this.logEventDisruptor.start();
-		
-		this.httpRequestEventDisruptor = new Disruptor<>(new HttpRequestEventFactory(),
-				DEFAULT_SMALL_RINGBUFFER_SIZE, disruptorExecutors);
-		this.httpRequestEventDisruptor.handleEventsWith(new HttpRequestEventHandler());
+
+		this.httpRequestEventDisruptor = new Disruptor<>(
+				new HttpRequestEventFactory(), DEFAULT_SMALL_RINGBUFFER_SIZE,
+				disruptorExecutors, ProducerType.MULTI,
+				new YieldingWaitStrategy());
+		this.httpRequestEventDisruptor
+				.handleEventsWith(new HttpRequestEventHandler());
 		this.httpRequestEventDisruptor.start();
 
 		this.recievedTestEventDisruptor = new Disruptor<>(
@@ -86,6 +91,7 @@ public class DisruptorManager {
 	public Disruptor<LogEvent> getLogEventDisruptor() {
 		return logEventDisruptor;
 	}
+
 	public Disruptor<HttpRequestEvent> getHttpRequestEventDisruptor() {
 		return httpRequestEventDisruptor;
 	}

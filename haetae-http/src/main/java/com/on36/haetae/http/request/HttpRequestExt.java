@@ -9,25 +9,37 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
 
 public class HttpRequestExt {
-	
+
 	private final HttpRequest request;
-	
+
 	private final long startHandleTime;
-	
+
 	private final String remoteAddress;
-	
-	public HttpRequestExt(HttpRequest request, String remoteAddress, long startHandleTime) {
+
+	private final int remotePort;
+
+	public HttpRequestExt(HttpRequest request, String remoteAddress,
+			int remotePort, long startHandleTime) {
 		this.request = request;
+		this.remotePort = remotePort;
 		this.remoteAddress = remoteAddress;
 		this.startHandleTime = startHandleTime;
 	}
-	
+
 	public HttpRequest getRequest() {
 		return request;
 	}
-	
+
+	public long getContentLength() {
+		return HttpHeaders.getContentLength(request);
+	}
+
 	public long getStartHandleTime() {
 		return startHandleTime;
+	}
+
+	public int getRemotePort() {
+		return remotePort;
 	}
 
 	public HttpVersion getProtocolVersion() {

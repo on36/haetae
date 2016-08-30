@@ -8,6 +8,13 @@ import com.on36.haetae.api.http.Session;
 public interface Context {
 
 	/**
+	 * 请求客户端地址.
+	 * 
+	 * @return
+	 */
+	String getClientAddress();
+
+	/**
 	 * 请求开始响应时间
 	 * 
 	 * @return
@@ -27,7 +34,7 @@ public interface Context {
 	 * @return
 	 */
 	String getParentId();
-	
+
 	/**
 	 * 返回请求链当前节点ID
 	 * 
@@ -57,7 +64,7 @@ public interface Context {
 	 * @return
 	 */
 	Set<String> getRequestParameterNames();
-	
+
 	/**
 	 * 返回所有请求参数key-value的集合
 	 * 
@@ -84,6 +91,13 @@ public interface Context {
 	String getHeaderValue(String param);
 
 	/**
+	 * 返回获取请求头Content-Length的参数值
+	 * 
+	 * @return
+	 */
+	long getContentLength();
+
+	/**
 	 * 返回获取请求头Content-Type的参数值
 	 * 
 	 * @return
@@ -96,7 +110,6 @@ public interface Context {
 	 * @return
 	 */
 	Session getSession();
-	
 
 	/**
 	 * 返回获取请求体的值，返回字符串类型
@@ -111,6 +124,7 @@ public interface Context {
 	 * @return
 	 */
 	JSONObject getBodyAsJSONObject();
+
 	/**
 	 * 返回获取请求体的值对象，如果请求体数据是JSON对象格式，否则抛出异常
 	 * 
@@ -129,8 +143,10 @@ public interface Context {
 	 * @throws Exception
 	 */
 	String getURI(String resource) throws Exception;
-	String getURI(String resource,Map<String, String> queryParam) throws Exception;
-	
+
+	String getURI(String resource, Map<String, String> queryParam)
+			throws Exception;
+
 	/**
 	 * 调用其他请求，如果结果数据是JSON对象格式，返回获取请求体的值对象，否则抛出异常
 	 * 
@@ -142,6 +158,7 @@ public interface Context {
 	 * @throws Exception
 	 */
 	<T> T getURI(String resource, Class<T> clazz) throws Exception;
+
 	/**
 	 * 调用其他请求，返回字符串结果
 	 * 
@@ -151,8 +168,11 @@ public interface Context {
 	 * @throws Exception
 	 */
 	String postURI(String resource) throws Exception;
-	String postURI(String resource,String body) throws Exception;
-	String postURI(String resource,Map<String, String> queryParam) throws Exception;
+
+	String postURI(String resource, String body) throws Exception;
+
+	String postURI(String resource, Map<String, String> queryParam)
+			throws Exception;
 
 	/**
 	 * 调用其他请求，如果结果数据是JSON对象格式，返回获取请求体的值对象，否则抛出异常
@@ -165,7 +185,11 @@ public interface Context {
 	 * @throws Exception
 	 */
 	<T> T postURI(String resource, Class<T> clazz) throws Exception;
-	<T> T postURI(String resource, String body, Class<T> clazz) throws Exception;
-	<T> T postURI(String resource, Map<String, String> queryParam, Class<T> clazz) throws Exception;
+
+	<T> T postURI(String resource, String body, Class<T> clazz)
+			throws Exception;
+
+	<T> T postURI(String resource, Map<String, String> queryParam,
+			Class<T> clazz) throws Exception;
 
 }

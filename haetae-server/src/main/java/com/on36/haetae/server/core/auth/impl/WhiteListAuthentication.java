@@ -1,6 +1,6 @@
 package com.on36.haetae.server.core.auth.impl;
 
-import io.netty.handler.codec.http.HttpResponse;
+import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,6 +11,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.server.core.auth.IAuthentication;
+
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class WhiteListAuthentication implements IAuthentication {
 
@@ -66,7 +69,8 @@ public class WhiteListAuthentication implements IAuthentication {
 	}
 
 	@Override
-	public boolean auth(HttpRequestExt request, HttpResponse response) {
+	public HttpResponseStatus auth(HttpRequestExt request,
+			HttpResponse response) {
 
 		/* validation white list */
 		if (!whiteMap.isEmpty()) {
@@ -74,30 +78,50 @@ public class WhiteListAuthentication implements IAuthentication {
 			String remoteIp = request.getRemoteAddress();
 			Integer level = whiteMap.get(remoteIp);
 			if (level == null)
-				return true;
+				return FORBIDDEN;
 
 			long current = System.currentTimeMillis();
 			long last = whiteFirstTime.get(remoteIp).longValue();
+			long periodInMillis = whiteTimeUnit.get(remoteIp)
+					.toMillis(whitePeriodTime.get(remoteIp).longValue());
+
+			response.headers().set("X-RateLimit-Limit", level.intValue());
+			long remaining = 0;
+			if (last == 0)
+				remaining = (long) (periodInMillis * 0.001);
+			else
+				remaining = (long) ((periodInMillis - (current - last))
+						* 0.001);
+			response.headers().set("X-RateLimit-Reset", remaining > 0
+					? remaining : (long) (periodInMillis * 0.001));
+
 			if (last == 0) {
 				whiteFirstTime.get(remoteIp).set(current);
 				whiteStatsMap.get(remoteIp).incrementAndGet();
 			} else {
-				long periodInMillis = whiteTimeUnit.get(remoteIp).toMillis(
-						whitePeriodTime.get(remoteIp).longValue());
 				if ((current - last) < periodInMillis) {
-					if (whiteStatsMap.get(remoteIp).longValue() < level
-							.longValue())
+					if (level.intValue() == -1 || whiteStatsMap.get(remoteIp)
+							.intValue() < level.intValue())
 						whiteStatsMap.get(remoteIp).incrementAndGet();
-					else
-						return false;
+					else {
+						response.headers().set("X-RateLimit-Remaining", 0);
+						return FORBIDDEN;
+					}
 				} else {
 					whiteFirstTime.get(remoteIp).set(current);
 					whiteStatsMap.get(remoteIp).set(1);
 				}
 			}
+
+			if (level.intValue() > 0)
+				response.headers().set("X-RateLimit-Remaining",
+						(level.intValue()
+								- whiteStatsMap.get(remoteIp).intValue()));
+			else
+				response.headers().set("X-RateLimit-Remaining", -1);
 		}
 
-		return true;
+		return null;
 	}
 
 }

@@ -1,6 +1,6 @@
 package com.on36.haetae.server.core.auth.impl;
 
-import io.netty.handler.codec.http.HttpResponse;
+import static io.netty.handler.codec.http.HttpResponseStatus.TOO_MANY_REQUESTS;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -9,11 +9,14 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.server.core.auth.IAuthentication;
 
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+
 public class RequestFlowAuthentication implements IAuthentication {
 
 	private AtomicLong lastTime = new AtomicLong(0L);
 	private AtomicInteger curTimes = new AtomicInteger(0);
-	
+
 	private AtomicLong tpsTime = new AtomicLong(0L);
 	private AtomicInteger curTPS = new AtomicInteger(0);
 	private AtomicInteger maxTPS = new AtomicInteger(0);
@@ -28,18 +31,16 @@ public class RequestFlowAuthentication implements IAuthentication {
 		this.period = period;
 		this.periodUnit = periodUnit;
 	}
-	
-	
 
 	public int getCurTPS() {
 		long current = System.currentTimeMillis();
 		long lastTPSTime = tpsTime.longValue();
-		
+
 		if ((current - lastTPSTime) > 1000) {
 			tpsTime.set(current);
 			curTPS.set(0);
 		}
-		
+
 		return curTPS.intValue();
 	}
 
@@ -47,33 +48,46 @@ public class RequestFlowAuthentication implements IAuthentication {
 		return maxTPS.intValue();
 	}
 
-
-
 	@Override
-	public boolean auth(HttpRequestExt request, HttpResponse response) {
+	public HttpResponseStatus auth(HttpRequestExt request,
+			HttpResponse response) {
 		/* validation request times */
 		long current = System.currentTimeMillis();
 		if (period > -1) {
+			long periodInMillis = periodUnit.toMillis(period);
 			long last = lastTime.get();
+
+			response.headers().set("X-RateLimit-Limit", periodTimes);
+			long remaining = 0;
+			if (last == 0)
+				remaining = (long) (periodInMillis * 0.001);
+			else
+				remaining = (long) ((periodInMillis - (current - last))
+						* 0.001);
+			response.headers().set("X-RateLimit-Reset", remaining > 0
+					? remaining : (long) (periodInMillis * 0.001));
+
 			if (last == 0) {
 				lastTime.set(current);
 				curTimes.incrementAndGet();
 			} else {
-				long periodInMillis = periodUnit.toMillis(period);
 				if ((current - last) < periodInMillis) {
-					if (curTimes.get() < periodTimes) {
+					if (curTimes.get() < periodTimes)
 						curTimes.incrementAndGet();
-					} else {
-
-						return false;
+					else {
+						response.headers().set("X-RateLimit-Remaining", 0);
+						return TOO_MANY_REQUESTS;
 					}
 				} else {
 					lastTime.set(current);
 					curTimes.set(1);
 				}
 			}
+
+			response.headers().set("X-RateLimit-Remaining",
+					periodTimes - curTimes.get());
 		}
-		
+
 		long lastTPSTime = tpsTime.longValue();
 		if (tpsTime.longValue() == 0) {
 			tpsTime.set(current);
@@ -86,10 +100,10 @@ public class RequestFlowAuthentication implements IAuthentication {
 				curTPS.set(1);
 			}
 		}
-		
-		if(maxTPS.intValue() < curTPS.intValue())
+
+		if (maxTPS.intValue() < curTPS.intValue())
 			maxTPS.set(curTPS.intValue());
-		return true;
+		return null;
 	}
 
 }

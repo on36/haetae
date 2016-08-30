@@ -38,18 +38,18 @@ public class HaetaeServer {
 	private final Container container;
 	private final Server server;
 	private final DisruptorManager disruptorManager;
-	private final Scheduler scheduler;
 	private final Heartbeat hbThread;
 	private final List<String> clazzes;
 	private final ClassLoader classLoader;
 	private MODE runningMode = MODE.REGISTER;
 
+	private static Scheduler scheduler = null;
 	public static ExecutorService threadPools;
 
 	private Configuration conf = Configuration.create();
 
-	public HaetaeServer getInstance() {
-		return this;
+	public static Scheduler getScheduler() {
+		return scheduler;
 	}
 
 	public HaetaeServer(int port) {
@@ -87,7 +87,7 @@ public class HaetaeServer {
 		scheduler = new MessageScheduler(disruptorManager);
 		container = new HaetaeContainer(scheduler);
 		server = new HTTPServer(port, threadPoolSize, container);
-		hbThread = new Heartbeat(root, port);
+		hbThread = new Heartbeat(root, port, scheduler);
 
 		if (excp != null)
 			scheduler.trace(Configuration.class, LogLevel.WARN,
@@ -99,7 +99,7 @@ public class HaetaeServer {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				scheduler.trace(this.getClass(), LogLevel.WARN,
-						"Server is shutsowning....");
+						"Server is shutsowning...");
 				close();
 			}
 		});
@@ -187,7 +187,7 @@ public class HaetaeServer {
 	private RequestHandler register(String resource, String version,
 			HttpMethod method, String contentType) {
 
-		RequestHandlerImpl handler = new RequestHandlerImpl(scheduler);
+		RequestHandlerImpl handler = new RequestHandlerImpl();
 		container.addHandler(handler, method, resource, version, contentType);
 		return handler;
 	}

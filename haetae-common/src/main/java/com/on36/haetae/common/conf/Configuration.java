@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import com.on36.haetae.common.utils.StringUtils;
+
 /***
  * 文本文件配置信息类
  * 
@@ -79,7 +81,8 @@ public class Configuration {
 	 * @author zhanghr
 	 */
 	public String getString(String key) {
-		return prop.getProperty(key);
+		String value = prop.getProperty(key);
+		return StringUtils.isEmpty(value) ? null : value;
 	}
 
 	/**

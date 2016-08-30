@@ -219,17 +219,13 @@ public class ConfigClient {
 	 * @param address
 	 * @return
 	 */
-	public static boolean registerNode(String address, String data) {
+	public static boolean registerNode(String address, String data)
+			throws Exception {
 		if (address == null)
 			return false;
-		try {
-			HttpClient.getInstance().post(getURI(
-					"/node/register?address=" + address + "&data=" + data));
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
+		HttpClient.getInstance().post(
+				getURI("/node/register?address=" + address + "&data=" + data));
+		return true;
 	}
 
 	/**

@@ -24,8 +24,8 @@ public class ServerTest {
 		int port = 8080;
 		if (args != null && args.length == 1)
 			port = Integer.parseInt(args[0]);
-		
-		HaetaeServer server = new HaetaeServer(port, 128);
+
+		HaetaeServer server = new HaetaeServer(port, 4);
 		server.register("/hello").with("Hello xiongdi!").auth(false);
 		server.register("/name/:name<[A-Za-z]+>").with("Hello :name");
 		server.register("/multi/*/*").with("Hello *[0] *[1]");
@@ -38,7 +38,7 @@ public class ServerTest {
 		server.register("/white").with("Hello white!").permit("172.31.25.40",
 				"127.0.0.1");
 		server.register("/whitecontrol").with("Hello white!")
-				.permit("127.0.0.1", ServiceLevel.LEVEL_50);
+				.permit("127.0.0.1");
 		server.register("/body", HttpMethod.POST)
 				.with(new HttpHandler<String>() {
 
@@ -59,7 +59,7 @@ public class ServerTest {
 					public String handle(Context context) throws Exception {
 						// User user = context.getBody(User.class);
 						String jo = context.getBodyAsString();
-						
+
 						return jo;
 					}
 				});

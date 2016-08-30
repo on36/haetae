@@ -55,6 +55,27 @@ public class Constant {
 	public static final String V_SERVER_SCAN_CLASSLOADER = "com.on36.haetae.hotswap.classloader.DirectoryClassLoader";
 
 	/**
+	 * 指定HttpClient客户端keepalive的值,默认值:true
+	 */
+	public static final String K_HTTPCLIENT_KEEPALIVE = "http.client.keepalive";
+	public static final boolean V_HTTPCLIENT_KEEPALIVE = true;
+	/**
+	 * 指定HttpClient客户端requestTimeout的值,默认值：5000
+	 */
+	public static final String K_HTTPCLIENT_REQUEST_TIMEOUT = "http.client.request.timeout";
+	public static final int V_HTTPCLIENT_REQUEST_TIMEOUT = 5000;
+	/**
+	 * 指定HttpClient客户端connectionIdleTimeout的值,默认值：60000
+	 */
+	public static final String K_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT = "http.client.connection.idle.timeout";
+	public static final int V_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT = 60000;
+	/**
+	 * 指定HttpClient客户端connectionTtl的值,默认值：-1 为不限制
+	 */
+	public static final String K_HTTPCLIENT_CONNECTION_TTL = "http.client.connection.ttl";
+	public static final int V_HTTPCLIENT_CONNECTION_TTL = -1;
+
+	/**
 	 * 指定zookeeper路径地址，默认为 localhost:2181
 	 */
 	public static final String K_ZOOKEEPER_ADDRESS_URL = "zookeeper.address.url";
@@ -63,8 +84,13 @@ public class Constant {
 	/**
 	 * 指定zookeeper安全验证digest的用户名和密码
 	 */
-	public static final String K_ZOOKEEPER_AUTH_DIGEST = "zookeeper.digest";
-	public static final String V_ZOOKEEPER_AUTH_DIGEST = "guest:guest123";
+	public static final String K_ZOOKEEPER_AUTH_DIGEST_ADMIN = "zookeeper.digest.admin";
+	public static final String V_ZOOKEEPER_AUTH_DIGEST_ADMIN = "admin:admin123";
+	/**
+	 * 指定zookeeper安全验证digest的用户名和密码
+	 */
+	public static final String K_ZOOKEEPER_AUTH_DIGEST_GUEST = "zookeeper.digest.guest";
+	public static final String V_ZOOKEEPER_AUTH_DIGEST_GUEST = "guest:guest123";
 
 	/**
 	 * 指定zookeeper session 超时时间

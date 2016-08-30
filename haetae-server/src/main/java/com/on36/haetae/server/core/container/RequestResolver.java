@@ -41,7 +41,7 @@ public class RequestResolver {
 		rootHandlerKey = new HandlerKey(HttpMethod.GET.name(), Route.PATH_ROOT,
 				MediaType.TEXT_HTML.value());
 
-		rootHandler = new RequestHandlerImpl(null);
+		rootHandler = new RequestHandlerImpl();
 		rootHandler.with(new StatisticsHandler(container));
 	}
 
@@ -87,7 +87,6 @@ public class RequestResolver {
 		slot.put(version, (RequestHandlerImpl) handler);
 
 		router.add(route);
-
 		return true;
 	}
 

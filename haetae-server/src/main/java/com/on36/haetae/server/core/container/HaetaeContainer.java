@@ -2,7 +2,6 @@ package com.on36.haetae.server.core.container;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
-import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.List;
@@ -67,24 +66,26 @@ public class HaetaeContainer implements Container {
 			}
 			handler = resolved.handler;
 
+			/* create a new session if required */
+			boolean hasSession = handler.hasSession();
+			Session session = null;
+			if (hasSession) {
+				session = sessionManager.getSessionIfExists(request);
+				if (session == null)
+					session = sessionManager.newSession(response);
+			}
+			/* create context */
+			context = new SimpleContext(request, resolved.route, session, this);
+
 			/* validatetion handler information */
-			boolean isValid = handler.validation(request, response);
-			if (!isValid) {
-				response.setStatus(SERVICE_UNAVAILABLE);
+			HttpResponseStatus validStatus = handler.validation(request,
+					response);
+			if (validStatus != null) {
+				response.setStatus(validStatus);
 				sendAndCommitResponse(response, responseContentType,
 						responseBody);
 				return;
 			}
-
-			/* create a new session if required */
-			Session session = sessionManager.getSessionIfExists(request);
-			boolean hasSession = handler.hasSession();
-			if (hasSession && session == null) {
-				session = sessionManager.newSession(response);
-			}
-
-			/* create context */
-			context = new SimpleContext(request, resolved.route, session, this);
 
 			/* set the response body */
 			ResponseBody handlerBody = handler.body(context);

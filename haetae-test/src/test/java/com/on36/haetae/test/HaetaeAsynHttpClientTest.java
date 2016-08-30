@@ -5,6 +5,7 @@ import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.asynchttpclient.Response;
 import org.asynchttpclient.request.body.multipart.StringPart;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -17,7 +18,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testHello() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/hello").execute()
+				.prepareGet("http://192.168.153.129:8080/services/hello").execute()
 				.get();
 
 		String result = resp.getResponseBody().trim();
@@ -30,7 +31,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testName() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/name/zhangsan")
+				.prepareGet("http://192.168.153.129:8080/services/name/zhangsan")
 				.execute().get();
 
 		String result = resp.getResponseBody().trim();
@@ -43,7 +44,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testMulti() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/multi/zhangsan/123")
+				.prepareGet("http://192.168.153.129:8080/services/multi/zhangsan/123")
 				.execute().get();
 
 		String result = resp.getResponseBody().trim();
@@ -56,7 +57,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testHeaderValue() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/greeting")
+				.prepareGet("http://192.168.153.129:8080/services/greeting")
 				.execute().get();
 
 		String result = resp.getResponseBody().trim();
@@ -70,24 +71,25 @@ public class HaetaeAsynHttpClientTest {
 
 		int count = 20;
 
+		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		while (count-- > 0) {
-			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
+			long start = System.currentTimeMillis();
 			Response resp = asyncHttpClient
-					.prepareGet("http://localhost:8080/services/control")
+					.prepareGet("http://192.168.153.129:8080/services/control")
 					.execute().get();
-
+			System.out.println(System.currentTimeMillis() - start);
 			String result = resp.getResponseBody().trim();
 			System.out.println(result);
 			Assert.assertEquals("{\"status\":200,\"message\":\"OK\",\"result\":\"Hello control!\"}", result);
-			asyncHttpClient.close();
 		}
+		asyncHttpClient.close();
 	}
 
 	@Test
 	public void testBlackList() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/black").execute()
+				.prepareGet("http://192.168.153.129:8080/services/black").execute()
 				.get();
 
 		String result = resp.getResponseBody().trim();
@@ -100,7 +102,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testWhiteList() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.prepareGet("http://localhost:8080/services/white").execute()
+				.prepareGet("http://192.168.153.129:8080/services/white").execute()
 				.get();
 
 		String result = resp.getResponseBody().trim();
@@ -117,7 +119,7 @@ public class HaetaeAsynHttpClientTest {
 		while (count-- > 0) {
 			AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 			Response resp = asyncHttpClient
-					.prepareGet("http://localhost:8080/services/whitecontrol")
+					.prepareGet("http://192.168.153.129:8080/services/whitecontrol")
 					.execute().get();
 
 			String result = resp.getResponseBody().trim();
@@ -131,7 +133,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testBodyParts() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.preparePost("http://localhost:8080/services/custom")
+				.preparePost("http://192.168.153.129:8080/services/custom")
 				.addBodyPart(new StringPart("user", "zhangsan"))
 				.addBodyPart(new StringPart("name", "nihao")).execute().get();
 
@@ -145,7 +147,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testBodyParameter() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.preparePost("http://localhost:8080/services/custom")
+				.preparePost("http://192.168.153.129:8080/services/custom")
 				.addQueryParam("user", "zhangsan").addQueryParam("name", "nihao")
 				.execute().get();
 
@@ -160,7 +162,7 @@ public class HaetaeAsynHttpClientTest {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
 				.preparePost(
-						"http://localhost:8080/services/custom?user=zhangsan&name=nihao")
+						"http://192.168.153.129:8080/services/custom?user=zhangsan&name=nihao")
 				.execute().get();
 
 		String result = resp.getResponseBody().trim();
@@ -173,7 +175,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testBodyString() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.preparePost("http://localhost:8080/services/body")
+				.preparePost("http://192.168.153.129:8080/services/body")
 				.setHeader("Content-Type", "application/json")
 				.setBody("{\"val\":\"someJSON\"}").execute().get();
 
@@ -186,7 +188,7 @@ public class HaetaeAsynHttpClientTest {
 	public void testBodyObejct() throws Exception {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
-				.preparePost("http://localhost:8080/services/customobject")
+				.preparePost("http://192.168.153.129:8080/services/customobject")
 				.setHeader("Content-Type", "application/json")
 				.setBody("{\"val\":\"someJSON\"}").execute().get();
 		
@@ -201,7 +203,7 @@ public class HaetaeAsynHttpClientTest {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
 				.preparePost(
-						"http://localhost:8080/services/custombody/lisi/zhangsan")
+						"http://192.168.153.129:8080/services/custombody/lisi/zhangsan")
 				.execute().get();
 
 		String result = resp.getResponseBody().trim();
@@ -214,7 +216,7 @@ public class HaetaeAsynHttpClientTest {
 		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
 		Response resp = asyncHttpClient
 				.prepareGet(
-						"http://localhost:8080/services/timeout")
+						"http://192.168.153.129:8080/services/timeout")
 						.execute().get();
 		
 		String result = resp.getResponseBody().trim();

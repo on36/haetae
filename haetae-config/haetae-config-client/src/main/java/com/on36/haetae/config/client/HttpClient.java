@@ -11,6 +11,9 @@ import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.asynchttpclient.Response;
 
 import com.on36.haetae.api.JSONObject;
+import com.on36.haetae.common.conf.Configuration;
+import com.on36.haetae.common.conf.Constant;
+import com.on36.haetae.common.utils.ThrowableUtils;
 import com.on36.haetae.config.client.json.JSONObjectImpl;
 import com.on36.haetae.config.client.json.util.JSONUtils;
 
@@ -24,7 +27,19 @@ public class HttpClient {
 		private static HttpClient instance = new HttpClient();
 		private static AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient(
 				new DefaultAsyncHttpClientConfig.Builder()
-						.setRequestTimeout(5000).build());// 请求5S超时
+						.setKeepAlive(Configuration.create().getBoolean(
+								Constant.K_HTTPCLIENT_KEEPALIVE,
+								Constant.V_HTTPCLIENT_KEEPALIVE))
+						.setPooledConnectionIdleTimeout(Configuration.create()
+								.getInt(Constant.K_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT,
+										Constant.V_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT))
+						.setConnectionTtl(Configuration.create().getInt(
+								Constant.K_HTTPCLIENT_CONNECTION_TTL,
+								Constant.V_HTTPCLIENT_CONNECTION_TTL))
+						.setRequestTimeout(Configuration.create().getInt(
+								Constant.K_HTTPCLIENT_REQUEST_TIMEOUT,
+								Constant.V_HTTPCLIENT_REQUEST_TIMEOUT))
+						.build());
 	}
 
 	private HttpClient() {
@@ -72,7 +87,9 @@ public class HttpClient {
 		if (resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else
-			throw new Exception(resp.getResponseBody().trim());
+			throw new Exception("post " + uri + " failed !",
+					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
+							resp.getResponseBody().trim(), "result")));
 	}
 
 	public String postBody(String uri, String body) throws Exception {
@@ -102,7 +119,9 @@ public class HttpClient {
 		if (resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else
-			throw new Exception(resp.getResponseBody().trim());
+			throw new Exception("getbody " + uri + " failed !",
+					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
+							resp.getResponseBody().trim(), "result")));
 	}
 
 	public <T> T post2Entity(String uri, Class<T> clazz) throws Exception {
@@ -200,7 +219,9 @@ public class HttpClient {
 		if (resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else
-			throw new Exception(resp.getResponseBody().trim());
+			throw new Exception("get " + uri + " failed !",
+					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
+							resp.getResponseBody().trim(), "result")));
 	}
 
 	public JSONObject get2JSON(String uri) throws Exception {

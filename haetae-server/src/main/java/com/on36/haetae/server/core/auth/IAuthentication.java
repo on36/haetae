@@ -1,10 +1,11 @@
 package com.on36.haetae.server.core.auth;
 
-import io.netty.handler.codec.http.HttpResponse;
-
 import com.on36.haetae.http.request.HttpRequestExt;
+
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 public interface IAuthentication {
 
-	boolean auth(HttpRequestExt request, HttpResponse response);
+	HttpResponseStatus auth(HttpRequestExt request, HttpResponse response);
 }

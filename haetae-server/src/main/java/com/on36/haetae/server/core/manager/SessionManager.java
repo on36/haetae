@@ -31,7 +31,7 @@ public class SessionManager {
 		Set<Cookie> cookies = cookieDecoder.decode(value);
 
 		// check invalid session and remove it
-		checkSession();
+		// checkSession();
 
 		for (Cookie cookie : cookies) {
 			if (SESSION_COOKIE_NAME.equals(cookie.name())) {
@@ -52,8 +52,8 @@ public class SessionManager {
 	public Session newSession(HttpResponse response) {
 
 		Session session = new Session();
-		String sessionid = new ShortUUID.Builder()
-				.build(session.getSessionId()).toString();
+		String sessionid = new ShortUUID.Builder().build(session.getSessionId())
+				.toString();
 		sessions.put(sessionid, session);
 
 		Cookie cookie = new DefaultCookie(SESSION_COOKIE_NAME, sessionid);

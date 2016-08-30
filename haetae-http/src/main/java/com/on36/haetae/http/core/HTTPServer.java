@@ -112,6 +112,8 @@ public class HTTPServer implements Server {
 
 				channel = b.bind(socketAddress).sync().channel();
 				RUNNING = true;
+				
+				Thread.sleep(50);
 				System.out.println("Starting server...");
 				Banner.print(socketAddress.getPort());
 				Environment.logEnv();

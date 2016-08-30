@@ -32,5 +32,15 @@
 			<artifactId>mapdb</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

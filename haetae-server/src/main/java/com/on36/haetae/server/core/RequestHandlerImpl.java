@@ -22,12 +22,14 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.core.HttpHandler;
 import com.on36.haetae.common.log.LogLevel;
+import com.on36.haetae.common.utils.DateUtils;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.ServiceLevel;
+import com.on36.haetae.http.Version;
 import com.on36.haetae.http.request.HttpRequestExt;
-import com.on36.haetae.http.route.RouteHelper;
 import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.HaetaeServer;
+import com.on36.haetae.server.Heartbeat;
 import com.on36.haetae.server.core.auth.IAuthentication;
 import com.on36.haetae.server.core.auth.impl.BlackListAuthentication;
 import com.on36.haetae.server.core.auth.impl.RequestFlowAuthentication;
@@ -75,8 +77,9 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	private final Scheduler scheduler;
 
-	public RequestHandlerImpl(Scheduler scheduler) {
-		this.scheduler = scheduler;
+	public RequestHandlerImpl() {
+		this.scheduler = HaetaeServer.getScheduler();
+
 		this.authList = new ArrayList<IAuthentication>();
 		this.authList.add(blackList);
 		this.authList.add(whiteList);
@@ -256,19 +259,17 @@ public class RequestHandlerImpl implements RequestHandler {
 			return body(context).content();
 		} finally {
 			long elapsedTime = System.currentTimeMillis() - start;
-			trace(elapsedTime, resource, context.getRequestParameters(),
-					traceId, parenId, spanId);
+			trace(context.getClientAddress(), start, elapsedTime, -1, -1,
+					resource, context.getRequestParameters(), traceId, parenId,
+					spanId);
 			((SimpleContext) context).setDeepAviable(false);
 		}
 	}
 
-	private void trace(long elapsedTime, String resource,
+	private void trace(String client, long startTime, long elapsedTime,
+			int status, long length, String resource,
 			Map<String, String> queryParam, String traceId, String parenId,
 			String spanId) {
-
-		// 过滤掉cluster的性能日志
-		if (resource.startsWith("/cluster"))
-			return;
 
 		Class<?> clazz = this.getClass();
 		String methodName = "body";
@@ -279,11 +280,47 @@ public class RequestHandlerImpl implements RequestHandler {
 			clazz = object.getClass();
 			methodName = method.getName();
 		}
-		String message = traceId + "|" + parenId + "|" + spanId + "|"
-				+ methodName + "|" + resource + "|" + queryParam + "|"
-				+ elapsedTime + "ms";
-		if (scheduler != null)
-			scheduler.trace(clazz, LogLevel.INFO, message);
+		StringBuilder sb = new StringBuilder();
+		try {
+			sb.append(DateUtils.toString(DateUtils.toDate(startTime)));
+		} catch (Exception e) {
+			e.printStackTrace();
+			sb.append(startTime);
+		}
+		sb.append(" ");
+		sb.append(client);
+		sb.append(" -> ");
+		sb.append(Heartbeat.myself());
+		sb.append(" ");
+		sb.append(traceId);
+		sb.append(" ");
+		sb.append(parenId);
+		sb.append(" ");
+		sb.append(spanId);
+		sb.append(" ");
+		sb.append(resource);
+		sb.append(" ");
+		if (status > 0)
+			sb.append(status);
+		else
+			sb.append("-");
+		sb.append(" ");
+		if (length > 0)
+			sb.append(length);
+		else
+			sb.append("-");
+		sb.append(" ");
+		sb.append(clazz.getName());
+		sb.append(".");
+		sb.append(methodName);
+		sb.append("[");
+		sb.append(queryParam);
+		sb.append("] ");
+		sb.append(elapsedTime);
+		sb.append("ms");
+		sb.append(" at Haetae server version: ");
+		sb.append(Version.CURRENT_VERSION);
+		scheduler.trace(RequestHandlerImpl.class, LogLevel.INFO, sb.toString());
 	}
 
 	public void stats(HttpResponse response, long elapsedTime,
@@ -296,8 +333,11 @@ public class RequestHandlerImpl implements RequestHandler {
 
 			String resource = context.getPath();
 			if (resource.length() > 1)
-				trace(elapsedTime, resource, context.getRequestParameters(),
-						traceId, parenId, spanId);
+				trace(context.getClientAddress(), context.getStartHandleTime(),
+						elapsedTime, response.getStatus().code(),
+						context.getContentLength(), resource,
+						context.getRequestParameters(), traceId, parenId,
+						spanId);
 			else
 				return;
 		}
@@ -344,16 +384,18 @@ public class RequestHandlerImpl implements RequestHandler {
 		return auth;
 	}
 
-	public boolean validation(HttpRequestExt request, HttpResponse response) {
+	public HttpResponseStatus validation(HttpRequestExt request,
+			HttpResponse response) {
 
 		if (auth) {
 			for (IAuthentication authentication : authList) {
-				boolean result = authentication.auth(request, response);
-				if (!result)
+				HttpResponseStatus result = authentication.auth(request,
+						response);
+				if (result != null)
 					return result;
 			}
 		}
-		return true;
+		return null;
 	}
 
 	public Statistics getStatistics() {

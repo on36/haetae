@@ -6,11 +6,17 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.on36.haetae.common.log.Logger;
+import com.on36.haetae.common.log.LoggerFactory;
+
 /**
  * @author zhanghr
  * @date 2016年1月24日
  */
 public class Environment {
+	protected static final Logger LOG = LoggerFactory
+			.getLogger(Environment.class);
+
 	public static class Entry {
 		private String k;
 		private String v;
@@ -52,8 +58,10 @@ public class Environment {
 		put(l, "java.version", System.getProperty("java.version", "<NA>"));
 		put(l, "java.vendor", System.getProperty("java.vendor", "<NA>"));
 		put(l, "java.home", System.getProperty("java.home", "<NA>"));
-		put(l, "java.class.path",System.getProperty("java.class.path", "<NA>"));
-		put(l, "java.library.path",System.getProperty("java.library.path", "<NA>"));
+		put(l, "java.class.path",
+				System.getProperty("java.class.path", "<NA>"));
+		put(l, "java.library.path",
+				System.getProperty("java.library.path", "<NA>"));
 		put(l, "java.io.tmpdir", System.getProperty("java.io.tmpdir", "<NA>"));
 		put(l, "java.compiler", System.getProperty("java.compiler",
 				"maven-compiler-plugin 3.1"));
@@ -70,7 +78,10 @@ public class Environment {
 	public static void logEnv() {
 		List<Entry> env = Environment.list();
 		for (Entry e : env) {
-			System.out.println("Server environment :" + e.toString());
+			if (LOG.isDebugEnabled())
+				LOG.debug("Server environment :" + e.toString());
+			else
+				System.out.println("Server environment :" + e.toString());
 		}
 	}
 
