@@ -1,6 +1,7 @@
 package com.on36.haetae.server.core.auth.impl;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
+import static io.netty.handler.codec.http.HttpResponseStatus.TOO_MANY_REQUESTS;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -105,7 +106,7 @@ public class WhiteListAuthentication implements IAuthentication {
 						whiteStatsMap.get(remoteIp).incrementAndGet();
 					else {
 						response.headers().set("X-RateLimit-Remaining", 0);
-						return FORBIDDEN;
+						return TOO_MANY_REQUESTS;
 					}
 				} else {
 					whiteFirstTime.get(remoteIp).set(current);
