@@ -15,7 +15,8 @@ public class Server {
 	public static void start() {
 		try {
 			QuorumPeerConfig qc = new QuorumPeerConfig();
-			qc.parseProperties(Configuration.create().getResource("zoo_sample.conf"));
+			qc.parseProperties(
+					Configuration.create().getResource("zoo_sample.conf"));
 			System.out.println("Loading config file [zoo_sample.conf]");
 			ServerConfig config = new ServerConfig();
 			config.readFrom(qc);

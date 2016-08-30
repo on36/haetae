@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.on36.haetae</groupId>
-		<artifactId>haetae</artifactId>
+		<artifactId>haetae-parent</artifactId>
 		<version>${project.version}</version>
 	</parent>
 	<artifactId>haetae-assembly</artifactId>
@@ -28,11 +28,6 @@
 			<artifactId>haetae-test</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.on36.haetae</groupId>
-			<artifactId>haetae-config-agent</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -48,7 +43,7 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<finalName>${parent.artifactId}-${project.version}</finalName>
+					<finalName>haetae-${project.version}</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 					<descriptor>src/main/assembly/assembly.xml</descriptor>
 				</configuration>

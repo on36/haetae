@@ -1,4 +1,4 @@
-package com.on36.haetae.manager.process;
+package com.on36.haetae.tools.process;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

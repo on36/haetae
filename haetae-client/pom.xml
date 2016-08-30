@@ -5,11 +5,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.on36.haetae</groupId>
-		<artifactId>haetae-config</artifactId>
+		<artifactId>haetae-parent</artifactId>
 		<version>${project.version}</version>
 	</parent>
-	<artifactId>haetae-config-agent</artifactId>
-	<name>haetae-config-agent</name>
+	<artifactId>haetae-client</artifactId>
+	<name>haetae-client</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,26 +21,32 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.on36.haetae</groupId>
-			<artifactId>haetae-server</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
+			<groupId>org.asynchttpclient</groupId>
+			<artifactId>async-http-client</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>org.mapdb</groupId>
-			<artifactId>mapdb</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.on36.haetae</groupId>
-			<artifactId>haetae-common</artifactId>
-			<version>${project.version}</version>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-api</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-common</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.zookeeper</groupId>
+					<artifactId>zookeeper</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
 		</dependency>
 	</dependencies>
 </project>

@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * @author zhanghr
@@ -24,9 +23,8 @@ public class DateUtils {
 	}
 
 	public static String getTimeZoneTime() {
-		SimpleDateFormat sdf = new SimpleDateFormat(
-				"yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-		Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		SimpleDateFormat sdf = new SimpleDateFormat(DEFFAULT_DATE_FORMAT);
+		Calendar cal = Calendar.getInstance();
 		return sdf.format(cal.getTime());
 	}
 
@@ -59,7 +57,7 @@ public class DateUtils {
 			if (strVal.length() == 0) {
 				return null;
 			}
-			
+
 			if (strVal.indexOf('-') != -1) {
 				String format;
 				if (strVal.length() == "yyyy-MM-dd HH:mm:ss".length()) {

@@ -27,7 +27,6 @@ public class HaetaeLauncher {
 
 			List<String> clazzs = ClassPathPackageScanner.scan(classLoader,
 					"com.on36.haetae.manager");
-			clazzs.add("com.on36.haetae.config.agent.ConfigAgentService");
 			Object obj = haetaeServerClass
 					.getConstructor(int.class, int.class, String.class,
 							List.class, ClassLoader.class)

@@ -7,7 +7,7 @@ import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.common.log.Logger;
 import com.on36.haetae.common.log.LoggerFactory;
 import com.on36.haetae.common.utils.ThrowableUtils;
-import com.on36.haetae.manager.process.ProcessManagerFactory;
+import com.on36.haetae.tools.process.ProcessManagerFactory;
 
 /**
  * @author zhanghr

@@ -5,13 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.on36.haetae</groupId>
-		<artifactId>haetae</artifactId>
+		<artifactId>haetae-parent</artifactId>
 		<version>${project.version}</version>
 	</parent>
 	<artifactId>haetae-manager</artifactId>
 	<name>haetae-manager</name>
 	<url>http://maven.apache.org</url>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -27,6 +27,11 @@
 			<groupId>com.on36.haetae</groupId>
 			<artifactId>haetae-tools</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mapdb</groupId>
+			<artifactId>mapdb</artifactId>
 		</dependency>
 	</dependencies>
 </project>

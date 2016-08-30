@@ -44,12 +44,16 @@ public class HaetaeServer {
 	private MODE runningMode = MODE.REGISTER;
 
 	private static Scheduler scheduler = null;
-	public static ExecutorService threadPools;
+	private static ExecutorService threadPools;
 
 	private Configuration conf = Configuration.create();
 
 	public static Scheduler getScheduler() {
 		return scheduler;
+	}
+
+	public static ExecutorService getThreadPoolExecutor() {
+		return threadPools;
 	}
 
 	public HaetaeServer(int port) {

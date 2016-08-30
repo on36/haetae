@@ -1,7 +1,7 @@
-package com.on36.haetae.manager.process;
+package com.on36.haetae.tools.process;
 
-import com.on36.haetae.manager.process.impl.ProcessManagerUnixImpl;
-import com.on36.haetae.manager.process.impl.ProcessManagerWindowImpl;
+import com.on36.haetae.tools.process.impl.ProcessManagerUnixImpl;
+import com.on36.haetae.tools.process.impl.ProcessManagerWindowImpl;
 
 /**
  * @author zhanghr

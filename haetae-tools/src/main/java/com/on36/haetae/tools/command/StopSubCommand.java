@@ -3,7 +3,7 @@ package com.on36.haetae.tools.command;
 import org.apache.commons.cli.Options;
 
 import com.on36.haetae.tools.SubCommand;
-import com.on36.haetae.tools.utils.ProcessUtil;
+import com.on36.haetae.tools.process.ProcessManagerFactory;
 
 /**
  * @author zhanghr
@@ -25,7 +25,8 @@ public class StopSubCommand implements SubCommand {
 
 	@Override
 	public Options buildCommandlineOptions(Options options) {
-		options.addOption("h", "help", false, "usage: haetae stop <arg>; default:8080");
+		options.addOption("h", "help", false,
+				"usage: haetae stop <arg>; default:8080");
 		return options;
 	}
 
@@ -33,9 +34,9 @@ public class StopSubCommand implements SubCommand {
 	public void execute(String... args) {
 		if (args != null && args.length == 1)
 			port = Integer.parseInt(args[0]);
-		else 
+		else
 			System.out.println("No specify port, using default port 8080");
-		ProcessUtil.killProcess(true,port);
+		ProcessManagerFactory.getProcessManager().killProcess(port);
 	}
 
 }

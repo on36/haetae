@@ -1,9 +1,9 @@
-package com.on36.haetae.manager.process.impl;
+package com.on36.haetae.tools.process.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.on36.haetae.manager.process.BaseProcessManager;
+import com.on36.haetae.tools.process.BaseProcessManager;
 import com.on36.haetae.tools.utils.ProcessUtil;
 
 /**

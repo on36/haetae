@@ -1,4 +1,4 @@
-package com.on36.haetae.config.agent;
+package com.on36.haetae.manager;
 
 import java.util.List;
 import java.util.Map;

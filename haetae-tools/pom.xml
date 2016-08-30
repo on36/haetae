@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.on36.haetae</groupId>
-		<artifactId>haetae</artifactId>
+		<artifactId>haetae-parent</artifactId>
 		<version>${project.version}</version>
 	</parent>
 	<artifactId>haetae-tools</artifactId>

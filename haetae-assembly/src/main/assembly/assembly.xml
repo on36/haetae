@@ -26,7 +26,6 @@
 			<excludes>
 				<exclude>com.on36.haetae:haetae-test:jar</exclude>
 				<exclude>com.on36.haetae:haetae-manager:jar</exclude>
-				<exclude>com.on36.haetae:haetae-config-agent:jar</exclude>
 				<exclude>org.mapdb:mapdb:jar</exclude>
 
 				<exclude>org.eclipse.jetty.websocket:*:jar</exclude>
@@ -54,7 +53,6 @@
 			<includes>
 				<include>com.on36.haetae:haetae-manager:jar</include>
 				<include>com.on36.haetae:haetae-test:jar</include>
-				<include>com.on36.haetae:haetae-config-agent:jar</include>
 				<include>org.mapdb:mapdb:jar</include>
 			</includes>
 		</dependencySet>

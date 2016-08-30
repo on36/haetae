@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.on36.haetae</groupId>
-	<artifactId>haetae</artifactId>
+	<artifactId>haetae-parent</artifactId>
 	<version>0.0.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
@@ -17,7 +17,7 @@
 		<module>haetae-sample</module>
 		<module>haetae-common</module>
 		<module>haetae-manager</module>
-		<module>haetae-config</module>
+		<module>haetae-client</module>
 		<module>haetae-assembly</module>
 	</modules>
 	<properties>

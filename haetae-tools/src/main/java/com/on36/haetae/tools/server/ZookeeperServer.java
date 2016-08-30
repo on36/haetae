@@ -7,7 +7,7 @@ import com.on36.haetae.hotswap.classloader.DirectoryClassLoader;
 
 /**
  * @author zhanghr
- * @date 2016年4月24日 
+ * @date 2016年4月24日
  */
 public class ZookeeperServer {
 

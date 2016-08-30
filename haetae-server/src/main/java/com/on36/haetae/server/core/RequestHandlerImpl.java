@@ -73,13 +73,10 @@ public class RequestHandlerImpl implements RequestHandler {
 	private List<IAuthentication> authList = null;
 	private boolean auth = true;
 
-	private final ExecutorService es = HaetaeServer.threadPools;
-
-	private final Scheduler scheduler;
+	private final ExecutorService es = HaetaeServer.getThreadPoolExecutor();
+	private final Scheduler scheduler = HaetaeServer.getScheduler();
 
 	public RequestHandlerImpl() {
-		this.scheduler = HaetaeServer.getScheduler();
-
 		this.authList = new ArrayList<IAuthentication>();
 		this.authList.add(blackList);
 		this.authList.add(whiteList);
@@ -287,7 +284,7 @@ public class RequestHandlerImpl implements RequestHandler {
 			e.printStackTrace();
 			sb.append(startTime);
 		}
-		sb.append(" ");
+		sb.append(" [HAETAE] ");
 		sb.append(client);
 		sb.append(" -> ");
 		sb.append(Heartbeat.myself());
@@ -318,7 +315,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		sb.append("] ");
 		sb.append(elapsedTime);
 		sb.append("ms");
-		sb.append(" at Haetae server version: ");
+		sb.append(" at Haetae server version : ");
 		sb.append(Version.CURRENT_VERSION);
 		scheduler.trace(RequestHandlerImpl.class, LogLevel.INFO, sb.toString());
 	}

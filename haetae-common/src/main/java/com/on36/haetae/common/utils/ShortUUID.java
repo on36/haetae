@@ -38,7 +38,7 @@ public final class ShortUUID {
 	}
 
 	public static class Builder {
-		private char[] alphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+		private char[] alphabet = "0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 				.toCharArray();
 		private int alphabetSize = alphabet.length;
 
