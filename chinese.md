@@ -289,6 +289,102 @@ TODO LIST
 
 	{"status":429,"message":"Too Many Requests"}
 
+### URL地址匹配功能
+
+		HaetaeServer server = new HaetaeServer(port, 4);
+		server.register("/name/:name").with("Hello :name");
+		server.start();
+
+请求地址 http://localhost:8080/services/name/zhangsan
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"Hello zhangsan"}
+
+### URL地址匹配正则限制功能
+
+		HaetaeServer server = new HaetaeServer(port, 4);
+		server.register("/name/:name<[A-Za-z]+>").with("Hello :name");
+		server.start();
+
+请求地址 http://localhost:8080/services/name/zhangsan
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"Hello zhangsan"}
+
+请求地址 http://localhost:8080/services/name/123
+
+错误返回结果：
+
+	{"status":503,"message":"Service Unavailable"}
+
+### URL地址多参数匹配功能
+
+		HaetaeServer server = new HaetaeServer(port, 4);
+		server.register("/multi/*/*").with("Hello *[0] *[1]");
+		server.start();
+
+请求地址 http://localhost:8080/services/multi/zhangsan/123
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"Hello zhangsan 123"}
+
+
+### 自定义响应处理功能(不推荐,这种方式已经放弃)
+
+		HaetaeServer server = new HaetaeServer(port, 4);
+		server.register("/custom", HttpMethod.GET)
+				.with(new HttpHandler<String>() {
+
+					public String handle(Context context) {
+						return "ni hao";
+					}
+				});
+		server.start();		
+
+请求地址 http://localhost:8080/services/custom
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"ni hao"}
+
+
+### 自定义服务(推荐)
+
+	public class UserService {
+		@Get(value="/user/add",version="1.1")
+		public String addUser(Context context) {
+			return "lisi";
+		}
+	｝
+
+		HaetaeServer server = new HaetaeServer(port, 4);
+		Class<?> clazz = UserService.class;
+		Method[] methods = clazz.getDeclaredMethods();
+
+		for (Method method : methods) {
+			Class<?>[] clazzs = method.getParameterTypes();
+			if (clazzs.length == 1
+					&& clazzs[0].getName().equals(Context.class.getName())) {
+
+				Post post = method.getAnnotation(Post.class);
+				Get get = method.getAnnotation(Get.class);
+				if (post != null)
+					server.register(post).with(clazz.newInstance(), method);
+				else
+					server.register(get).with(clazz.newInstance(), method);
+			}
+		}
+		server.start();		
+
+请求地址 http://localhost:8080/services/user/add
+
+正常返回结果：
+
+	{"status":200,"message":"OK","result":"lisi"}
+
 
 ### 作者
 
