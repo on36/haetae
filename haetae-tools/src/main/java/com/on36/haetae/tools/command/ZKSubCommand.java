@@ -7,7 +7,7 @@ import com.on36.haetae.tools.utils.ProcessUtil;
 
 /**
  * @author zhanghr
- * @date 2016年8月24日 
+ * @date 2016年8月24日
  */
 public class ZKSubCommand implements SubCommand {
 
@@ -30,7 +30,12 @@ public class ZKSubCommand implements SubCommand {
 	public void execute(String... args) {
 		if (args == null)
 			args = new String[0];
-		ProcessUtil.execJava("com.on36.haetae.tools.server.ZookeeperServer", true, args);
+		String classPath = System.getProperty("java.class.path");
+		if (classPath.indexOf("../conf") > -1)
+			System.setProperty("java.class.path",
+					classPath.replace("../conf", ""));
+		ProcessUtil.execJava("com.on36.haetae.tools.server.ZookeeperServer",
+				true, args);
 	}
 
 }

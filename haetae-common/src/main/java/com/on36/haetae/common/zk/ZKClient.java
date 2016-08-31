@@ -409,7 +409,7 @@ public abstract class ZKClient implements Watcher {
 							Stat stat = exists(subPath, false);
 							if (stat == null) {
 								p = this.zk.create(subPath, null,
-										Ids.READ_ACL_UNSAFE,
+										Ids.OPEN_ACL_UNSAFE,
 										CreateMode.PERSISTENT);
 							}
 						}

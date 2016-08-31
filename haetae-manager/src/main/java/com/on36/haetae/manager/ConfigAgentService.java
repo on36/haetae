@@ -35,7 +35,7 @@ public class ConfigAgentService {
 		propMap = db.createTreeMap(app + "/property").make();
 		servicesMap = db.createTreeMap(app + "/services").make();
 
-		client = new ZKClient(connectString, null, null) {
+		client = new ZKClient(connectString) {
 			@Override
 			public void process(WatchedEvent event) {
 				EventType type = event.getType();
