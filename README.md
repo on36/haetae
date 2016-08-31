@@ -353,12 +353,16 @@ TODO LIST
 
 ### 自定义服务(推荐)
 
+自定义服务类
+
 	public class UserService {
 		@Get(value="/user/add",version="1.1")
 		public String addUser(Context context) {
 			return "lisi";
 		}
 	｝
+
+启动服务
 
 		HaetaeServer server = new HaetaeServer(port, 4);
 		Class<?> clazz = UserService.class;
