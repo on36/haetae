@@ -146,27 +146,6 @@ public class ProcessUtil {
 		return execAndAutoCloseble(Arrays.asList(args));
 	}
 
-	public static Map<String, Object> killProcess(boolean autoExited,
-			int port) {
-
-		List<String> list = new ArrayList<String>(4);
-		list.add("/bin/sh");
-		list.add("-c");
-		// if (port > 0)
-		list.add("kill -15 `lsof -i :" + port
-				+ " |grep '(LISTEN)'| awk '{print $2}'`");
-		// else if (port == 0)
-		// list.add(
-		// "kill -15 `ps -au |grep java |grep
-		// com.on36.haetae.tools.server.HaetaeServerStartup |grep '(LISTEN)'|
-		// awk '{print $1}'`");
-		// else if (port == -1)
-		// list.add(
-		// "kill -15 `ps -au |grep java |grep com.on36.haetae.test.ServerTest
-		// |grep '(LISTEN)'| awk '{print $1}'`");
-		return exec(true, autoExited, list);
-	}
-
 	static class ProcessTask implements Runnable {
 
 		private InputStream inputStream;
