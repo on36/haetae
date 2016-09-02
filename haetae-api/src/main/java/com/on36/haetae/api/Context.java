@@ -192,4 +192,16 @@ public interface Context {
 	<T> T postURI(String resource, Map<String, String> queryParam,
 			Class<T> clazz) throws Exception;
 
+	/**
+	 * 异步输出日志,仅仅用于用户自定义的服务类中使用，其它地方使用可能带来上下文信息不准确
+	 * 
+	 * @param level
+	 *            日志级别 ,可选值有：INFO、WARN、ERROR、DEBUG
+	 * @param message
+	 *            输出信息
+	 * @param t
+	 *            异常
+	 */
+	void trace(String level, String message, Throwable t);
+	void trace(String level, String message);
 }

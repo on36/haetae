@@ -8,7 +8,7 @@ import com.on36.haetae.common.log.LogLevel;
  */
 public class LogEvent {
 
-	private Class<?> clazz;
+	private Object clazz;
 
 	private String message;
 
@@ -16,11 +16,11 @@ public class LogEvent {
 
 	private Throwable excp;
 
-	public Class<?> getClazz() {
+	public Object getClazz() {
 		return clazz;
 	}
 
-	public void setClazz(Class<?> clazz) {
+	public void setClazz(Object clazz) {
 		this.clazz = clazz;
 	}
 

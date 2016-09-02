@@ -14,6 +14,10 @@ public class LoggerAppender implements Logger {
 		log = org.slf4j.LoggerFactory.getLogger(name);
 	}
 
+	public LoggerAppender(String className) {
+		log = org.slf4j.LoggerFactory.getLogger(className);
+	}
+
 	@Override
 	public void info(String message) {
 		log.info(message);
@@ -31,12 +35,14 @@ public class LoggerAppender implements Logger {
 
 	@Override
 	public void debug(String message) {
-		log.debug(message);
+		if (log.isDebugEnabled())
+			log.debug(message);
 	}
 
 	@Override
 	public void debug(String message, Throwable t) {
-		log.debug(message, t);
+		if (log.isDebugEnabled())
+			log.debug(message, t);
 	}
 
 	@Override

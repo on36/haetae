@@ -11,6 +11,7 @@ import com.on36.haetae.api.Context;
 import com.on36.haetae.api.JSONObject;
 import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.api.http.Session;
+import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.common.utils.ShortUUID;
 import com.on36.haetae.config.client.HttpClient;
 import com.on36.haetae.config.client.json.JSONObjectImpl;
@@ -18,6 +19,7 @@ import com.on36.haetae.config.client.json.util.JSONUtils;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.http.route.Route;
+import com.on36.haetae.server.HaetaeServer;
 import com.on36.haetae.server.core.interpolation.ResponseBodyInterpolator;
 
 import io.netty.buffer.ByteBuf;
@@ -302,5 +304,29 @@ public class SimpleContext implements Context {
 		if (result != null)
 			return JSONUtils.fromJson(clazz, result);
 		return null;
+	}
+
+	@Override
+	public void trace(String level, String message, Throwable t) {
+		StackTraceElement[] lvStacks = Thread.currentThread().getStackTrace();
+		String className = lvStacks[2].getClassName();
+		HaetaeServer.getScheduler().trace(className,
+				LogLevel.valueOf(level.toUpperCase()), message, t);
+
+	}
+
+	@Override
+	public void trace(String level, String message) {
+		StackTraceElement[] lvStacks = Thread.currentThread().getStackTrace();
+		String className = lvStacks[2].getClassName();
+
+		int len = lvStacks.length;
+		int index = 2;
+		StringBuilder sb = new StringBuilder();
+		while (index < len)
+			sb.append("\n\tat " + lvStacks[index++].toString());
+		HaetaeServer.getScheduler().trace(className,
+				LogLevel.valueOf(level.toUpperCase()), message + sb.toString(),
+				null);
 	}
 }

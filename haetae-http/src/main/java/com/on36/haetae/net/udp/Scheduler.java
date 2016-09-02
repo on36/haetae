@@ -15,10 +15,11 @@ public interface Scheduler {
 	void revieve(Message message);
 
 	void send(Message message);
-	
-	void trace(Class<?> clazz, LogLevel level, String message);
-	
-	void trace(Class<?> clazz, LogLevel level, String message, Throwable e);
-	
-	void handleHTTPRequest(ChannelHandlerContext ctx, HttpRequest request, Container container);
+
+	void trace(Object clazz, LogLevel level, String message);
+
+	void trace(Object clazz, LogLevel level, String message, Throwable e);
+
+	void handleHTTPRequest(ChannelHandlerContext ctx, HttpRequest request,
+			Container container);
 }

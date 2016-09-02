@@ -37,6 +37,10 @@ public class Configuration {
 		return p;
 	}
 
+	public Exception getResource(String name, Properties p) {
+		return loadResource(p, name);
+	}
+
 	private Exception loadResource(Properties properties, String name) {
 		try {
 			properties.load(classLoader.getResourceAsStream(name));

@@ -12,6 +12,7 @@ import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.log.LogLevel;
+import com.on36.haetae.common.log.LoggerUtils;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.Server;
@@ -78,7 +79,10 @@ public class HaetaeServer {
 				Constant.V_SERVER_ROOT_PATH);
 
 		String rootName = root.replace("/", "");
-		System.setProperty("log.file.name", "haetae-" + rootName + "-" + port);
+		System.setProperty("haetae.log.name",
+				"haetae-" + rootName + "-" + port);
+
+		LoggerUtils.startAccess();
 
 		this.clazzes = clazzes;
 		this.classLoader = classLoader;
@@ -115,6 +119,8 @@ public class HaetaeServer {
 							"there is no found any service class at running mode:"
 									+ runningMode);
 				else {
+					
+					LoggerUtils.start("com.on36.haetae.manager", "biz", "biz", "INFO");
 					for (String classString : clazzes) {
 						Class<?> clazz = classLoader.loadClass(classString);
 						Method[] methods = clazz.getDeclaredMethods();

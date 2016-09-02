@@ -44,6 +44,7 @@ public class ClusterManagerService {
 		boolean success = (boolean) result.get("success");
 		String message = result.get("message").toString();
 		if (!success) {
+			LOG.error(message);
 			throw new Exception("start failed!",
 					ThrowableUtils.makeThrowable(message));
 		} else {

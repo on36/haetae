@@ -50,21 +50,13 @@ public class MessageScheduler implements Scheduler {
 	}
 
 	@Override
-	public void trace(final Class<?> clazz, final LogLevel level,
+	public void trace(final Object clazz, final LogLevel level,
 			final String message) {
-		disruptorManager.getLogEventDisruptor()
-				.publishEvent(new EventTranslator<LogEvent>() {
-					@Override
-					public void translateTo(LogEvent event, long sequence) {
-						event.setLevel(level);
-						event.setClazz(clazz);
-						event.setMessage(message);
-					}
-				});
+		trace(clazz, level, message, null);
 	}
 
 	@Override
-	public void trace(final Class<?> clazz, final LogLevel level,
+	public void trace(final Object clazz, final LogLevel level,
 			final String message, final Throwable e) {
 		disruptorManager.getLogEventDisruptor()
 				.publishEvent(new EventTranslator<LogEvent>() {
@@ -84,7 +76,8 @@ public class MessageScheduler implements Scheduler {
 		disruptorManager.getHttpRequestEventDisruptor()
 				.publishEvent(new EventTranslator<HttpRequestEvent>() {
 					@Override
-					public void translateTo(HttpRequestEvent event, long sequence) {
+					public void translateTo(HttpRequestEvent event,
+							long sequence) {
 						event.setContainer(container);
 						event.setContext(ctx);
 						event.setRequest(request);

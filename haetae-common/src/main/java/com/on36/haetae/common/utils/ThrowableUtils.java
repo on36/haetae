@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.on36.haetae.common.log.LoggerFactory;
+
 /**
  * @author zhanghr
  * @date 2016年4月27日
@@ -75,7 +77,9 @@ public class ThrowableUtils {
 				+ "\tat sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)\n"
 				+ "\tat java.lang.reflect.Method.invoke(Method.java:498)\n"
 				+ "\tat com.on36.haetae.tools.server.HaetaeServerStartup.main(HaetaeServerStartup.java:68)\n";
-
-		throw new Exception(makeThrowable(errMsg));
+		System.out.println(errMsg);
+		LoggerFactory.getLogger(ThrowableUtils.class).info("error",
+				new Exception("start failed!",
+						ThrowableUtils.makeThrowable(errMsg)));
 	}
 }

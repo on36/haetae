@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+
+	<properties>
+		<property name="logPath">../logs</property>
+	</properties>
+
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="%-d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%p]%c- %m%n" />
+		</Console>
+
+		<RollingFile name="defaultFile" filename="${logPath}/${sys:haetae.log.name}.log"
+			filepattern="${logPath}/${sys:haetae.log.name}-%d{yyyy-MM-dd-HH}.log">
+			<PatternLayout pattern="%-d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%p]%c- %m%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<logger name="org.apache.zookeeper" additivity="false" />
+		<Root level="info">
+			<AppenderRef ref="Console" />
+			<AppenderRef ref="defaultFile" />
+		</Root>
+	</Loggers>
+</Configuration>

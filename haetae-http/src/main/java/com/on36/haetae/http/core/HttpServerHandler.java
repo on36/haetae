@@ -23,10 +23,19 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders.Values;
 import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.ContinuationWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
-public class HttpServerHandler
-		extends SimpleChannelInboundHandler<HttpRequest> {
+public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private final Container container;
+
+	protected WebSocketServerHandshaker handshaker;
+	private StringBuilder frameBuffer = null;
 
 	public HttpServerHandler(Container container) {
 		this.container = container;
@@ -38,9 +47,70 @@ public class HttpServerHandler
 	}
 
 	@Override
-	public void channelRead0(ChannelHandlerContext ctx, HttpRequest request) {
+	protected void channelRead0(ChannelHandlerContext ctx, Object msg)
+			throws Exception {
+		if (msg instanceof HttpRequest) {
+			this.handleHttpRequest(ctx, (HttpRequest) msg);
+		} else if (msg instanceof WebSocketFrame) {
+			this.handleWebSocketFrame(ctx, (WebSocketFrame) msg);
+		}
+	}
 
-//		 container.getScheduler().handleHTTPRequest(ctx, request, container);
+	private void handleWebSocketFrame(ChannelHandlerContext ctx,
+			WebSocketFrame frame) {
+		// Check for closing frame
+		if (frame instanceof CloseWebSocketFrame) {
+			if (frameBuffer != null) {
+				handleMessageCompleted(ctx, frameBuffer.toString());
+			}
+			handshaker.close(ctx.channel(),
+					(CloseWebSocketFrame) frame.retain());
+			return;
+		}
+
+		if (frame instanceof PingWebSocketFrame) {
+			ctx.channel().writeAndFlush(
+					new PongWebSocketFrame(frame.content().retain()));
+			return;
+		}
+
+		if (frame instanceof PongWebSocketFrame) {
+			return;
+		}
+
+		if (frame instanceof TextWebSocketFrame) {
+			frameBuffer = new StringBuilder();
+			frameBuffer.append(((TextWebSocketFrame) frame).text());
+		} else if (frame instanceof ContinuationWebSocketFrame) {
+			if (frameBuffer != null) {
+				frameBuffer.append(((ContinuationWebSocketFrame) frame).text());
+			}
+		} else {
+			throw new UnsupportedOperationException(
+					String.format("%s frame types not supported",
+							frame.getClass().getName()));
+		}
+
+		// Check if Text or Continuation Frame is final fragment and handle if
+		// needed.
+		if (frame.isFinalFragment()) {
+			handleMessageCompleted(ctx, frameBuffer.toString());
+			frameBuffer = null;
+		}
+	}
+
+	private void handleMessageCompleted(ChannelHandlerContext ctx,
+			String frameText) {
+		// String response = wsMessageHandler.handleMessage(ctx, frameText);
+		// if (response != null) {
+		// ctx.channel().writeAndFlush(new TextWebSocketFrame(response));
+		// }
+	}
+
+	private void handleHttpRequest(ChannelHandlerContext ctx,
+			HttpRequest request) {
+
+		// container.getScheduler().handleHTTPRequest(ctx, request, container);
 
 		long start = System.currentTimeMillis();
 		if (HttpHeaders.is100ContinueExpected(request)) {
