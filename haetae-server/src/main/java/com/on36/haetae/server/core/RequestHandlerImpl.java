@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.core.HttpHandler;
+import com.on36.haetae.api.manager.ContextManager;
 import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.common.utils.DateUtils;
 import com.on36.haetae.http.RequestHandler;
@@ -217,10 +218,15 @@ public class RequestHandlerImpl implements RequestHandler {
 				future = es.submit(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {
-						if (getCustomHandler() != null)
-							return getCustomHandler().handle(context);
-						else
-							return method.invoke(object, context);
+						try {
+							ContextManager.set(context);
+							if (getCustomHandler() != null)
+								return getCustomHandler().handle(context);
+							else
+								return method.invoke(object, context);
+						} finally {
+							ContextManager.destroy();
+						}
 					}
 				});
 				Object result = null;

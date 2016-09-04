@@ -30,6 +30,11 @@ public class LoggerUtils {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void start(String className, String name, String suffix,
 			String level) {
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		Configuration config = ctx.getConfiguration();
+		LoggerConfig lc = config.getLoggerConfig(className);
+		if (lc != null)
+			return;
 
 		String fileName = System.getProperty("haetae.log.name", "haetae");
 		String logPath = System.getProperty("haetae.log.path", "../logs");
@@ -40,8 +45,6 @@ public class LoggerUtils {
 		sb.append(fileName);
 		if (!StringUtils.isEmpty(suffix))
 			sb.append("-" + suffix);
-		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-		final Configuration config = ctx.getConfiguration();
 		Layout layout = PatternLayout.createLayout("%m%n", null, config, null,
 				null, false, false, null, null);
 		Appender appender = RollingFileAppender.createAppender(
@@ -63,10 +66,18 @@ public class LoggerUtils {
 	}
 
 	public static void stop(String className, String name) {
-		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-		final Configuration config = ctx.getConfiguration();
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		Configuration config = ctx.getConfiguration();
 		config.getAppender(name).stop();
 		config.getLoggerConfig(className).removeAppender(className);
+		config.removeLogger(className);
+		ctx.updateLoggers();
+	}
+
+	public static void changeLevel(String className, String level) {
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		Configuration config = ctx.getConfiguration();
+		config.getLoggerConfig(className).setLevel(Level.valueOf(level));
 		config.removeLogger(className);
 		ctx.updateLoggers();
 	}
