@@ -11,6 +11,7 @@ import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.asynchttpclient.Response;
 
 import com.on36.haetae.api.JSONObject;
+import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.utils.ThrowableUtils;
 import com.on36.haetae.config.client.json.JSONObjectImpl;
@@ -26,16 +27,16 @@ public class HttpClient {
 		private static HttpClient instance = new HttpClient();
 		private static AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient(
 				new DefaultAsyncHttpClientConfig.Builder()
-						.setKeepAlive(ConfigClient.getBoolean(
+						.setKeepAlive(Configuration.create().getBoolean(
 								Constant.K_HTTPCLIENT_KEEPALIVE,
 								Constant.V_HTTPCLIENT_KEEPALIVE))
-						.setPooledConnectionIdleTimeout(ConfigClient.getInt(
-								Constant.K_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT,
-								Constant.V_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT))
-						.setConnectionTtl(ConfigClient.getInt(
+						.setPooledConnectionIdleTimeout(Configuration.create()
+								.getInt(Constant.K_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT,
+										Constant.V_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT))
+						.setConnectionTtl(Configuration.create().getInt(
 								Constant.K_HTTPCLIENT_CONNECTION_TTL,
 								Constant.V_HTTPCLIENT_CONNECTION_TTL))
-						.setRequestTimeout(ConfigClient.getInt(
+						.setRequestTimeout(Configuration.create().getInt(
 								Constant.K_HTTPCLIENT_REQUEST_TIMEOUT,
 								Constant.V_HTTPCLIENT_REQUEST_TIMEOUT))
 						.build());
@@ -66,29 +67,34 @@ public class HttpClient {
 
 	public String post(String uri, Map<String, String> queryParam,
 			Map<String, String> header) throws Exception {
-		BoundRequestBuilder request = HttpClientHolder.asyncHttpClient
-				.preparePost(getURI(uri));
-		if (header != null) {
-			for (Map.Entry<String, String> entry : header.entrySet()) {
-				String key = entry.getKey();
-				String value = entry.getValue();
-				request.setHeader(key, value);
+		Response resp = null;
+		try {
+			BoundRequestBuilder request = HttpClientHolder.asyncHttpClient
+					.preparePost(getURI(uri));
+			if (header != null) {
+				for (Map.Entry<String, String> entry : header.entrySet()) {
+					String key = entry.getKey();
+					String value = entry.getValue();
+					request.setHeader(key, value);
+				}
 			}
-		}
-		if (queryParam != null) {
-			for (Map.Entry<String, String> entry : queryParam.entrySet()) {
-				String key = entry.getKey();
-				String value = entry.getValue();
-				request.addQueryParam(key, value);
+			if (queryParam != null) {
+				for (Map.Entry<String, String> entry : queryParam.entrySet()) {
+					String key = entry.getKey();
+					String value = entry.getValue();
+					request.addQueryParam(key, value);
+				}
 			}
-		}
-		Response resp = request.execute().get();
-		if (resp.getStatusCode() == 200)
+			resp = request.execute().get();
+		} catch (Exception e) {}
+		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
-		else
+		else if (resp != null)
 			throw new Exception("post " + uri + " failed !",
 					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
 							resp.getResponseBody().trim(), "result")));
+		else
+			throw new Exception("post " + uri + " failed !");
 	}
 
 	public String postBody(String uri, String body) throws Exception {
@@ -112,15 +118,15 @@ public class HttpClient {
 				request.setBody(body);
 
 			resp = request.execute().get();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		if (resp.getStatusCode() == 200)
+		} catch (Exception e) {}
+		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
-		else
+		else if (resp != null)
 			throw new Exception("getbody " + uri + " failed !",
 					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
 							resp.getResponseBody().trim(), "result")));
+		else
+			throw new Exception("getbody " + uri + " failed !");
 	}
 
 	public <T> T post2Entity(String uri, Class<T> clazz) throws Exception {
@@ -212,15 +218,15 @@ public class HttpClient {
 				}
 			}
 			resp = request.execute().get();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		if (resp.getStatusCode() == 200)
+		} catch (Exception e) {}
+		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
-		else
+		else if (resp != null)
 			throw new Exception("get " + uri + " failed !",
 					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
 							resp.getResponseBody().trim(), "result")));
+		else
+			throw new Exception("get " + uri + " failed !");
 	}
 
 	public JSONObject get2JSON(String uri) throws Exception {

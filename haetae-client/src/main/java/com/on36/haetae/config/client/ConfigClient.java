@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.on36.haetae.common.conf.Configuration;
+import com.on36.haetae.common.log.Logger;
+import com.on36.haetae.common.log.LoggerFactory;
 import com.on36.haetae.config.client.json.util.JSONUtils;
 
 /**
@@ -16,6 +18,7 @@ import com.on36.haetae.config.client.json.util.JSONUtils;
 public class ConfigClient {
 
 	private static Configuration config = Configuration.create();
+	private static Logger LOG = LoggerFactory.getLogger(ConfigClient.class);
 
 	private static String getURI(String path) {
 		StringBuilder sb = new StringBuilder();
@@ -89,7 +92,9 @@ public class ConfigClient {
 					.get(getURI("/property/get?key=" + key));
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.warn(
+					"It will get data from default resource file [haetae-default.conf,haetae.conf]",
+					e);
 		}
 		return config.getString(key);
 	}
@@ -192,7 +197,9 @@ public class ConfigClient {
 						.println(JSONUtils.get(String.class, result, "result"));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.warn(
+					"It will get data from default resource file [haetae-default.conf,haetae.conf]",
+					e);
 		}
 		return config.getStringList(route);
 	}
