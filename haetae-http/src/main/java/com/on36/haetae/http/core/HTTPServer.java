@@ -4,8 +4,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
-import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
+import com.on36.haetae.config.client.ConfigClient;
 import com.on36.haetae.http.Banner;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.Environment;
@@ -27,8 +27,6 @@ import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 public class HTTPServer implements Server {
 
-	private static Configuration config = Configuration.create();
-
 	private final InetSocketAddress socketAddress;
 	private final int threadPoolSize;
 
@@ -37,10 +35,6 @@ public class HTTPServer implements Server {
 	private Channel channel;
 
 	public static boolean RUNNING = false;
-
-	public static Configuration getConfig() {
-		return config;
-	}
 
 	public HTTPServer(int port, Container container) {
 		this(port, 0, container);
@@ -70,7 +64,7 @@ public class HTTPServer implements Server {
 
 		if (channel == null || !channel.isActive()) {
 			final SslContext sslCtx;
-			boolean ssl = getConfig().getBoolean(Constant.K_SERVER_SSL_ENABLED,
+			boolean ssl = ConfigClient.getBoolean(Constant.K_SERVER_SSL_ENABLED,
 					Constant.V_SERVER_SSL_ENABLED);
 			if (ssl) {
 				SelfSignedCertificate ssc = new SelfSignedCertificate(
@@ -83,18 +77,18 @@ public class HTTPServer implements Server {
 			// Configure the server.
 			EventLoopGroup bossGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
-							: getConfig().getInt(
+							: ConfigClient.getInt(
 									Constant.K_SERVER_THREADPOOL_SIZE,
 									Constant.V_SERVER_THREADPOOL_SIZE));
 			EventLoopGroup workerGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
-							: getConfig().getInt(
+							: ConfigClient.getInt(
 									Constant.K_SERVER_THREADPOOL_SIZE,
 									Constant.V_SERVER_THREADPOOL_SIZE));
 			try {
 				ServerBootstrap b = new ServerBootstrap();
 				b.option(ChannelOption.SO_BACKLOG,
-						getConfig().getInt(Constant.K_SERVER_SOBACKLOG,
+						ConfigClient.getInt(Constant.K_SERVER_SOBACKLOG,
 								Constant.V_SERVER_SOBACKLOG));
 				b.option(ChannelOption.SO_REUSEADDR, true);
 				b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS,
@@ -112,7 +106,7 @@ public class HTTPServer implements Server {
 
 				channel = b.bind(socketAddress).sync().channel();
 				RUNNING = true;
-				
+
 				Thread.sleep(50);
 				System.out.println("Starting server...");
 				Banner.print(socketAddress.getPort());

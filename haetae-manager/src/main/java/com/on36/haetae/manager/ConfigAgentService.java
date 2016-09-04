@@ -13,9 +13,9 @@ import org.mapdb.DBMaker;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
-import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.zk.ZKClient;
+import com.on36.haetae.config.client.ConfigClient;
 
 /**
  * @author zhanghr
@@ -23,9 +23,9 @@ import com.on36.haetae.common.zk.ZKClient;
  */
 public class ConfigAgentService {
 
-	private String app = Configuration.create()
-			.getString(Constant.K_SERVER_APP_NAME, Constant.V_SERVER_APP_NAME);;
-	private String connectString = Configuration.create().getString(
+	private String app = ConfigClient.get(Constant.K_SERVER_APP_NAME,
+			Constant.V_SERVER_APP_NAME);;
+	private String connectString = ConfigClient.get(
 			Constant.K_ZOOKEEPER_ADDRESS_URL, Constant.V_ZOOKEEPER_ADDRESS_URL);
 	private ZKClient client;
 

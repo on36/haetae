@@ -11,7 +11,6 @@ import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.asynchttpclient.Response;
 
 import com.on36.haetae.api.JSONObject;
-import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.utils.ThrowableUtils;
 import com.on36.haetae.config.client.json.JSONObjectImpl;
@@ -27,16 +26,16 @@ public class HttpClient {
 		private static HttpClient instance = new HttpClient();
 		private static AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient(
 				new DefaultAsyncHttpClientConfig.Builder()
-						.setKeepAlive(Configuration.create().getBoolean(
+						.setKeepAlive(ConfigClient.getBoolean(
 								Constant.K_HTTPCLIENT_KEEPALIVE,
 								Constant.V_HTTPCLIENT_KEEPALIVE))
-						.setPooledConnectionIdleTimeout(Configuration.create()
-								.getInt(Constant.K_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT,
-										Constant.V_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT))
-						.setConnectionTtl(Configuration.create().getInt(
+						.setPooledConnectionIdleTimeout(ConfigClient.getInt(
+								Constant.K_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT,
+								Constant.V_HTTPCLIENT_CONNECTION_IDLE_TIMEOUT))
+						.setConnectionTtl(ConfigClient.getInt(
 								Constant.K_HTTPCLIENT_CONNECTION_TTL,
 								Constant.V_HTTPCLIENT_CONNECTION_TTL))
-						.setRequestTimeout(Configuration.create().getInt(
+						.setRequestTimeout(ConfigClient.getInt(
 								Constant.K_HTTPCLIENT_REQUEST_TIMEOUT,
 								Constant.V_HTTPCLIENT_REQUEST_TIMEOUT))
 						.build());

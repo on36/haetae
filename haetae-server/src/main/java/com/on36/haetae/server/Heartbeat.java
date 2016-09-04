@@ -1,6 +1,5 @@
 package com.on36.haetae.server;
 
-import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.common.utils.NetworkUtils;
@@ -42,8 +41,7 @@ public class Heartbeat implements Runnable {
 	@Override
 	public void run() {
 		mineEndPoint = NetworkUtils.getInnerIP() + ":" + port;
-		long period = Configuration.create().getLong(
-				Constant.K_SERVER_HEARTBEAT_PERIOD,
+		long period = ConfigClient.getLong(Constant.K_SERVER_HEARTBEAT_PERIOD,
 				Constant.V_SERVER_HEARTBEAT_PERIOD);
 		int retry = RETRIES;
 		while (running) {

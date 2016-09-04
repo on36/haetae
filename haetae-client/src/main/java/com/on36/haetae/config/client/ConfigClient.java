@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.config.client.json.util.JSONUtils;
 
 /**
@@ -13,6 +14,8 @@ import com.on36.haetae.config.client.json.util.JSONUtils;
  * @date 2016年4月14日
  */
 public class ConfigClient {
+
+	private static Configuration config = Configuration.create();
 
 	private static String getURI(String path) {
 		StringBuilder sb = new StringBuilder();
@@ -88,7 +91,7 @@ public class ConfigClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return config.getString(key);
 	}
 
 	/**
@@ -191,7 +194,7 @@ public class ConfigClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return config.getStringList(route);
 	}
 
 	/**

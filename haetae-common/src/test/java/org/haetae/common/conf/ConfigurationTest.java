@@ -1,4 +1,4 @@
-package com.on36.haetae.udp;
+package org.haetae.common.conf;
 
 import static org.junit.Assert.assertEquals;
 
