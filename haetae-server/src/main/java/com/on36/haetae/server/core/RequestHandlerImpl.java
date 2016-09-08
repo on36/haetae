@@ -214,7 +214,7 @@ public class RequestHandlerImpl implements RequestHandler {
 
 		Future<Object> future = null;
 		try {
-			if (getCustomHandler() != null || method != null) {
+			if (method != null || getCustomHandler() != null) {
 				future = es.submit(new Callable<Object>() {
 					@Override
 					public Object call() throws Exception {

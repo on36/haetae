@@ -21,7 +21,8 @@ public interface RequestHandler {
 	RequestHandler with(String body);
 
 	/**
-	 * 指定自定义处理逻辑实现CustomHandler接口的实现类.
+	 * 指定自定义处理逻辑实现HttpHandler接口的实现类,如果有Object和Method自定义的处理逻辑，则设置无效.
+	 * @see com.on36.haetae.api.core.HttpHandler
 	 * 
 	 * @param customHandler
 	 *            自定义处理逻辑实现类
