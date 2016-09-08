@@ -12,7 +12,7 @@ import io.netty.util.CharsetUtil;
 
 public class StringResponseBody extends ResponseBody {
 
-	private Object body = null;
+	protected Object body = null;
 
 	public StringResponseBody(Object body) {
 		this.body = body;
@@ -50,39 +50,7 @@ public class StringResponseBody extends ResponseBody {
 		}
 	}
 
-	private String build(HttpResponse response, String contentType) {
-		if (MediaType.TEXT_HTML.value().equals(contentType))
-			return content();
-
-		StringBuilder sb = new StringBuilder("{");
-		sb.append("\"status\":").append(response.getStatus().code())
-				.append(",");
-		sb.append("\"message\":\"").append(response.getStatus().reasonPhrase())
-				.append("\"");
-		if (hasContent())
-			translate(sb, body);
-		sb.append("}");
-		return sb.toString();
-	}
-
-	private boolean isJSON(String data) {
-		return data.startsWith("{") && data.endsWith("}");
-	}
-
-	private void translate(StringBuilder sb, Object entity) {
-		sb.append(",").append("\"result\":");
-		String data = null;
-		if (entity.getClass().isPrimitive())
-			sb.append(entity.toString());
-		else if (entity instanceof String) {
-			data = (String) entity;
-			if (isJSON(data))
-				sb.append(data);
-			else
-				sb.append("\"").append(data).append("\"");
-		} else {
-			data = JSONUtils.toJson(entity);
-			sb.append(entity.toString());
-		}
+	protected String build(HttpResponse response, String contentType) {
+		return content();
 	}
 }

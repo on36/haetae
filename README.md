@@ -389,6 +389,11 @@ TODO LIST
 
 	{"status":200,"message":"OK","result":"lisi"}
 
+### 性能监控页面
+
+请求地址 http://localhost:8080/services
+
+![性能页面](on36.github.io/20160908150141.png)
 
 ### 作者
 
