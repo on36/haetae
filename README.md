@@ -393,7 +393,7 @@ TODO LIST
 
 请求地址 http://localhost:8080/services
 
-![性能页面](on36.github.io/20160908150141.png)
+![性能页面](http://on36.github.io/20160908150141.png)
 
 ### 作者
 
