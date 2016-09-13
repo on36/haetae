@@ -22,6 +22,7 @@ public interface RequestHandler {
 
 	/**
 	 * 指定自定义处理逻辑实现HttpHandler接口的实现类,如果有Object和Method自定义的处理逻辑，则设置无效.
+	 * 
 	 * @see com.on36.haetae.api.core.HttpHandler
 	 * 
 	 * @param customHandler
@@ -86,12 +87,20 @@ public interface RequestHandler {
 	RequestHandler every(int times);
 
 	/**
-	 * 设置是否需要做黑白名单和流量权限控制.
+	 * 设置是否需要做黑白名单和流量权限控制,默认为true.
 	 * 
 	 * @param authentication
 	 * @return
 	 */
 	RequestHandler auth(boolean authentication);
+
+	/**
+	 * 设置是否需要数据签名验证,默认为true.
+	 * 
+	 * @param verify
+	 * @return
+	 */
+	RequestHandler verify(boolean verify);
 
 	/**
 	 * 删除黑名单的IP限制.
@@ -180,7 +189,8 @@ public interface RequestHandler {
 	 *            时间单位
 	 * @return
 	 */
-	RequestHandler permit(String ip, int times, long period, TimeUnit periodUnit);
+	RequestHandler permit(String ip, int times, long period,
+			TimeUnit periodUnit);
 
 	/**
 	 * 设置转发地址.

@@ -14,12 +14,12 @@ import com.on36.haetae.server.HaetaeServer;
 public class ClusterManagerServerTest {
 
 	public static void main(String[] args) throws Exception {
-		
+
 		int port = 1025;
-		if(args != null && args.length == 1)
+		if (args != null && args.length == 1)
 			port = Integer.parseInt(args[0]);
 
-		HaetaeServer server = new HaetaeServer(port,"/cluster");
+		HaetaeServer server = new HaetaeServer(port, "/cluster");
 
 		Class<?> clazz = ClusterManagerService.class;
 		Method[] methods = clazz.getDeclaredMethods();
@@ -34,10 +34,10 @@ public class ClusterManagerServerTest {
 				if (object == null)
 					object = clazz.newInstance();
 				if (post != null) {
-					if (server.find(post.value()) == null)
+					if (server.find(post) == null)
 						server.register(post).with(object, method);
 				} else if (get != null) {
-					if (server.find(get.value()) == null)
+					if (server.find(get) == null)
 						server.register(get).with(object, method);
 				}
 			}

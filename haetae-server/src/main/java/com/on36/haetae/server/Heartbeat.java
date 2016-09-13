@@ -5,6 +5,7 @@ import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.common.utils.NetworkUtils;
 import com.on36.haetae.config.client.ConfigClient;
 import com.on36.haetae.config.client.HttpClient;
+import com.on36.haetae.config.client.ServiceClient;
 import com.on36.haetae.http.Environment;
 import com.on36.haetae.http.core.HTTPServer;
 import com.on36.haetae.net.udp.Scheduler;
@@ -48,7 +49,7 @@ public class Heartbeat implements Runnable {
 			try {
 				Thread.sleep(period);// 休眠一次
 				if (HTTPServer.RUNNING)
-					ConfigClient.registerNode(root + "/" + mineEndPoint,
+					ServiceClient.registerNode(root + "/" + mineEndPoint,
 							Environment.pid());
 			} catch (Exception e) {
 				retry--;
@@ -60,13 +61,14 @@ public class Heartbeat implements Runnable {
 									e);
 				} else {
 					scheduler.trace(this.getClass(), LogLevel.WARN,
-							"Config Agent connected failed. Already tried "
+							"Config Agent connected failed and counld not register node. Already tried "
 									+ (RETRIES - retry)
 									+ " time(s), will sleep " + FAIL_NEXT_PERIOD
 									+ " minutes and try again!",
 							e);
 					try {
 						Thread.sleep(FAIL_NEXT_PERIOD * 60 * 1000);
+						retry = RETRIES;
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -79,7 +81,7 @@ public class Heartbeat implements Runnable {
 	public void close() {
 		running = false;
 		if (HTTPServer.RUNNING)
-			ConfigClient.unregisterNode(root + "/" + mineEndPoint);
+			ServiceClient.unregisterNode(root + "/" + mineEndPoint);
 		HttpClient.getInstance().close();
 	}
 }

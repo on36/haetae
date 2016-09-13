@@ -4,7 +4,6 @@ import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_ROOT;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_SEPARATOR;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
-import io.netty.handler.codec.http.HttpMethod;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -25,6 +24,8 @@ import com.on36.haetae.http.route.TreeRouter;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.stats.Statistics;
 import com.on36.haetae.server.core.stats.StatisticsHandler;
+
+import io.netty.handler.codec.http.HttpMethod;
 
 public class RequestResolver {
 
@@ -73,12 +74,15 @@ public class RequestResolver {
 
 		Route route = router.route(path);
 		if (route != null) {
-			throw new IllegalArgumentException("There is already the route["
-					+ resource + "], adding operation is not allowed!");
+			String resourceKey = resource + "-" + method.name();
+			if (handlerKeyMap.get(resourceKey) != null && handlerMap
+					.get(handlerKeyMap.get(resourceKey)).containsKey(version))
+				throw new IllegalArgumentException(
+						"There is already the route[" + resource + " " + version
+								+ "], adding operation is not allowed!");
 		}
 		route = new Route(path);
-		HandlerKey key = new HandlerKey(method.name(), route, contentType,
-				version);
+		HandlerKey key = new HandlerKey(method.name(), route, contentType);
 		handlerKeyMap.put(route.getResourcePath() + "-" + method.name(), key);
 		if (!handlerMap.containsKey(key))
 			handlerMap.put(key, new TreeMap<String, RequestHandlerImpl>(
@@ -90,7 +94,14 @@ public class RequestResolver {
 		return true;
 	}
 
-	public RequestHandlerImpl findHandler(String resource) {
+	public RequestHandlerImpl findHandler(String resource, String methodName,
+			String version) {
+		if (resource == null || resource.trim().length() == 0) {
+			throw new IllegalArgumentException("resource cannot be null");
+		}
+		if (methodName == null || methodName.trim().length() == 0) {
+			throw new IllegalArgumentException("methodName cannot be null");
+		}
 
 		String path = resource;
 		if (!resource.startsWith(PATH_ELEMENT_ROOT))
@@ -100,19 +111,35 @@ public class RequestResolver {
 
 		Route route = router.route(path);
 		if (route != null) {
-			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
-			RequestHandlerImpl handler = handlerMap.get(key).lastEntry()
-					.getValue();
-			if (handler == null) {
-				key = new HandlerKey(HttpMethod.POST.name(), route);
-				return handlerMap.get(key).lastEntry().getValue();
-			} else
-				return handler;
+			String resourceKey = resource + "-" + methodName;
+			return find(resourceKey, version);
 		}
 		return null;
 	}
 
-	public boolean removeHandler(String resource) {
+	private RequestHandlerImpl find(String resourceKey, String version) {
+		RequestHandlerImpl handler = null;
+		if (handlerKeyMap.containsKey(resourceKey)) {
+			if (version == null)
+				handler = handlerMap.get(handlerKeyMap.get(resourceKey))
+						.lastEntry().getValue();
+			else {
+				handler = handlerMap.get(handlerKeyMap.get(resourceKey))
+						.get(version);
+				if (handler == null)
+					handler = handlerMap.get(handlerKeyMap.get(resourceKey))
+							.lastEntry().getValue();
+			}
+		}
+		return handler;
+	}
+
+	public boolean removeHandler(String resource, String methodName,
+			String version) {
+		if (resource == null || resource.trim().length() == 0) {
+			throw new IllegalArgumentException("resource cannot be null");
+		}
+
 		String path = resource;
 		if (!resource.startsWith(PATH_ELEMENT_ROOT))
 			path = PATH_ELEMENT_ROOT
@@ -120,18 +147,34 @@ public class RequestResolver {
 							: (PATH_ELEMENT_SEPARATOR + resource));
 		Route route = router.route(path);
 		if (route != null) {
-			HandlerKey key = new HandlerKey(HttpMethod.GET.name(), route);
-			handlerMap.remove(key);
-			handlerKeyMap.remove(
-					route.getResourcePath() + "-" + HttpMethod.GET.name());
-			key = new HandlerKey(HttpMethod.POST.name(), route);
-			handlerMap.remove(key);
-			handlerKeyMap.remove(
-					route.getResourcePath() + "-" + HttpMethod.POST.name());
-			router.remove(path);
+			if (methodName != null) {
+				String resourceKey = resource + "-" + methodName;
+				remove(path, resourceKey, version);
+			} else {
+				String resourceKey = resource + "-" + HttpMethod.PUT.name();
+				remove(path, resourceKey, version);
+				resourceKey = resource + "-" + HttpMethod.GET.name();
+				remove(path, resourceKey, version);
+				resourceKey = resource + "-" + HttpMethod.POST.name();
+				remove(path, resourceKey, version);
+				resourceKey = resource + "-" + HttpMethod.DELETE.name();
+				remove(path, resourceKey, version);
+			}
 		}
 
 		return true;
+	}
+
+	private void remove(String path, String resourceKey, String version) {
+		if (handlerKeyMap.containsKey(resourceKey)) {
+			HandlerKey key = handlerKeyMap.get(resourceKey);
+			if (version == null)
+				handlerMap.remove(key);
+			else
+				handlerMap.get(key).remove(version);
+			router.remove(path);
+			handlerKeyMap.remove(resourceKey);
+		}
 	}
 
 	public ResolvedRequest resolve(HttpRequestExt request) throws Exception {
@@ -139,6 +182,7 @@ public class RequestResolver {
 		ResolvedRequest resolved = new ResolvedRequest();
 		String method = request.getMethod().name();
 		String path = new URI(request.getUri()).getPath();
+		String version = request.headers().get("VERSION");// TODO 请求服务版本号如何处理？
 		String contentType = request.headers().get(CONTENT_TYPE);
 
 		if (path.endsWith(PATH_ELEMENT_SEPARATOR))
@@ -147,6 +191,7 @@ public class RequestResolver {
 		Route route = router.route(path);
 		if (route == null) {
 			resolved.errorStatus = SERVICE_UNAVAILABLE;
+			resolved.warn = "Not found route " + path;
 			return resolved;
 		}
 
@@ -158,13 +203,13 @@ public class RequestResolver {
 			if (contentType != null)
 				resolved.contentType = contentType;
 		} else {
-			HandlerKey key = handlerKeyMap
-					.get(route.getResourcePath() + "-" + method);
-
-			RequestHandlerImpl handler = handlerMap.get(key).lastEntry()
-					.getValue();
+			String resourceKey = route.getResourcePath() + "-" + method;
+			HandlerKey key = handlerKeyMap.get(resourceKey);
+			RequestHandlerImpl handler = find(resourceKey, version);
 			if (handler == null) {
 				resolved.errorStatus = SERVICE_UNAVAILABLE;
+				resolved.warn = "Not found route[" + path + "],method[" + method
+						+ "],version[" + version + "]";
 				return resolved;
 			}
 			if (contentType != null)
@@ -183,14 +228,32 @@ public class RequestResolver {
 		for (Map.Entry<HandlerKey, TreeMap<String, RequestHandlerImpl>> entry : handlerMap
 				.entrySet()) {
 			String resourcePath = entry.getKey().getRoute().getResourcePath();
+			TreeMap<String, RequestHandlerImpl> treeMap = entry.getValue();
+			int size = treeMap.size();
 			Statistics stat = entry.getValue().lastEntry().getValue()
 					.getStatistics();
 			stat.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT)
 					? resourcePath.replace(PATH_ELEMENT_ROOT, "")
 					: resourcePath);
 			stat.setMethod(entry.getKey().getMethod());
-			stat.setVersion(entry.getKey().getVersion());
+			stat.setVersion(entry.getValue().lastEntry().getKey());
 			stats.add(stat);
+			if (size > 1) {
+				List<Statistics> children = new ArrayList<Statistics>();
+				for (Map.Entry<String, RequestHandlerImpl> versionHandler : treeMap
+						.entrySet()) {
+					String version = versionHandler.getKey();
+					Statistics child = versionHandler.getValue()
+							.getStatistics();
+					child.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT)
+							? resourcePath.replace(PATH_ELEMENT_ROOT, "")
+							: resourcePath);
+					child.setMethod(entry.getKey().getMethod());
+					child.setVersion(version);
+					children.add(0, child);
+				}
+				stat.setChildStatisticsList(children);
+			}
 		}
 		Collections.sort(stats);
 		return stats;

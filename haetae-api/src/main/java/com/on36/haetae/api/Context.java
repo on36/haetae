@@ -8,7 +8,19 @@ import com.on36.haetae.api.http.Session;
 public interface Context {
 
 	/**
-	 * 请求客户端地址.
+	 * 请求客户端IP.
+	 * 
+	 * @return
+	 */
+	String getClientIP();
+	/**
+	 * 请求客户端端口.
+	 * 
+	 * @return
+	 */
+	int getClientPort();
+	/**
+	 * 请求客户端地址 IP+端口.
 	 * 
 	 * @return
 	 */

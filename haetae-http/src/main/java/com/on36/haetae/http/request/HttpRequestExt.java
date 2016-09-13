@@ -54,10 +54,6 @@ public class HttpRequestExt {
 		return request.getDecoderResult();
 	}
 
-	public void setDecoderResult(DecoderResult result) {
-		request.setDecoderResult(result);
-	}
-
 	public ByteBuf content() {
 		return ((HttpContent) request).content();
 	}
@@ -94,20 +90,8 @@ public class HttpRequestExt {
 		return request.getMethod();
 	}
 
-	public HttpRequest setMethod(HttpMethod method) {
-		return request.setMethod(method);
-	}
-
 	public String getUri() {
 		return request.getUri();
-	}
-
-	public HttpRequest setUri(String uri) {
-		return request.setUri(uri);
-	}
-
-	public HttpRequest setProtocolVersion(HttpVersion version) {
-		return request.setProtocolVersion(version);
 	}
 
 	public String getRemoteAddress() {

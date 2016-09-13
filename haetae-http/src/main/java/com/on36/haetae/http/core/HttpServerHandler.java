@@ -13,12 +13,15 @@ import java.net.InetSocketAddress;
 import com.on36.haetae.common.utils.DateUtils;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.request.HttpRequestExt;
+import com.on36.haetae.net.udp.Message;
+import com.on36.haetae.net.udp.Message.Title;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders.Values;
@@ -33,12 +36,16 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private final Container container;
+	private final String wsUri;
 
 	protected WebSocketServerHandshaker handshaker;
+	protected WebSocketServerHandler handler;
 	private StringBuilder frameBuffer = null;
 
-	public HttpServerHandler(Container container) {
+	public HttpServerHandler(Container container, String wsuri) {
 		this.container = container;
+		this.wsUri = wsuri;
+		handler = new WebSocketServerHandler(wsuri);
 	}
 
 	@Override
@@ -50,7 +57,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	protected void channelRead0(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
 		if (msg instanceof HttpRequest) {
-			this.handleHttpRequest(ctx, (HttpRequest) msg);
+			this.handleHttpRequest(ctx, (FullHttpRequest) msg);
 		} else if (msg instanceof WebSocketFrame) {
 			this.handleWebSocketFrame(ctx, (WebSocketFrame) msg);
 		}
@@ -66,19 +73,13 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 			handshaker.close(ctx.channel(),
 					(CloseWebSocketFrame) frame.retain());
 			return;
-		}
-
-		if (frame instanceof PingWebSocketFrame) {
+		} else if (frame instanceof PingWebSocketFrame) {
 			ctx.channel().writeAndFlush(
 					new PongWebSocketFrame(frame.content().retain()));
 			return;
-		}
-
-		if (frame instanceof PongWebSocketFrame) {
+		} else if (frame instanceof PongWebSocketFrame) {
 			return;
-		}
-
-		if (frame instanceof TextWebSocketFrame) {
+		} else if (frame instanceof TextWebSocketFrame) {
 			frameBuffer = new StringBuilder();
 			frameBuffer.append(((TextWebSocketFrame) frame).text());
 		} else if (frame instanceof ContinuationWebSocketFrame) {
@@ -103,17 +104,22 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 			String frameText) {
 		// String response = wsMessageHandler.handleMessage(ctx, frameText);
 		// if (response != null) {
-		// ctx.channel().writeAndFlush(new TextWebSocketFrame(response));
+		ctx.channel().writeAndFlush(new TextWebSocketFrame("hi hao client"));
 		// }
+		System.out.println(frameText);
+		container.getScheduler().revieve(
+				Message.newMessage(Title.ENDPOINT, frameText.getBytes()));
 	}
 
 	private void handleHttpRequest(ChannelHandlerContext ctx,
-			HttpRequest request) {
+			FullHttpRequest request) {
 
 		// container.getScheduler().handleHTTPRequest(ctx, request, container);
 
 		long start = System.currentTimeMillis();
-		if (HttpHeaders.is100ContinueExpected(request)) {
+		if (wsUri.equalsIgnoreCase(request.getUri())) {
+			handler.channelRead(ctx, request);
+		} else if (HttpHeaders.is100ContinueExpected(request)) {
 			ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
 		} else {
 

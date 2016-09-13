@@ -6,24 +6,17 @@ public class HandlerKey {
 
 	private final String method;
 	private final Route route;
-	private final String version;
 	private String contentType;
 
 	public HandlerKey(String method, Route route) {
-		this(method, route, null, "1.0");
+		this(method, route, null);
 	}
 
 	public HandlerKey(String method, Route route, String contentType) {
-		this(method, route, contentType, "1.0");
-	}
-
-	public HandlerKey(String method, Route route, String contentType,
-			String version) {
 		super();
 		this.method = method;
 		this.route = route;
 		this.contentType = contentType;
-		this.version = version;
 	}
 
 	public String contentType() {
@@ -40,10 +33,6 @@ public class HandlerKey {
 
 	public Route getRoute() {
 		return route;
-	}
-
-	public String getVersion() {
-		return version;
 	}
 
 	@Override

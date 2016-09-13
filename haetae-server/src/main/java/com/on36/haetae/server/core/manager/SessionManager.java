@@ -1,12 +1,5 @@
 package com.on36.haetae.server.core.manager;
 
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponse;
-import io.netty.handler.codec.http.cookie.Cookie;
-import io.netty.handler.codec.http.cookie.DefaultCookie;
-import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
-import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,6 +7,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.on36.haetae.api.http.Session;
 import com.on36.haetae.common.utils.ShortUUID;
 import com.on36.haetae.http.request.HttpRequestExt;
+
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.DefaultCookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 
 public class SessionManager {
 
@@ -52,8 +52,7 @@ public class SessionManager {
 	public Session newSession(HttpResponse response) {
 
 		Session session = new Session();
-		String sessionid = new ShortUUID.Builder().build(session.getSessionId())
-				.toString();
+		String sessionid = ShortUUID.randomUUID();
 		sessions.put(sessionid, session);
 
 		Cookie cookie = new DefaultCookie(SESSION_COOKIE_NAME, sessionid);

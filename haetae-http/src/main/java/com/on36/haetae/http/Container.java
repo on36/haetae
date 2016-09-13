@@ -12,17 +12,16 @@ public interface Container {
 
 	void handle(HttpRequestExt request, HttpResponse response);
 
-	RequestHandler findHandler(String resource);
-	
-	boolean removeHandler(String resource);
-	
-	boolean addHandler(RequestHandler handler, String resource);
-	
-	boolean addHandler(RequestHandler handler, HttpMethod method, String resource, String version);
-	
-	boolean addHandler(RequestHandler handler, HttpMethod method, String resource, String version, String contentType);
-	
+	RequestHandler findHandler(String resource, String methodName,
+			String version);
+
+	boolean removeHandler(String resource, String methodName,
+			String version);
+
+	boolean addHandler(RequestHandler handler, HttpMethod method,
+			String resource, String version, String contentType);
+
 	List<?> getStatistics();
-	
+
 	Scheduler getScheduler();
 }

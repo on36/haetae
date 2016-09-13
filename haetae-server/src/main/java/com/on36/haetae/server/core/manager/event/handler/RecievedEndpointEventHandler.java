@@ -8,14 +8,14 @@ import com.on36.haetae.server.core.manager.event.RecievedEvent;
  * @author zhanghr
  * @date 2016年1月8日
  */
-public class RecievedEndpointEventHandler implements EventHandler<RecievedEvent> {
+public class RecievedEndpointEventHandler
+		implements EventHandler<RecievedEvent> {
 
-	private EndPointManager endpointMgr = new EndPointManager();
 	@Override
 	public void onEvent(RecievedEvent event, long sequence, boolean endOfBatch)
 			throws Exception {
-		String endPoint = new String(event.getSendMessage().content(),"UTF-8");
-		endpointMgr.update(endPoint);
+		String endPoint = new String(event.getSendMessage().content(), "UTF-8");
+		EndPointManager.update(endPoint);
 	}
 
 }

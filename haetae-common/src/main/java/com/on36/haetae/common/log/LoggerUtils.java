@@ -11,8 +11,6 @@ import org.apache.logging.log4j.core.config.AppenderRef;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.on36.haetae.common.utils.StringUtils;
 
@@ -33,7 +31,7 @@ public class LoggerUtils {
 		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 		Configuration config = ctx.getConfiguration();
 		LoggerConfig lc = config.getLoggerConfig(className);
-		if (lc != null)
+		if (lc.getName().equalsIgnoreCase(className))
 			return;
 
 		String fileName = System.getProperty("haetae.log.name", "haetae");
@@ -80,17 +78,5 @@ public class LoggerUtils {
 		config.getLoggerConfig(className).setLevel(Level.valueOf(level));
 		config.removeLogger(className);
 		ctx.updateLoggers();
-	}
-
-	/**
-	 * 获取Logger
-	 *
-	 * 如果不想使用slf4j,那这里改成直接返回Log4j的Logger即可
-	 * 
-	 * @param jobId
-	 * @return
-	 */
-	public static Logger createLogger(String fileName) {
-		return LoggerFactory.getLogger(fileName);
 	}
 }

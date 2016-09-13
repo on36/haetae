@@ -27,13 +27,13 @@ import com.on36.haetae.common.utils.DateUtils;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.http.Version;
-import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.HaetaeServer;
 import com.on36.haetae.server.Heartbeat;
 import com.on36.haetae.server.core.auth.IAuthentication;
 import com.on36.haetae.server.core.auth.impl.BlackListAuthentication;
 import com.on36.haetae.server.core.auth.impl.RequestFlowAuthentication;
+import com.on36.haetae.server.core.auth.impl.SignatureAuthentication;
 import com.on36.haetae.server.core.auth.impl.WhiteListAuthentication;
 import com.on36.haetae.server.core.body.EntityResponseBody;
 import com.on36.haetae.server.core.body.InterpolatedResponseBody;
@@ -71,14 +71,17 @@ public class RequestHandlerImpl implements RequestHandler {
 	private BlackListAuthentication blackList = new BlackListAuthentication();
 	private WhiteListAuthentication whiteList = new WhiteListAuthentication();
 	private RequestFlowAuthentication requestFlow = new RequestFlowAuthentication();
+	private SignatureAuthentication signature = new SignatureAuthentication();
 	private List<IAuthentication> authList = null;
 	private boolean auth = true;
+	private boolean verify = true;
 
 	private final ExecutorService es = HaetaeServer.getThreadPoolExecutor();
 	private final Scheduler scheduler = HaetaeServer.getScheduler();
 
 	public RequestHandlerImpl() {
 		this.authList = new ArrayList<IAuthentication>();
+		this.authList.add(signature);
 		this.authList.add(blackList);
 		this.authList.add(whiteList);
 		this.authList.add(requestFlow);
@@ -118,6 +121,13 @@ public class RequestHandlerImpl implements RequestHandler {
 	public RequestHandler auth(boolean authentication) {
 
 		this.auth = authentication;
+		return this;
+	}
+
+	public RequestHandler verify(boolean verify) {
+
+		this.verify = verify;
+		this.signature.setVerify(verify);
 		return this;
 	}
 
@@ -387,12 +397,16 @@ public class RequestHandlerImpl implements RequestHandler {
 		return auth;
 	}
 
-	public HttpResponseStatus validation(HttpRequestExt request,
+	public boolean hasVerify() {
+		return verify;
+	}
+
+	public HttpResponseStatus validation(Context context,
 			HttpResponse response) {
 
 		if (auth) {
 			for (IAuthentication authentication : authList) {
-				HttpResponseStatus result = authentication.auth(request,
+				HttpResponseStatus result = authentication.auth(context,
 						response);
 				if (result != null)
 					return result;

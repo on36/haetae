@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.on36.haetae.api.Context;
 import com.on36.haetae.http.ServiceLevel;
-import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.server.core.auth.IAuthentication;
 
 import io.netty.handler.codec.http.HttpResponse;
@@ -70,13 +70,13 @@ public class WhiteListAuthentication implements IAuthentication {
 	}
 
 	@Override
-	public HttpResponseStatus auth(HttpRequestExt request,
+	public HttpResponseStatus auth(Context context,
 			HttpResponse response) {
 
 		/* validation white list */
 		if (!whiteMap.isEmpty()) {
 
-			String remoteIp = request.getRemoteAddress();
+			String remoteIp = context.getClientIP();
 			Integer level = whiteMap.get(remoteIp);
 			if (level == null)
 				return FORBIDDEN;

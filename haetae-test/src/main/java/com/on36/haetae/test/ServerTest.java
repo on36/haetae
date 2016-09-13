@@ -4,11 +4,11 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.JSONObject;
+import com.on36.haetae.api.annotation.Delete;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
+import com.on36.haetae.api.annotation.Put;
 import com.on36.haetae.api.core.HttpHandler;
-import com.on36.haetae.http.ServiceLevel;
 import com.on36.haetae.server.HaetaeServer;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -38,7 +38,7 @@ public class ServerTest {
 		server.register("/white").with("Hello white!").permit("172.31.25.40",
 				"127.0.0.1");
 		server.register("/whitecontrol").with("Hello white!")
-				.permit("127.0.0.1",10,10,TimeUnit.SECONDS);
+				.permit("127.0.0.1", 10, 10, TimeUnit.SECONDS);
 		server.register("/body", HttpMethod.POST)
 				.with(new HttpHandler<String>() {
 
@@ -85,17 +85,27 @@ public class ServerTest {
 		Class<?> clazz = UserService.class;
 		Method[] methods = clazz.getDeclaredMethods();
 
+		Object object = null;
 		for (Method method : methods) {
 			Class<?>[] clazzs = method.getParameterTypes();
 			if (clazzs.length == 1
 					&& clazzs[0].getName().equals(Context.class.getName())) {
 
+				if (object == null)
+					object = clazz.newInstance();
+
 				Post post = method.getAnnotation(Post.class);
 				Get get = method.getAnnotation(Get.class);
-				if (post != null)
-					server.register(post).with(clazz.newInstance(), method);
-				else
-					server.register(get).with(clazz.newInstance(), method);
+				Put put = method.getAnnotation(Put.class);
+				Delete delete = method.getAnnotation(Delete.class);
+				if (put != null)
+					server.register(put).with(object, method);
+				else if (delete != null)
+					server.register(delete).with(object, method);
+				else if (post != null)
+					server.register(post).with(object, method);
+				else if (get != null)
+					server.register(get).with(object, method);
 			}
 		}
 		server.start();

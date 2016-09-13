@@ -9,9 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EndPointManager {
 
-	private Map<String, Long> epMap = new ConcurrentHashMap<String, Long>();
+	private static Map<String, Long> epMap = new ConcurrentHashMap<String, Long>();
 
-	public void update(String endPoint) {
+	public static void update(String endPoint) {
 		long current = System.currentTimeMillis();
 		epMap.put(endPoint, current);
 	}

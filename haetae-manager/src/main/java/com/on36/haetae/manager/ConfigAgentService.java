@@ -6,13 +6,13 @@ import java.util.Map;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.data.Stat;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
 import com.on36.haetae.api.Context;
+import com.on36.haetae.api.annotation.Delete;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
+import com.on36.haetae.api.annotation.Put;
+import com.on36.haetae.common.cache.CacheMap;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.zk.ZKClient;
 import com.on36.haetae.config.client.ConfigClient;
@@ -30,10 +30,8 @@ public class ConfigAgentService {
 	private ZKClient client;
 
 	public ConfigAgentService() {
-		db = DBMaker.newMemoryDirectDB().transactionDisable()
-				.compressionEnable().closeOnJvmShutdown().make();
-		propMap = db.createTreeMap(app + "/property").make();
-		servicesMap = db.createTreeMap(app + "/services").make();
+		propMap = new CacheMap<String, String>(-1, 30, 500);
+		servicesMap = new CacheMap<String, List<String>>(-1, 30, 500);
 
 		client = new ZKClient(connectString) {
 			@Override
@@ -53,9 +51,8 @@ public class ConfigAgentService {
 		};
 	}
 
-	private DB db;
-	private BTreeMap<String, String> propMap;
-	private BTreeMap<String, List<String>> servicesMap;
+	private CacheMap<String, String> propMap;
+	private CacheMap<String, List<String>> servicesMap;
 
 	/**
 	 * ZNODE节点删除时，清空缓存数据
@@ -102,12 +99,13 @@ public class ConfigAgentService {
 			return "/" + data;
 	}
 
-	@Post("/property/set")
-	public void setProperty(Context context) throws Exception {
+	@Post("/property")
+	public void changeProperty(Context context) throws Exception {
 		Map<String, String> map = context.getRequestParameters();
 
 		if (map == null || map.isEmpty())
-			throw new Exception("Request parameters should not be null");
+			throw new IllegalArgumentException(
+					"Request parameters should not be null");
 
 		for (Map.Entry<String, String> entry : map.entrySet()) {
 			String key = entry.getKey();
@@ -120,7 +118,30 @@ public class ConfigAgentService {
 		}
 	}
 
-	@Get("/property/get")
+	@Put("/property")
+	public void addProperty(Context context) throws Exception {
+		Map<String, String> map = context.getRequestParameters();
+
+		if (map == null || map.isEmpty())
+			throw new IllegalArgumentException(
+					"Request parameters should not be null");
+
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			String key = entry.getKey();
+			String path = app + "/property" + checkPrefix(key);
+			if (client.exists(path))
+				throw new Exception(
+						"Property [" + key + "] is already existed!");
+		}
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			String path = app + "/property" + checkPrefix(key);
+			client.create(path, value, true);
+		}
+	}
+
+	@Get("/property")
 	public String getProperty(Context context) throws Exception {
 		String key = context.getRequestParameter("key");
 		if (key != null) {
@@ -132,10 +153,38 @@ public class ConfigAgentService {
 			}
 			return result;
 		} else
-			throw new Exception("key should not be null");
+			throw new IllegalArgumentException("key should not be null");
 	}
 
-	@Get("/service/get")
+	@Get("/property/:key")
+	public String getPropertyByURI(Context context) throws Exception {
+		String key = context.getCapturedParameter(":key");
+		if (key != null) {
+			String path = app + "/property" + checkPrefix(key);
+			String result = propMap.get(path);
+			if (result == null) {
+				result = client.getData2String(path, true);
+				propMap.put(path, result);
+			}
+			return result;
+		} else
+			throw new IllegalArgumentException("key should not be null");
+	}
+
+	@Delete("/property/:key")
+	public void deleteProperty(Context context) throws Exception {
+		String key = context.getCapturedParameter(":key");
+		if (key != null) {
+			String path = app + "/property" + checkPrefix(key);
+			if (client.exists(path))
+				client.delete(path);
+			else
+				throw new Exception("Property [" + key + "] is not existed!");
+		} else
+			throw new IllegalArgumentException("key should not be null");
+	}
+
+	@Get("/service")
 	public List<String> getServices(Context context) throws Exception {
 		String route = context.getRequestParameter("route");
 		if (route != null) {
@@ -147,10 +196,24 @@ public class ConfigAgentService {
 			}
 			return result;
 		} else
-			throw new Exception("route should not be null");
+			throw new IllegalArgumentException("route should not be null");
 	}
 
-	@Post("/service/register")
+	@Put("/service")
+	public void putServices(Context context) throws Exception {
+		String address = context.getRequestParameter("address");
+		if (address != null) {
+			String path = app + "/services" + checkPrefix(address);
+			if (!client.exists(path))
+				client.createEphemeral(path, true);
+			else
+				throw new Exception(
+						"Node [" + address + "] is already existed!");
+		} else
+			throw new IllegalArgumentException("address should not be null");
+	}
+
+	@Post("/service")
 	public void registerServices(Context context) throws Exception {
 		String address = context.getRequestParameter("address");
 		if (address != null) {
@@ -163,12 +226,27 @@ public class ConfigAgentService {
 				client.createEphemeral(path, true);
 			}
 		} else
-			throw new Exception("address should not be null");
+			throw new IllegalArgumentException("address should not be null");
 	}
 
-	@Post("/node/register")
-	public void registerNode(Context context) throws Exception {
-		String address = context.getRequestParameter("address");
+	@Put("/node")
+	public void putNode(Context context) throws Exception {
+		String address = context.getRequestParameter("node");
+		String data = context.getRequestParameter("data");
+		if (address != null) {
+			String path = app + "/nodes" + checkPrefix(address);
+			if (!client.exists(path))
+				client.createEphemeral(path, data, true);
+			else
+				throw new Exception(
+						"Node [" + address + "] is already existed!");
+		} else
+			throw new IllegalArgumentException("node should not be null");
+	}
+
+	@Post("/node")
+	public void postNode(Context context) throws Exception {
+		String address = context.getRequestParameter("node");
 		String data = context.getRequestParameter("data");
 		if (address != null) {
 			String path = app + "/nodes" + checkPrefix(address);
@@ -180,16 +258,54 @@ public class ConfigAgentService {
 				client.createEphemeral(path, data, true);
 			}
 		} else
-			throw new Exception("address should not be null");
+			throw new IllegalArgumentException("node should not be null");
 	}
 
-	@Post("/node/unregister")
+	@Delete("/node")
 	public void unregisterNode(Context context) throws Exception {
-		String address = context.getRequestParameter("address");
+		String address = context.getRequestParameter("node");
 		if (address != null) {
 			String path = app + "/nodes" + checkPrefix(address);
-			client.delete(path);
+			if (client.exists(path))
+				client.delete(path);
+			else
+				throw new Exception("Node [" + address + "] is not existed!");
 		} else
-			throw new Exception("address should not be null");
+			throw new IllegalArgumentException("node should not be null");
+	}
+
+	@Delete("/node/:node")
+	public void deleteNode(Context context) throws Exception {
+		String address = context.getCapturedParameter(":node");
+		if (address != null) {
+			String path = app + "/nodes" + checkPrefix(address);
+			if (client.exists(path))
+				client.delete(path);
+			else
+				throw new Exception("Node [" + address + "] is not existed!");
+		} else
+			throw new IllegalArgumentException("node should not be null");
+	}
+
+	@Get("/node")
+	public List<String> getNodes(Context context) throws Exception {
+		String path = app + "/nodes";
+		if (client.exists(path))
+			return client.getChildren(path);
+		else
+			throw new Exception("Node [" + app + "] is not existed!");
+	}
+
+	@Get("/node/:node")
+	public int getNode(Context context) throws Exception {
+		String address = context.getCapturedParameter(":node");
+		if (address != null) {
+			String path = app + "/nodes" + checkPrefix(address);
+			if (client.exists(path))
+				return client.getData2Integer(path);
+			else
+				throw new Exception("Node [" + address + "] is not existed!");
+		} else
+			throw new IllegalArgumentException("node should not be null");
 	}
 }

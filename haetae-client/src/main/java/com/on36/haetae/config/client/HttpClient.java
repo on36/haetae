@@ -1,7 +1,6 @@
 package com.on36.haetae.config.client;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.asynchttpclient.AsyncHttpClient;
@@ -49,28 +48,21 @@ public class HttpClient {
 		return HttpClientHolder.instance;
 	}
 
-	private String getURI(String path) {
-		if (path != null && path.startsWith("http"))
-			return path;
-		List<String> address = ConfigClient.getList("serice");
-		return address.get(0);
+	public String post(String url) throws Exception {
+		return post(url, null);
 	}
 
-	public String post(String uri) throws Exception {
-		return post(uri, null);
-	}
-
-	public String post(String uri, Map<String, String> queryParam)
+	public String post(String url, Map<String, String> queryParam)
 			throws Exception {
-		return post(uri, queryParam, null);
+		return post(url, queryParam, null);
 	}
 
-	public String post(String uri, Map<String, String> queryParam,
+	public String post(String url, Map<String, String> queryParam,
 			Map<String, String> header) throws Exception {
 		Response resp = null;
 		try {
 			BoundRequestBuilder request = HttpClientHolder.asyncHttpClient
-					.preparePost(getURI(uri));
+					.preparePost(url);
 			if (header != null) {
 				for (Map.Entry<String, String> entry : header.entrySet()) {
 					String key = entry.getKey();
@@ -90,23 +82,23 @@ public class HttpClient {
 		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else if (resp != null)
-			throw new Exception("post " + uri + " failed !",
+			throw new Exception("post " + url + " failed !",
 					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
 							resp.getResponseBody().trim(), "result")));
 		else
-			throw new Exception("post " + uri + " failed !");
+			throw new Exception("post " + url + " failed !");
 	}
 
-	public String postBody(String uri, String body) throws Exception {
-		return postBody(uri, body, null);
+	public String postBody(String url, String body) throws Exception {
+		return postBody(url, body, null);
 	}
 
-	public String postBody(String uri, String body, Map<String, String> header)
+	public String postBody(String url, String body, Map<String, String> header)
 			throws Exception {
 		Response resp = null;
 		try {
 			BoundRequestBuilder request = HttpClientHolder.asyncHttpClient
-					.preparePost(getURI(uri));
+					.preparePost(url);
 			if (header != null) {
 				for (Map.Entry<String, String> entry : header.entrySet()) {
 					String key = entry.getKey();
@@ -122,87 +114,87 @@ public class HttpClient {
 		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else if (resp != null)
-			throw new Exception("getbody " + uri + " failed !",
+			throw new Exception("getbody " + url + " failed !",
 					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
 							resp.getResponseBody().trim(), "result")));
 		else
-			throw new Exception("getbody " + uri + " failed !");
+			throw new Exception("getbody " + url + " failed !");
 	}
 
-	public <T> T post2Entity(String uri, Class<T> clazz) throws Exception {
+	public <T> T post2Entity(String url, Class<T> clazz) throws Exception {
 
-		return JSONUtils.fromJson(clazz, post(uri));
+		return JSONUtils.fromJson(clazz, post(url));
 	}
 
-	public <T> T post2Entity(String uri, String body, Class<T> clazz)
+	public <T> T post2Entity(String url, String body, Class<T> clazz)
 			throws Exception {
 
-		return JSONUtils.fromJson(clazz, postBody(uri, body));
+		return JSONUtils.fromJson(clazz, postBody(url, body));
 	}
 
-	public <T> T post2Entity(String uri, String body,
+	public <T> T post2Entity(String url, String body,
 			Map<String, String> header, Class<T> clazz) throws Exception {
 
-		return JSONUtils.fromJson(clazz, postBody(uri, body, header));
+		return JSONUtils.fromJson(clazz, postBody(url, body, header));
 	}
 
-	public <T> T post2Entity(String uri, Map<String, String> queryParam,
+	public <T> T post2Entity(String url, Map<String, String> queryParam,
 			Class<T> clazz) throws Exception {
 
-		return JSONUtils.fromJson(clazz, post(uri, queryParam));
+		return JSONUtils.fromJson(clazz, post(url, queryParam));
 	}
 
-	public <T> T post2Entity(String uri, Map<String, String> queryParam,
+	public <T> T post2Entity(String url, Map<String, String> queryParam,
 			Map<String, String> header, Class<T> clazz) throws Exception {
 
-		return JSONUtils.fromJson(clazz, post(uri, queryParam, header));
+		return JSONUtils.fromJson(clazz, post(url, queryParam, header));
 	}
 
-	public JSONObject post2JSON(String uri) throws Exception {
+	public JSONObject post2JSON(String url) throws Exception {
 
-		return new JSONObjectImpl(post(uri));
+		return new JSONObjectImpl(post(url));
 	}
 
-	public JSONObject post2JSON(String uri, String body) throws Exception {
+	public JSONObject post2JSON(String url, String body) throws Exception {
 
-		return new JSONObjectImpl(postBody(uri, body));
+		return new JSONObjectImpl(postBody(url, body));
 	}
 
-	public JSONObject post2JSON(String uri, String body,
+	public JSONObject post2JSON(String url, String body,
 			Map<String, String> header) throws Exception {
 
-		return new JSONObjectImpl(postBody(uri, body, header));
+		return new JSONObjectImpl(postBody(url, body, header));
 	}
 
-	public JSONObject post2JSON(String uri, Map<String, String> queryParam)
+	public JSONObject post2JSON(String url, Map<String, String> queryParam)
 			throws Exception {
 
-		return new JSONObjectImpl(post(uri, queryParam));
+		return new JSONObjectImpl(post(url, queryParam));
 	}
 
-	public JSONObject post2JSON(String uri, Map<String, String> queryParam,
+	public JSONObject post2JSON(String url, Map<String, String> queryParam,
 			Map<String, String> header) throws Exception {
 
-		return new JSONObjectImpl(post(uri, queryParam, header));
+		return new JSONObjectImpl(post(url, queryParam, header));
 	}
 
-	public String get(String uri) throws Exception {
+	public String get(String url) throws Exception {
 
-		return get(uri, null);
+		return get(url, null);
 	}
 
-	public String get(String uri, Map<String, String> queryParam)
+	public String get(String url, Map<String, String> queryParam)
 			throws Exception {
 
-		return get(uri, null, null);
+		return get(url, null, null);
 	}
 
-	public String get(String uri, Map<String, String> queryParam,
+	public String get(String url, Map<String, String> queryParam,
 			Map<String, String> header) throws Exception {
 		Response resp = null;
 		try {
 			BoundRequestBuilder request = HttpClientHolder.asyncHttpClient
-					.prepareGet(getURI(uri));
+					.prepareGet(url);
 			if (header != null) {
 				for (Map.Entry<String, String> entry : header.entrySet()) {
 					String key = entry.getKey();
@@ -222,45 +214,45 @@ public class HttpClient {
 		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else if (resp != null)
-			throw new Exception("get " + uri + " failed !",
+			throw new Exception("get " + url + " failed !",
 					ThrowableUtils.makeThrowable(JSONUtils.get(String.class,
 							resp.getResponseBody().trim(), "result")));
 		else
-			throw new Exception("get " + uri + " failed !");
+			throw new Exception("get " + url + " failed !");
 	}
 
-	public JSONObject get2JSON(String uri) throws Exception {
+	public JSONObject get2JSON(String url) throws Exception {
 
-		return get2JSON(uri, null, null);
+		return get2JSON(url, null, null);
 	}
 
-	public JSONObject get2JSON(String uri, Map<String, String> queryParam)
+	public JSONObject get2JSON(String url, Map<String, String> queryParam)
 			throws Exception {
 
-		return get2JSON(uri, queryParam, null);
+		return get2JSON(url, queryParam, null);
 	}
 
-	public JSONObject get2JSON(String uri, Map<String, String> queryParam,
+	public JSONObject get2JSON(String url, Map<String, String> queryParam,
 			Map<String, String> header) throws Exception {
 
-		return new JSONObjectImpl(get(uri, queryParam, header));
+		return new JSONObjectImpl(get(url, queryParam, header));
 	}
 
-	public <T> T get2Entity(String uri, Class<T> clazz) throws Exception {
+	public <T> T get2Entity(String url, Class<T> clazz) throws Exception {
 
-		return get2Entity(uri, null, clazz);
+		return get2Entity(url, null, clazz);
 	}
 
-	public <T> T get2Entity(String uri, Map<String, String> queryParam,
+	public <T> T get2Entity(String url, Map<String, String> queryParam,
 			Class<T> clazz) throws Exception {
 
-		return get2Entity(uri, queryParam, null, clazz);
+		return get2Entity(url, queryParam, null, clazz);
 	}
 
-	public <T> T get2Entity(String uri, Map<String, String> queryParam,
+	public <T> T get2Entity(String url, Map<String, String> queryParam,
 			Map<String, String> header, Class<T> clazz) throws Exception {
 
-		return JSONUtils.fromJson(clazz, get(uri, queryParam, header));
+		return JSONUtils.fromJson(clazz, get(url, queryParam, header));
 	}
 
 	public void close() {

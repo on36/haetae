@@ -67,10 +67,10 @@ public class SimpleContext implements Context {
 		this.parentId = getHeaderValue(HEADER_PARENT_ID);
 		try {
 			if (this.traceId == null) {
-				this.parentId = this.spanId = this.traceId = new ShortUUID.Builder()
-						.build().toString();
+				this.parentId = this.spanId = this.traceId = ShortUUID
+						.randomUUID();
 			} else {
-				this.spanId = new ShortUUID.Builder().build().toString();
+				this.spanId = ShortUUID.randomUUID();
 			}
 			path = new URI(this.request.getUri()).getPath();
 			parse();
@@ -78,7 +78,13 @@ public class SimpleContext implements Context {
 			e.printStackTrace();
 		}
 	}
+	public String getClientIP() {
+	 return request.getRemoteAddress();
+	}
 
+	public int getClientPort() {
+		return request.getRemotePort();
+	}
 	public String getClientAddress() {
 		return request.getRemoteAddress() + ":" + request.getRemotePort();
 	}
@@ -214,7 +220,7 @@ public class SimpleContext implements Context {
 	public String getURI(String resource) throws Exception {
 
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource);
+				.findHandler(resource, HttpMethod.GET.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
@@ -227,7 +233,7 @@ public class SimpleContext implements Context {
 			throws Exception {
 		this.extraParamMap = queryParam;
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource);
+				.findHandler(resource, HttpMethod.GET.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
@@ -247,7 +253,7 @@ public class SimpleContext implements Context {
 	@Override
 	public String postURI(String resource) throws Exception {
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource);
+				.findHandler(resource, HttpMethod.POST.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
@@ -259,7 +265,7 @@ public class SimpleContext implements Context {
 	public String postURI(String resource, String body) throws Exception {
 		this.extraBody = body;
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource);
+				.findHandler(resource, HttpMethod.POST.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
@@ -272,7 +278,7 @@ public class SimpleContext implements Context {
 			throws Exception {
 		this.extraParamMap = queryParam;
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource);
+				.findHandler(resource, HttpMethod.POST.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {

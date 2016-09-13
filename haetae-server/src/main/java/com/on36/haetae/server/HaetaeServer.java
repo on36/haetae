@@ -6,8 +6,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.on36.haetae.api.Context;
+import com.on36.haetae.api.annotation.Delete;
 import com.on36.haetae.api.annotation.Get;
 import com.on36.haetae.api.annotation.Post;
+import com.on36.haetae.api.annotation.Put;
 import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
@@ -119,8 +121,9 @@ public class HaetaeServer {
 							"there is no found any service class at running mode:"
 									+ runningMode);
 				else {
-					
-					LoggerUtils.start("com.on36.haetae.manager", "biz", "biz", "INFO");
+
+					LoggerUtils.start("com.on36.haetae.manager", "biz", "biz",
+							"INFO");
 					for (String classString : clazzes) {
 						Class<?> clazz = classLoader.loadClass(classString);
 						Method[] methods = clazz.getDeclaredMethods();
@@ -133,14 +136,19 @@ public class HaetaeServer {
 
 								Post post = method.getAnnotation(Post.class);
 								Get get = method.getAnnotation(Get.class);
+								Put put = method.getAnnotation(Put.class);
+								Delete delete = method
+										.getAnnotation(Delete.class);
 								if (object == null)
 									object = clazz.newInstance();
-								if (post != null) {
-									if (find(post.value()) == null)
-										register(post).with(object, method);
+								if (put != null) {
+									register(put).with(object, method);
+								} else if (delete != null) {
+									register(delete).with(object, method);
+								} else if (post != null) {
+									register(post).with(object, method);
 								} else if (get != null) {
-									if (find(get.value()) == null)
-										register(get).with(object, method);
+									register(get).with(object, method);
 								}
 							}
 						}
@@ -241,6 +249,44 @@ public class HaetaeServer {
 	}
 
 	/**
+	 * 注册一个put服务.
+	 * 
+	 * @param put
+	 *            服务请求的put
+	 * @return
+	 */
+	public RequestHandler register(Put put) {
+
+		return register(put.value(), put.version(), HttpMethod.PUT,
+				MediaType.TEXT_JSON.value());
+	}
+
+	public RequestHandler register(Put put, String contentType) {
+
+		return register(put.value(), put.version(), HttpMethod.PUT,
+				contentType);
+	}
+
+	/**
+	 * 注册一个delete服务.
+	 * 
+	 * @param delete
+	 *            服务请求的delete
+	 * @return
+	 */
+	public RequestHandler register(Delete delete) {
+
+		return register(delete.value(), delete.version(), HttpMethod.DELETE,
+				MediaType.TEXT_JSON.value());
+	}
+
+	public RequestHandler register(Delete delete, String contentType) {
+
+		return register(delete.value(), delete.version(), HttpMethod.DELETE,
+				contentType);
+	}
+
+	/**
 	 * 注册一个服务,默认方法类型为GET.
 	 * 
 	 * @param resource
@@ -257,22 +303,104 @@ public class HaetaeServer {
 	 * 
 	 * @param resource
 	 *            服务请求URI路径
+	 * @param methodName
+	 *            http方法名
+	 * @param version
+	 *            版本号
 	 * @return
 	 */
+	public boolean unregister(String resource, String methodName,
+			String version) {
+
+		return container.removeHandler(resource, methodName, version);
+	}
+
+	public boolean unregister(String resource, String methodName) {
+
+		return unregister(resource, methodName, null);
+	}
+
 	public boolean unregister(String resource) {
 
-		return container.removeHandler(resource);
+		return unregister(resource, null, null);
+	}
+
+	/**
+	 * 搜索指定请求路径的服务,返回指定版本号服务,如果没有找到则返回最新版本号服务
+	 * 
+	 * @param resource
+	 *            服务请求URI路径
+	 * @param methodName
+	 *            http方法名
+	 * @param version
+	 *            版本号
+	 * @return
+	 */
+	public RequestHandler find(String resource, String methodName,
+			String version) {
+
+		return container.findHandler(resource, methodName, version);
+	}
+
+	/**
+	 * 搜索指定请求路径的服务,默认返回最新版本.
+	 * 
+	 * @param resource
+	 *            服务请求URI路径
+	 * @param methodName
+	 *            http方法名
+	 * @return
+	 */
+	public RequestHandler find(String resource, String methodName) {
+
+		return find(resource, methodName, null);
 	}
 
 	/**
 	 * 搜索指定请求路径的服务.
 	 * 
-	 * @param resource
+	 * @param Get
 	 *            服务请求URI路径
 	 * @return
 	 */
-	public RequestHandler find(String resource) {
+	public RequestHandler find(Get get) {
 
-		return container.findHandler(resource);
+		return find(get.value(), HttpMethod.GET.name(), get.version());
+	}
+
+	/**
+	 * 搜索指定请求路径的服务.
+	 * 
+	 * @param Post
+	 *            服务请求URI路径
+	 * @return
+	 */
+	public RequestHandler find(Post post) {
+
+		return find(post.value(), HttpMethod.POST.name(), post.version());
+	}
+
+	/**
+	 * 搜索指定请求路径的服务.
+	 * 
+	 * @param Put
+	 *            服务请求URI路径
+	 * @return
+	 */
+	public RequestHandler find(Put put) {
+
+		return find(put.value(), HttpMethod.PUT.name(), put.version());
+	}
+
+	/**
+	 * 搜索指定请求路径的服务.
+	 * 
+	 * @param Delete
+	 *            服务请求URI路径
+	 * @return
+	 */
+	public RequestHandler find(Delete delete) {
+
+		return find(delete.value(), HttpMethod.DELETE.name(), delete.version());
 	}
 }

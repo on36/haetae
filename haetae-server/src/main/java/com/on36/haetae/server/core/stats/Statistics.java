@@ -1,6 +1,8 @@
 package com.on36.haetae.server.core.stats;
 
-public class Statistics implements Comparable<Statistics>{
+import java.util.List;
+
+public class Statistics implements Comparable<Statistics> {
 
 	private String path;
 	private String version;
@@ -16,7 +18,9 @@ public class Statistics implements Comparable<Statistics>{
 	private int curRPS;
 	private int maxRPS;
 
-	//private int maxConcurrent;
+	private List<Statistics> childStatisticsList;
+
+	// private int maxConcurrent;
 
 	public Statistics(int successCount, int failureCount, long minElapsedTime,
 			long avgElapsedTime, long maxElapsedTime, int curRPS, int maxRPS) {
@@ -110,6 +114,14 @@ public class Statistics implements Comparable<Statistics>{
 		this.maxElapsedTime = maxElapsedTime;
 	}
 
+	public List<Statistics> getChildStatisticsList() {
+		return childStatisticsList;
+	}
+
+	public void setChildStatisticsList(List<Statistics> childStatisticsList) {
+		this.childStatisticsList = childStatisticsList;
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer("{");
@@ -118,9 +130,9 @@ public class Statistics implements Comparable<Statistics>{
 		sb.append("method:" + method + ", ");
 		sb.append("success:" + successCount + ", ");
 		sb.append("failure:" + failureCount + ", ");
-		sb.append("min elapsed time(ms):" + minElapsedTime + ", ");
-		sb.append("avg elapsed time(ms):" + avgElapsedTime + ", ");
-		sb.append("max elapsed time(ms):" + maxElapsedTime + ", ");
+		sb.append("minElapsedTime(ms):" + minElapsedTime + ", ");
+		sb.append("avgElapsedTime(ms):" + avgElapsedTime + ", ");
+		sb.append("maxElapsedTime(ms):" + maxElapsedTime);
 		sb.append("}");
 		return sb.toString();
 	}
@@ -129,5 +141,5 @@ public class Statistics implements Comparable<Statistics>{
 	public int compareTo(Statistics o) {
 		return getPath().compareTo(o.getPath());
 	}
-	
+
 }

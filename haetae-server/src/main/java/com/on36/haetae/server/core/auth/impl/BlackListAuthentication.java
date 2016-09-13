@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.on36.haetae.http.request.HttpRequestExt;
+import com.on36.haetae.api.Context;
 import com.on36.haetae.server.core.auth.IAuthentication;
 
 import io.netty.handler.codec.http.HttpResponse;
@@ -53,10 +53,9 @@ public class BlackListAuthentication implements IAuthentication {
 	}
 
 	@Override
-	public HttpResponseStatus auth(HttpRequestExt request,
-			HttpResponse response) {
+	public HttpResponseStatus auth(Context context, HttpResponse response) {
 		/* validation black list */
-		String remoteIp = request.getRemoteAddress();
+		String remoteIp = context.getClientIP();
 		if (blackList != null && blackList.contains(remoteIp))
 			return FORBIDDEN;
 

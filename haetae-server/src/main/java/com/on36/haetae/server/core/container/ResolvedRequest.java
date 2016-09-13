@@ -13,4 +13,5 @@ public class ResolvedRequest {
 	public HandlerKey key;
 	public HttpResponseStatus errorStatus;
 	public String contentType;
+	public String warn;
 }

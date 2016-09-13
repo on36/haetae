@@ -189,7 +189,7 @@ public class ConfigClient {
 			return null;
 		try {
 			String result = HttpClient.getInstance()
-					.get(getURI("/service/get?route=" + route));
+					.get(getURI("/service?route=" + route));
 			if (result == null)
 				return JSONUtils.fromJsonToList(String.class, result);
 			else {
@@ -204,56 +204,4 @@ public class ConfigClient {
 		return config.getStringList(route);
 	}
 
-	/**
-	 * 注册一个服务地址
-	 * 
-	 * @param address
-	 * @return
-	 */
-	public static boolean registerService(String address) {
-		if (address == null)
-			return false;
-		try {
-			HttpClient.getInstance()
-					.post(getURI("/service/register?address=" + address));
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
-	/**
-	 * 注册一个cluster manager
-	 * 
-	 * @param address
-	 * @return
-	 */
-	public static boolean registerNode(String address, String data)
-			throws Exception {
-		if (address == null)
-			return false;
-		HttpClient.getInstance().post(
-				getURI("/node/register?address=" + address + "&data=" + data));
-		return true;
-	}
-
-	/**
-	 * 注册一个cluster manager
-	 * 
-	 * @param address
-	 * @return
-	 */
-	public static boolean unregisterNode(String address) {
-		if (address == null)
-			return false;
-		try {
-			HttpClient.getInstance()
-					.post(getURI("/node/unregister?address=" + address));
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
 }

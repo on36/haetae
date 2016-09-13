@@ -21,33 +21,42 @@ public class StatisticsHandler implements HttpHandler<Object> {
 	@Override
 	public Object handle(Context context) {
 		String contentType = context.getHeaderValue(CONTENT_TYPE);
-		String field = context.getRequestParameter("field");
+		String path = context.getRequestParameter("path");
+		String method = context.getRequestParameter("method");
 		List<?> stats = container.getStatistics();
 		if (MediaType.APPLICATION_JSON.value().equals(contentType)
 				|| MediaType.TEXT_JSON.value().equals(contentType)) {
-			if (field == null)
-				return stats;
-			return filterStats(stats, field);
+			return filterStats(stats, path, method);
 		}
-		return createHTML(stats);
+		return createHTML(stats, path, method);
 	}
 
-	private List<String> filterStats(List<?> stats, String filed) {
+	@SuppressWarnings("rawtypes")
+	private List filterStats(List<?> stats, String path, String method) {
 		if (stats.size() > 0) {
-			List<String> result = new ArrayList<>(stats.size());
+			if (path == null)
+				return stats;
+			List<Statistics> result = new ArrayList<Statistics>();
 			for (Object obj : stats) {
 				Statistics stat = (Statistics) obj;
-				if ("path".equals(filed)) {
-					result.add(stat.getPath());
+				if (stat.getPath().equalsIgnoreCase(path)) {
+					if (method == null)
+						result.add(stat);
+					else if (stat.getMethod().equalsIgnoreCase(method)) {
+						if (stat.getChildStatisticsList() != null)
+							return stat.getChildStatisticsList();
+						else
+							result.add(stat);
+					}
 				}
 			}
-
 			return result;
 		}
 		return null;
 	}
 
-	private String createHTML(List<?> stats) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private String createHTML(List<?> stats, String path, String method) {
 		StringBuffer sb = new StringBuffer(
 				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
 		sb.append("<html><head>");
@@ -80,7 +89,8 @@ public class StatisticsHandler implements HttpHandler<Object> {
 		sb.append("<td class=\"column\">current RPS</td>");
 		sb.append("<td class=\"column\">max RPS</td></tr>");
 		if (stats.size() > 0) {
-			for (Object obj : stats) {
+			List result = filterStats(stats, path, method);
+			for (Object obj : result) {
 				Statistics stat = (Statistics) obj;
 				sb.append("<tr><td>" + stat.getPath() + "</td>");
 				sb.append("<td>" + stat.getVersion() + "</td>");

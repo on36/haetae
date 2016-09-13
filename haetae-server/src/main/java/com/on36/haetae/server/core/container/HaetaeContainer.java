@@ -19,9 +19,9 @@ import com.on36.haetae.http.request.HttpRequestExt;
 import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.SimpleContext;
+import com.on36.haetae.server.core.body.EntityResponseBody;
 import com.on36.haetae.server.core.body.ErrorResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
-import com.on36.haetae.server.core.body.StringResponseBody;
 import com.on36.haetae.server.core.manager.SessionManager;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -53,7 +53,7 @@ public class HaetaeContainer implements Container {
 		long start = System.currentTimeMillis();
 		try {
 			String responseContentType = MediaType.TEXT_JSON.value();
-			ResponseBody responseBody = new StringResponseBody("");
+			ResponseBody responseBody = new EntityResponseBody("");
 			HttpResponseStatus handlerStatusCode = OK;
 
 			/* validatetion route */
@@ -78,7 +78,7 @@ public class HaetaeContainer implements Container {
 			context = new SimpleContext(request, resolved.route, session, this);
 
 			/* validatetion handler information */
-			HttpResponseStatus validStatus = handler.validation(request,
+			HttpResponseStatus validStatus = handler.validation(context,
 					response);
 			if (validStatus != null) {
 				response.setStatus(validStatus);
@@ -141,27 +141,20 @@ public class HaetaeContainer implements Container {
 		responseBody.sendAndCommit(response, responseContentType);
 	}
 
-	public RequestHandler findHandler(String resource) {
-		return requestResolver.findHandler(resource);
+	public RequestHandler findHandler(String resource, String methodName,
+			String version) {
+		return requestResolver.findHandler(resource, methodName, version);
 	}
 
-	public boolean removeHandler(String resource) {
-		return requestResolver.removeHandler(resource);
-	}
-
-	public boolean addHandler(RequestHandler handler, HttpMethod method,
-			String resource, String version) {
-		return addHandler(handler, method, resource, version, null);
+	public boolean removeHandler(String resource, String methodName,
+			String version) {
+		return requestResolver.removeHandler(resource, methodName, version);
 	}
 
 	public boolean addHandler(RequestHandler handler, HttpMethod method,
 			String resource, String version, String contentType) {
 		return requestResolver.addHandler(handler, method, resource, version,
 				contentType);
-	}
-
-	public boolean addHandler(RequestHandler handler, String resource) {
-		return addHandler(handler, HttpMethod.GET, resource, null);
 	}
 
 	@Override
