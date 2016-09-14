@@ -4,14 +4,10 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.annotation.Delete;
-import com.on36.haetae.api.annotation.Get;
-import com.on36.haetae.api.annotation.Post;
-import com.on36.haetae.api.annotation.Put;
+import com.on36.haetae.api.annotation.Api;
 import com.on36.haetae.api.core.HttpHandler;
+import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.server.HaetaeServer;
-
-import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * @author zhanghr
@@ -39,21 +35,21 @@ public class ServerTest {
 				"127.0.0.1");
 		server.register("/whitecontrol").with("Hello white!")
 				.permit("127.0.0.1", 10, 10, TimeUnit.SECONDS);
-		server.register("/body", HttpMethod.POST)
+		server.register("/body", MethodType.POST)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) {
 						return context.getBodyAsString();
 					}
 				});
-		server.register("/custom", HttpMethod.POST)
+		server.register("/custom", MethodType.POST)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) {
 						return context.getRequestParameter("user");
 					}
 				});
-		server.register("/customobject", HttpMethod.POST)
+		server.register("/customobject", MethodType.POST)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
@@ -63,7 +59,7 @@ public class ServerTest {
 						return jo;
 					}
 				});
-		server.register("/timeout", HttpMethod.GET).timeout(1, TimeUnit.SECONDS)
+		server.register("/timeout", MethodType.GET).timeout(1, TimeUnit.SECONDS)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
@@ -74,7 +70,7 @@ public class ServerTest {
 						return context.getURI("/hello");
 					}
 				});
-		server.register("/custombody/*/*", HttpMethod.POST)
+		server.register("/custombody/*/*", MethodType.POST)
 				.with(new HttpHandler<String>() {
 
 					public String handle(Context context) throws Exception {
@@ -91,21 +87,12 @@ public class ServerTest {
 			if (clazzs.length == 1
 					&& clazzs[0].getName().equals(Context.class.getName())) {
 
+				Api api = method.getAnnotation(Api.class);
 				if (object == null)
 					object = clazz.newInstance();
-
-				Post post = method.getAnnotation(Post.class);
-				Get get = method.getAnnotation(Get.class);
-				Put put = method.getAnnotation(Put.class);
-				Delete delete = method.getAnnotation(Delete.class);
-				if (put != null)
-					server.register(put).with(object, method);
-				else if (delete != null)
-					server.register(delete).with(object, method);
-				else if (post != null)
-					server.register(post).with(object, method);
-				else if (get != null)
-					server.register(get).with(object, method);
+				if (api != null) {
+					server.register(api).with(object, method);
+				}
 			}
 		}
 		server.start();

@@ -24,7 +24,6 @@ import com.on36.haetae.server.core.body.ErrorResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
 import com.on36.haetae.server.core.manager.SessionManager;
 
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -151,9 +150,9 @@ public class HaetaeContainer implements Container {
 		return requestResolver.removeHandler(resource, methodName, version);
 	}
 
-	public boolean addHandler(RequestHandler handler, HttpMethod method,
+	public boolean addHandler(RequestHandler handler, String methodName,
 			String resource, String version, String contentType) {
-		return requestResolver.addHandler(handler, method, resource, version,
+		return requestResolver.addHandler(handler, methodName, resource, version,
 				contentType);
 	}
 

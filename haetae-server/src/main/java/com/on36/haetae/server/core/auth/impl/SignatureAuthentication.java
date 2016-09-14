@@ -12,7 +12,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 
 public class SignatureAuthentication implements IAuthentication {
 
-	private boolean verify = true;
+	private boolean verify = false;
 
 	public void setVerify(boolean value) {
 		this.verify = value;

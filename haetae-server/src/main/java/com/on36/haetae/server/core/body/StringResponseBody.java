@@ -2,9 +2,6 @@ package com.on36.haetae.server.core.body;
 
 import java.io.IOException;
 
-import com.on36.haetae.api.http.MediaType;
-import com.on36.haetae.config.client.json.util.JSONUtils;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;

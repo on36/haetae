@@ -8,10 +8,8 @@ import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.data.Stat;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.annotation.Delete;
-import com.on36.haetae.api.annotation.Get;
-import com.on36.haetae.api.annotation.Post;
-import com.on36.haetae.api.annotation.Put;
+import com.on36.haetae.api.annotation.Api;
+import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.common.cache.CacheMap;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.zk.ZKClient;
@@ -30,8 +28,8 @@ public class ConfigAgentService {
 	private ZKClient client;
 
 	public ConfigAgentService() {
-		propMap = new CacheMap<String, String>(-1, 30, 500);
-		servicesMap = new CacheMap<String, List<String>>(-1, 30, 500);
+		propMap = new CacheMap<String, String>(-1, 30);
+		servicesMap = new CacheMap<String, List<String>>(-1, 30);
 
 		client = new ZKClient(connectString) {
 			@Override
@@ -99,7 +97,7 @@ public class ConfigAgentService {
 			return "/" + data;
 	}
 
-	@Post("/property")
+	@Api(value = "/property", method = MethodType.POST)
 	public void changeProperty(Context context) throws Exception {
 		Map<String, String> map = context.getRequestParameters();
 
@@ -118,7 +116,7 @@ public class ConfigAgentService {
 		}
 	}
 
-	@Put("/property")
+	@Api(value = "/property", method = MethodType.PUT)
 	public void addProperty(Context context) throws Exception {
 		Map<String, String> map = context.getRequestParameters();
 
@@ -141,7 +139,7 @@ public class ConfigAgentService {
 		}
 	}
 
-	@Get("/property")
+	@Api("/property")
 	public String getProperty(Context context) throws Exception {
 		String key = context.getRequestParameter("key");
 		if (key != null) {
@@ -156,7 +154,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("key should not be null");
 	}
 
-	@Get("/property/:key")
+	@Api("/property/:key")
 	public String getPropertyByURI(Context context) throws Exception {
 		String key = context.getCapturedParameter(":key");
 		if (key != null) {
@@ -171,7 +169,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("key should not be null");
 	}
 
-	@Delete("/property/:key")
+	@Api(value = "/property/:key", method = MethodType.DELETE)
 	public void deleteProperty(Context context) throws Exception {
 		String key = context.getCapturedParameter(":key");
 		if (key != null) {
@@ -184,7 +182,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("key should not be null");
 	}
 
-	@Get("/service")
+	@Api("/service")
 	public List<String> getServices(Context context) throws Exception {
 		String route = context.getRequestParameter("route");
 		if (route != null) {
@@ -199,7 +197,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("route should not be null");
 	}
 
-	@Put("/service")
+	@Api(value = "/service", method = MethodType.PUT)
 	public void putServices(Context context) throws Exception {
 		String address = context.getRequestParameter("address");
 		if (address != null) {
@@ -213,7 +211,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("address should not be null");
 	}
 
-	@Post("/service")
+	@Api(value = "/service", method = MethodType.POST)
 	public void registerServices(Context context) throws Exception {
 		String address = context.getRequestParameter("address");
 		if (address != null) {
@@ -229,7 +227,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("address should not be null");
 	}
 
-	@Put("/node")
+	@Api(value = "/node", method = MethodType.PUT)
 	public void putNode(Context context) throws Exception {
 		String address = context.getRequestParameter("node");
 		String data = context.getRequestParameter("data");
@@ -244,7 +242,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("node should not be null");
 	}
 
-	@Post("/node")
+	@Api(value = "/node", method = MethodType.POST)
 	public void postNode(Context context) throws Exception {
 		String address = context.getRequestParameter("node");
 		String data = context.getRequestParameter("data");
@@ -261,7 +259,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("node should not be null");
 	}
 
-	@Delete("/node")
+	@Api(value = "/node", method = MethodType.DELETE)
 	public void unregisterNode(Context context) throws Exception {
 		String address = context.getRequestParameter("node");
 		if (address != null) {
@@ -274,7 +272,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("node should not be null");
 	}
 
-	@Delete("/node/:node")
+	@Api(value = "/node/:node", method = MethodType.DELETE)
 	public void deleteNode(Context context) throws Exception {
 		String address = context.getCapturedParameter(":node");
 		if (address != null) {
@@ -287,7 +285,7 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("node should not be null");
 	}
 
-	@Get("/node")
+	@Api("/node")
 	public List<String> getNodes(Context context) throws Exception {
 		String path = app + "/nodes";
 		if (client.exists(path))
@@ -296,7 +294,7 @@ public class ConfigAgentService {
 			throw new Exception("Node [" + app + "] is not existed!");
 	}
 
-	@Get("/node/:node")
+	@Api("/node/:node")
 	public int getNode(Context context) throws Exception {
 		String address = context.getCapturedParameter(":node");
 		if (address != null) {

@@ -46,14 +46,14 @@ public class RequestResolver {
 		rootHandler.with(new StatisticsHandler(container));
 	}
 
-	public boolean addHandler(RequestHandler handler, HttpMethod method,
+	public boolean addHandler(RequestHandler handler, String methodName,
 			String resource, String version) {
-		return addHandler(handler, method, resource, version, null);
+		return addHandler(handler, methodName, resource, version, null);
 	}
 
-	public boolean addHandler(RequestHandler handler, HttpMethod method,
+	public boolean addHandler(RequestHandler handler, String methodName,
 			String resource, String version, String contentType) {
-		if (handler == null || method == null) {
+		if (handler == null || methodName == null) {
 			throw new IllegalArgumentException(
 					"handler or method cannot be null");
 		}
@@ -74,7 +74,7 @@ public class RequestResolver {
 
 		Route route = router.route(path);
 		if (route != null) {
-			String resourceKey = resource + "-" + method.name();
+			String resourceKey = resource + "-" + methodName;
 			if (handlerKeyMap.get(resourceKey) != null && handlerMap
 					.get(handlerKeyMap.get(resourceKey)).containsKey(version))
 				throw new IllegalArgumentException(
@@ -82,8 +82,8 @@ public class RequestResolver {
 								+ "], adding operation is not allowed!");
 		}
 		route = new Route(path);
-		HandlerKey key = new HandlerKey(method.name(), route, contentType);
-		handlerKeyMap.put(route.getResourcePath() + "-" + method.name(), key);
+		HandlerKey key = new HandlerKey(methodName, route, contentType);
+		handlerKeyMap.put(route.getResourcePath() + "-" + methodName, key);
 		if (!handlerMap.containsKey(key))
 			handlerMap.put(key, new TreeMap<String, RequestHandlerImpl>(
 					new VersionComparator()));

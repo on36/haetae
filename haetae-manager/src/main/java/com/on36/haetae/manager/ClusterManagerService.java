@@ -3,8 +3,8 @@ package com.on36.haetae.manager;
 import java.util.Map;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.annotation.Delete;
-import com.on36.haetae.api.annotation.Get;
+import com.on36.haetae.api.annotation.Api;
+import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.common.log.Logger;
 import com.on36.haetae.common.log.LoggerFactory;
 import com.on36.haetae.common.utils.ThrowableUtils;
@@ -19,7 +19,7 @@ public class ClusterManagerService {
 
 	private int defaultPort = 8080;
 
-	@Get("/process")
+	@Api("/process")
 	public Object add(Context context) throws Exception {
 
 		String port = context.getRequestParameter("port");
@@ -55,19 +55,19 @@ public class ClusterManagerService {
 		return success;
 	}
 
-	@Delete("/process")
+	@Api(value = "/process", method = MethodType.DELETE)
 	public String del(Context context) {
 		String port = context.getRequestParameter("port");
 		int pid = ProcessManagerFactory.getProcessManager().killProcess(port);
 		return "kill-" + pid;
 	}
 
-	@Get("/update")
+	@Api("/update")
 	public String update(Context context) {
 		return "update-" + context.getRequestParameter("key");
 	}
 
-	@Get("/list")
+	@Api("/list")
 	public String list(Context context) {
 		StringBuffer sb = new StringBuffer("<html><body>");
 		sb.append("hello<br/>");

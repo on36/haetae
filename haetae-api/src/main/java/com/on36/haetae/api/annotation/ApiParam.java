@@ -5,15 +5,21 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.on36.haetae.api.http.ParamType;
+
 /**
  * @author zhanghr
- * @date 2016年1月9日
+ * @date 2016年3月14日
  */
-
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Post {
-	String value();
+@Target(ElementType.ANNOTATION_TYPE)
+public @interface ApiParam {
 
-	String version() default "1.0";
+	String key();
+
+	ParamType type() default ParamType.REQUEST;
+
+	String testValue() default "";
+
+	String desc();
 }

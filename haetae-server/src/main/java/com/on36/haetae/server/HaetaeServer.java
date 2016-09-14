@@ -6,11 +6,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.annotation.Delete;
-import com.on36.haetae.api.annotation.Get;
-import com.on36.haetae.api.annotation.Post;
-import com.on36.haetae.api.annotation.Put;
+import com.on36.haetae.api.annotation.Api;
 import com.on36.haetae.api.http.MediaType;
+import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.log.LogLevel;
@@ -23,8 +21,6 @@ import com.on36.haetae.net.udp.Scheduler;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.container.HaetaeContainer;
 import com.on36.haetae.server.core.manager.DisruptorManager;
-
-import io.netty.handler.codec.http.HttpMethod;
 
 /**
  * 
@@ -134,21 +130,11 @@ public class HaetaeServer {
 							if (clazzs.length == 1 && clazzs[0].getName()
 									.equals(Context.class.getName())) {
 
-								Post post = method.getAnnotation(Post.class);
-								Get get = method.getAnnotation(Get.class);
-								Put put = method.getAnnotation(Put.class);
-								Delete delete = method
-										.getAnnotation(Delete.class);
-								if (object == null)
-									object = clazz.newInstance();
-								if (put != null) {
-									register(put).with(object, method);
-								} else if (delete != null) {
-									register(delete).with(object, method);
-								} else if (post != null) {
-									register(post).with(object, method);
-								} else if (get != null) {
-									register(get).with(object, method);
+								Api api = method.getAnnotation(Api.class);
+								if (api != null) {
+									if (object == null)
+										object = clazz.newInstance();
+									register(api).with(object, method);
 								}
 							}
 						}
@@ -183,12 +169,26 @@ public class HaetaeServer {
 	 *            服务请求的方法类型 如GET、POST
 	 * @return
 	 */
-	public RequestHandler register(String resource, HttpMethod method) {
+	public RequestHandler register(String resource, String methodName) {
 
 		if (runningMode == MODE.CLASSES)
 			runningMode = MODE.MIX;
 
-		return register(resource, "1.0", method, null);
+		return register(resource, "1.0", methodName, null);
+	}
+
+	/**
+	 * 注册一个服务.
+	 * 
+	 * @param resource
+	 *            服务请求URI路径
+	 * @param method
+	 *            服务请求的方法类型 如GET、POST
+	 * @return
+	 */
+	public RequestHandler register(String resource, MethodType method) {
+
+		return register(resource, "1.0", method.value(), null);
 	}
 
 	/**
@@ -203,86 +203,31 @@ public class HaetaeServer {
 	 * @return
 	 */
 	private RequestHandler register(String resource, String version,
-			HttpMethod method, String contentType) {
-
+			String methodName, String contentType) {
+		if (runningMode == MODE.CLASSES)
+			runningMode = MODE.MIX;
 		RequestHandlerImpl handler = new RequestHandlerImpl();
-		container.addHandler(handler, method, resource, version, contentType);
+		container.addHandler(handler, methodName, resource, version,
+				contentType);
 		return handler;
 	}
 
 	/**
-	 * 注册一个get服务.
+	 * 注册一个API服务.
 	 * 
-	 * @param get
-	 *            服务请求的get
+	 * @param api
+	 *            服务请求的api
 	 * @return
 	 */
-	public RequestHandler register(Get get) {
+	public RequestHandler register(Api api) {
 
-		return register(get.value(), get.version(), HttpMethod.GET,
+		return register(api.value(), api.version(), api.method().value(),
 				MediaType.TEXT_JSON.value());
 	}
 
-	public RequestHandler register(Get get, String contentType) {
+	public RequestHandler register(Api api, String contentType) {
 
-		return register(get.value(), get.version(), HttpMethod.GET,
-				contentType);
-	}
-
-	/**
-	 * 注册一个post服务.
-	 * 
-	 * @param post
-	 *            服务请求的post
-	 * @return
-	 */
-	public RequestHandler register(Post post) {
-
-		return register(post.value(), post.version(), HttpMethod.POST,
-				MediaType.TEXT_JSON.value());
-	}
-
-	public RequestHandler register(Post post, String contentType) {
-
-		return register(post.value(), post.version(), HttpMethod.POST,
-				contentType);
-	}
-
-	/**
-	 * 注册一个put服务.
-	 * 
-	 * @param put
-	 *            服务请求的put
-	 * @return
-	 */
-	public RequestHandler register(Put put) {
-
-		return register(put.value(), put.version(), HttpMethod.PUT,
-				MediaType.TEXT_JSON.value());
-	}
-
-	public RequestHandler register(Put put, String contentType) {
-
-		return register(put.value(), put.version(), HttpMethod.PUT,
-				contentType);
-	}
-
-	/**
-	 * 注册一个delete服务.
-	 * 
-	 * @param delete
-	 *            服务请求的delete
-	 * @return
-	 */
-	public RequestHandler register(Delete delete) {
-
-		return register(delete.value(), delete.version(), HttpMethod.DELETE,
-				MediaType.TEXT_JSON.value());
-	}
-
-	public RequestHandler register(Delete delete, String contentType) {
-
-		return register(delete.value(), delete.version(), HttpMethod.DELETE,
+		return register(api.value(), api.version(), api.method().value(),
 				contentType);
 	}
 
@@ -295,7 +240,7 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(String resource) {
 
-		return register(resource, HttpMethod.GET);
+		return register(resource, MethodType.GET);
 	}
 
 	/**
@@ -359,48 +304,12 @@ public class HaetaeServer {
 	/**
 	 * 搜索指定请求路径的服务.
 	 * 
-	 * @param Get
+	 * @param api
 	 *            服务请求URI路径
 	 * @return
 	 */
-	public RequestHandler find(Get get) {
+	public RequestHandler find(Api api) {
 
-		return find(get.value(), HttpMethod.GET.name(), get.version());
-	}
-
-	/**
-	 * 搜索指定请求路径的服务.
-	 * 
-	 * @param Post
-	 *            服务请求URI路径
-	 * @return
-	 */
-	public RequestHandler find(Post post) {
-
-		return find(post.value(), HttpMethod.POST.name(), post.version());
-	}
-
-	/**
-	 * 搜索指定请求路径的服务.
-	 * 
-	 * @param Put
-	 *            服务请求URI路径
-	 * @return
-	 */
-	public RequestHandler find(Put put) {
-
-		return find(put.value(), HttpMethod.PUT.name(), put.version());
-	}
-
-	/**
-	 * 搜索指定请求路径的服务.
-	 * 
-	 * @param Delete
-	 *            服务请求URI路径
-	 * @return
-	 */
-	public RequestHandler find(Delete delete) {
-
-		return find(delete.value(), HttpMethod.DELETE.name(), delete.version());
+		return find(api.value(), api.method().value(), api.version());
 	}
 }

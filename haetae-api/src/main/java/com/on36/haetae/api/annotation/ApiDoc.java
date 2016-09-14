@@ -7,13 +7,13 @@ import java.lang.annotation.Target;
 
 /**
  * @author zhanghr
- * @date 2016年1月9日
+ * @date 2016年3月14日
  */
-
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Get {
-	String value();
+public @interface ApiDoc {
 
-	String version() default "1.0";
+	String name();
+
+	ApiParam[] params();
 }

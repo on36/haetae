@@ -3,8 +3,7 @@ package com.on36.haetae.manager;
 import java.lang.reflect.Method;
 
 import com.on36.haetae.api.Context;
-import com.on36.haetae.api.annotation.Get;
-import com.on36.haetae.api.annotation.Post;
+import com.on36.haetae.api.annotation.Api;
 import com.on36.haetae.server.HaetaeServer;
 
 /**
@@ -29,16 +28,11 @@ public class ClusterManagerServerTest {
 			if (clazzs.length == 1
 					&& clazzs[0].getName().equals(Context.class.getName())) {
 
-				Post post = method.getAnnotation(Post.class);
-				Get get = method.getAnnotation(Get.class);
+				Api api = method.getAnnotation(Api.class);
 				if (object == null)
 					object = clazz.newInstance();
-				if (post != null) {
-					if (server.find(post) == null)
-						server.register(post).with(object, method);
-				} else if (get != null) {
-					if (server.find(get) == null)
-						server.register(get).with(object, method);
+				if (api != null) {
+					server.register(api).with(object, method);
 				}
 			}
 		}
