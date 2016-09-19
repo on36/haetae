@@ -10,6 +10,7 @@ import java.util.Set;
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.JSONObject;
 import com.on36.haetae.api.http.MediaType;
+import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.api.http.Session;
 import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.common.utils.ShortUUID;
@@ -220,7 +221,7 @@ public class SimpleContext implements Context {
 	public String getURI(String resource) throws Exception {
 
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, HttpMethod.GET.name(), null);
+				.findHandler(resource, MethodType.GET.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
@@ -233,7 +234,7 @@ public class SimpleContext implements Context {
 			throws Exception {
 		this.extraParamMap = queryParam;
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, HttpMethod.GET.name(), null);
+				.findHandler(resource, MethodType.GET.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
@@ -265,7 +266,7 @@ public class SimpleContext implements Context {
 	public String postURI(String resource, String body) throws Exception {
 		this.extraBody = body;
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, HttpMethod.POST.name(), null);
+				.findHandler(resource, MethodType.POST.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
@@ -278,7 +279,7 @@ public class SimpleContext implements Context {
 			throws Exception {
 		this.extraParamMap = queryParam;
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, HttpMethod.POST.name(), null);
+				.findHandler(resource, MethodType.POST.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {

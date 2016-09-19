@@ -78,7 +78,8 @@ public class HttpClient {
 				}
 			}
 			resp = request.execute().get();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else if (resp != null)
@@ -110,7 +111,8 @@ public class HttpClient {
 				request.setBody(body);
 
 			resp = request.execute().get();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else if (resp != null)
@@ -119,35 +121,6 @@ public class HttpClient {
 							resp.getResponseBody().trim(), "result")));
 		else
 			throw new Exception("getbody " + url + " failed !");
-	}
-
-	public <T> T post2Entity(String url, Class<T> clazz) throws Exception {
-
-		return JSONUtils.fromJson(clazz, post(url));
-	}
-
-	public <T> T post2Entity(String url, String body, Class<T> clazz)
-			throws Exception {
-
-		return JSONUtils.fromJson(clazz, postBody(url, body));
-	}
-
-	public <T> T post2Entity(String url, String body,
-			Map<String, String> header, Class<T> clazz) throws Exception {
-
-		return JSONUtils.fromJson(clazz, postBody(url, body, header));
-	}
-
-	public <T> T post2Entity(String url, Map<String, String> queryParam,
-			Class<T> clazz) throws Exception {
-
-		return JSONUtils.fromJson(clazz, post(url, queryParam));
-	}
-
-	public <T> T post2Entity(String url, Map<String, String> queryParam,
-			Map<String, String> header, Class<T> clazz) throws Exception {
-
-		return JSONUtils.fromJson(clazz, post(url, queryParam, header));
 	}
 
 	public JSONObject post2JSON(String url) throws Exception {
@@ -210,7 +183,8 @@ public class HttpClient {
 				}
 			}
 			resp = request.execute().get();
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 		if (resp != null && resp.getStatusCode() == 200)
 			return resp.getResponseBody().trim();
 		else if (resp != null)
@@ -236,23 +210,6 @@ public class HttpClient {
 			Map<String, String> header) throws Exception {
 
 		return new JSONObjectImpl(get(url, queryParam, header));
-	}
-
-	public <T> T get2Entity(String url, Class<T> clazz) throws Exception {
-
-		return get2Entity(url, null, clazz);
-	}
-
-	public <T> T get2Entity(String url, Map<String, String> queryParam,
-			Class<T> clazz) throws Exception {
-
-		return get2Entity(url, queryParam, null, clazz);
-	}
-
-	public <T> T get2Entity(String url, Map<String, String> queryParam,
-			Map<String, String> header, Class<T> clazz) throws Exception {
-
-		return JSONUtils.fromJson(clazz, get(url, queryParam, header));
 	}
 
 	public void close() {

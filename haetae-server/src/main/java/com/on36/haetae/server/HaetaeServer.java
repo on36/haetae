@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Api;
+import com.on36.haetae.api.annotation.ApiDoc;
 import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.common.conf.Configuration;
@@ -131,10 +132,12 @@ public class HaetaeServer {
 									.equals(Context.class.getName())) {
 
 								Api api = method.getAnnotation(Api.class);
+								ApiDoc apiDoc = method
+										.getAnnotation(ApiDoc.class);
 								if (api != null) {
 									if (object == null)
 										object = clazz.newInstance();
-									register(api).with(object, method);
+									register(api, apiDoc).with(object, method);
 								}
 							}
 						}
@@ -221,14 +224,36 @@ public class HaetaeServer {
 	 */
 	public RequestHandler register(Api api) {
 
-		return register(api.value(), api.version(), api.method().value(),
-				MediaType.TEXT_JSON.value());
+		return register(api, MediaType.TEXT_JSON.value());
+	}
+
+	public RequestHandler register(Api api, ApiDoc apiDoc) {
+
+		return register(api, apiDoc, MediaType.TEXT_JSON.value());
 	}
 
 	public RequestHandler register(Api api, String contentType) {
 
-		return register(api.value(), api.version(), api.method().value(),
-				contentType);
+		return register(api, null, contentType);
+	}
+
+	/**
+	 * 注册一个API服务.
+	 * 
+	 * @param api
+	 *            服务请求的api
+	 * @param apiDoc
+	 *            服务请求的api doc 描述
+	 * @return
+	 */
+	public RequestHandler register(Api api, ApiDoc apiDoc, String contentType) {
+
+		if (runningMode == MODE.CLASSES)
+			runningMode = MODE.MIX;
+		RequestHandlerImpl handler = new RequestHandlerImpl(api,apiDoc);
+		container.addHandler(handler, api.method().value(), api.value(),
+				api.version(), contentType);
+		return handler;
 	}
 
 	/**

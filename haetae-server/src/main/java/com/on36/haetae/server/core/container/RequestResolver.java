@@ -1,14 +1,12 @@
 package com.on36.haetae.server.core.container;
 
+import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_DOC;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_ROOT;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_SEPARATOR;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +20,7 @@ import com.on36.haetae.http.route.Route;
 import com.on36.haetae.http.route.Router;
 import com.on36.haetae.http.route.TreeRouter;
 import com.on36.haetae.server.core.RequestHandlerImpl;
-import com.on36.haetae.server.core.stats.Statistics;
+import com.on36.haetae.server.core.doc.DocHttpHandler;
 import com.on36.haetae.server.core.stats.StatisticsHandler;
 
 import io.netty.handler.codec.http.HttpMethod;
@@ -36,14 +34,21 @@ public class RequestResolver {
 
 	private final HandlerKey rootHandlerKey;
 	private final RequestHandlerImpl rootHandler;
+	private final HandlerKey docHandlerKey;
+	private final RequestHandlerImpl docHandler;
 
 	public RequestResolver(Container container) {
 		router.add(Route.PATH_ROOT);
+		router.add(Route.PATH_DOC);
 		rootHandlerKey = new HandlerKey(HttpMethod.GET.name(), Route.PATH_ROOT,
+				MediaType.TEXT_HTML.value());
+		docHandlerKey = new HandlerKey(HttpMethod.GET.name(), Route.PATH_DOC,
 				MediaType.TEXT_HTML.value());
 
 		rootHandler = new RequestHandlerImpl();
-		rootHandler.with(new StatisticsHandler(container));
+		rootHandler.with(new StatisticsHandler(handlerMap)).auth(false);
+		docHandler = new RequestHandlerImpl();
+		docHandler.with(new DocHttpHandler(handlerMap)).auth(false);
 	}
 
 	public boolean addHandler(RequestHandler handler, String methodName,
@@ -61,9 +66,10 @@ public class RequestResolver {
 			throw new IllegalArgumentException("resource cannot be null");
 		}
 		if (PATH_ELEMENT_SEPARATOR.equals(resource)
-				|| PATH_ELEMENT_ROOT.equals(resource)) {
-			throw new IllegalArgumentException(
-					"resource cannot be '/' or '" + PATH_ELEMENT_ROOT + "'");
+				|| PATH_ELEMENT_ROOT.equals(resource)
+				|| PATH_ELEMENT_DOC.equals(resource)) {
+			throw new IllegalArgumentException("resource cannot be '/' or '"
+					+ PATH_ELEMENT_ROOT + "," + PATH_ELEMENT_DOC + "'");
 		}
 
 		String path = resource;
@@ -202,6 +208,13 @@ public class RequestResolver {
 			resolved.key = rootHandlerKey;
 			if (contentType != null)
 				resolved.contentType = contentType;
+		} else if (Route.PATH_DOC.equals(route)
+				&& docHandlerKey.getMethod().equals(method)) {
+			resolved.handler = docHandler;
+			resolved.route = Route.PATH_DOC;
+			resolved.key = docHandlerKey;
+			if (contentType != null)
+				resolved.contentType = contentType;
 		} else {
 			String resourceKey = route.getResourcePath() + "-" + method;
 			HandlerKey key = handlerKeyMap.get(resourceKey);
@@ -221,42 +234,4 @@ public class RequestResolver {
 		}
 		return resolved;
 	}
-
-	public List<Statistics> getStatistics() {
-		List<Statistics> stats = new ArrayList<Statistics>();
-
-		for (Map.Entry<HandlerKey, TreeMap<String, RequestHandlerImpl>> entry : handlerMap
-				.entrySet()) {
-			String resourcePath = entry.getKey().getRoute().getResourcePath();
-			TreeMap<String, RequestHandlerImpl> treeMap = entry.getValue();
-			int size = treeMap.size();
-			Statistics stat = entry.getValue().lastEntry().getValue()
-					.getStatistics();
-			stat.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT)
-					? resourcePath.replace(PATH_ELEMENT_ROOT, "")
-					: resourcePath);
-			stat.setMethod(entry.getKey().getMethod());
-			stat.setVersion(entry.getValue().lastEntry().getKey());
-			stats.add(stat);
-			if (size > 1) {
-				List<Statistics> children = new ArrayList<Statistics>();
-				for (Map.Entry<String, RequestHandlerImpl> versionHandler : treeMap
-						.entrySet()) {
-					String version = versionHandler.getKey();
-					Statistics child = versionHandler.getValue()
-							.getStatistics();
-					child.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT)
-							? resourcePath.replace(PATH_ELEMENT_ROOT, "")
-							: resourcePath);
-					child.setMethod(entry.getKey().getMethod());
-					child.setVersion(version);
-					children.add(0, child);
-				}
-				stat.setChildStatisticsList(children);
-			}
-		}
-		Collections.sort(stats);
-		return stats;
-	}
-
 }

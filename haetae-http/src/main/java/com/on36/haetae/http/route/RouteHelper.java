@@ -16,6 +16,7 @@ import com.on36.haetae.config.client.ConfigClient;
 public class RouteHelper {
 
 	public static final String PATH_ELEMENT_SEPARATOR = "/";
+	public static final String PATH_ELEMENT_DOC = "/doc";
 	public static final String PATH_ELEMENT_ROOT = ConfigClient
 			.get(Constant.K_SERVER_ROOT_PATH, Constant.V_SERVER_ROOT_PATH);
 	public static final String PARAM_PREFIX = ":";

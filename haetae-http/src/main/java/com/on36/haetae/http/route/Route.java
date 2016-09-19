@@ -2,6 +2,7 @@ package com.on36.haetae.http.route;
 
 import static com.on36.haetae.http.route.RouteHelper.CUSTOM_REGEX_PATTERN;
 import static com.on36.haetae.http.route.RouteHelper.PARAM_PREFIX;
+import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_DOC;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_ROOT;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_SEPARATOR;
 import static com.on36.haetae.http.route.RouteHelper.WILDCARD;
@@ -16,6 +17,7 @@ import java.util.regex.Matcher;
 public class Route {
 
 	public static final Route PATH_ROOT = new Route();
+	public static final Route PATH_DOC = new Route(PATH_ELEMENT_DOC);
 
 	private final String resourcePath;
 	private final List<PathElement> allPathElements;
@@ -37,15 +39,15 @@ public class Route {
 	public Route(String paramPath) {
 
 		if (PATH_ELEMENT_SEPARATOR.equals(paramPath)) {
-			throw new IllegalArgumentException("path cannot be "
-					+ PATH_ELEMENT_SEPARATOR);
+			throw new IllegalArgumentException(
+					"path cannot be " + PATH_ELEMENT_SEPARATOR);
 		}
 		if (PATH_ELEMENT_ROOT.equals(paramPath)) {
-			throw new IllegalArgumentException("path cannot be "
-					+ PATH_ELEMENT_ROOT);
+			throw new IllegalArgumentException(
+					"path cannot be " + PATH_ELEMENT_ROOT);
 		}
 
-		this.resourcePath =  paramPath;
+		this.resourcePath = paramPath;
 
 		this.allPathElements = new ArrayList<PathElement>();
 		this.splatParamElements = new ArrayList<SplatParameterElement>();
@@ -119,7 +121,9 @@ public class Route {
 
 	public String getResourcePath() {
 
-		return resourcePath;
+		return resourcePath.startsWith(PATH_ELEMENT_ROOT)
+				? resourcePath.replace(PATH_ELEMENT_ROOT, "")
+				: resourcePath;
 	}
 
 	public List<PathElement> getPathElements() {
@@ -194,7 +198,8 @@ public class Route {
 
 			if (i + 1 == splatParams.size() && endsWithSplat()) {
 				/* this is the last splat param and the route ends with splat */
-				for (int j = splatParam.index() + 1; j < pathTokens.length; j++) {
+				for (int j = splatParam.index()
+						+ 1; j < pathTokens.length; j++) {
 					splat[i] = splat[i] + PATH_ELEMENT_SEPARATOR
 							+ urlDecodeForPathParams(pathTokens[j]);
 				}

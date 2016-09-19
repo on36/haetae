@@ -37,7 +37,6 @@
 
 		<aether.version>1.1.0</aether.version>
 		<maven.version>3.3.9</maven.version>
-		<guava.version>18.0</guava.version>
 
 		<jetty.runner.version>9.3.11.v20160721</jetty.runner.version>
 
@@ -169,11 +168,6 @@
 				<artifactId>maven-aether-provider</artifactId>
 				<version>${maven.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>${guava.version}</version>
-			</dependency>
 
 			<dependency>
 				<groupId>org.eclipse.jetty</groupId>
@@ -233,26 +227,13 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<repositories>
-		<repository>
-			<id>nexus</id>
-			<name>local private nexus</name>
-			<url>http://192.168.153.129:8081/repository/maven-public</url>
-		</repository>
-	</repositories>
-
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<name>Internal Releases</name>
-			<url>http://192.168.153.129:8081/repository/maven-releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<name>Internal Snapshots</name>
-			<url>http://192.168.153.129:8081/repository/maven-snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
+	<!--repositories> <repository> <id>nexus</id> <name>local private nexus</name> 
+		<url>http://192.168.153.129:8081/repository/maven-public</url> </repository> 
+		</repositories> <distributionManagement> <repository> <id>releases</id> <name>Internal 
+		Releases</name> <url>http://192.168.153.129:8081/repository/maven-releases</url> 
+		</repository> <snapshotRepository> <id>snapshots</id> <name>Internal Snapshots</name> 
+		<url>http://192.168.153.129:8081/repository/maven-snapshots</url> </snapshotRepository> 
+		</distributionManagement -->
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -265,7 +246,9 @@
 						<source>${java.version}</source>
 						<target>${java.version}</target>
 						<showWarnings>true</showWarnings>
+						<forceJavacCompilerUse>true</forceJavacCompilerUse>
 						<encoding>UTF-8</encoding>
+						<compilerArgument>-proc:none</compilerArgument>
 					</configuration>
 				</plugin>
 				<!-- assembly插件 -->

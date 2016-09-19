@@ -26,7 +26,9 @@
 
   7，提供应用超时控制功能
 
-  8，提供性能监控功能
+  8，提供API文档描述功能
+  
+  9，提供性能监控功能
   
 TODO LIST
 -----------------------------------
@@ -41,7 +43,7 @@ TODO LIST
 使用指导
 -----------------------------------
 
-### 基于基本haetae服务测试
+## 基于基本haetae服务测试
 
 	public class ServerTest {
 		public static void main(String[] args) throws Exception {
@@ -114,7 +116,7 @@ TODO LIST
 1，[点击这里你可以链接到服务类例子](https://github.com/on36/haetae/blob/master/haetae-test/src/main/java/com/on36/haetae/test/ServerTest.java)<br />
 2，[点击这里你可以链接到测试类](https://github.com/on36/haetae/blob/master/haetae-test/src/test/java/com/on36/haetae/test/HaetaeAsynHttpClientTest.java)<br />
 
-### 基于微服务测试
+## 基于微服务测试
 
 服务端
 
@@ -196,7 +198,7 @@ TODO LIST
 
  待添加。。
 
-### 超时响应功能
+#### 超时响应功能
 
 		HaetaeServer server = new HaetaeServer(8080, 8);
 		server.register("/timeout", HttpMethod.GET).timeout(2, TimeUnit.SECONDS)//设置两秒无响应，则请求返回超时
@@ -217,7 +219,7 @@ TODO LIST
 
 	{"status":408,"message":"Request Timeout"}
 
-### 黑名单功能
+#### 黑名单功能
 
 		HaetaeServer server = new HaetaeServer(8080, 8);
 		server.register("/black").with("Hello black!").ban("172.31.25.40",
@@ -234,7 +236,7 @@ TODO LIST
 
 	{"status":200,"message":"OK","result":"Hello black!"}
 
-### 白名单功能
+#### 白名单功能
 
 		HaetaeServer server = new HaetaeServer(8080, 8);
 		server.register("/white").with("Hello white!").permit("172.31.25.40",
@@ -251,7 +253,7 @@ TODO LIST
 
 	{"status":200,"message":"OK","result":"Hello white!"}
 
-### 白名单流量设置功能
+#### 白名单流量设置功能
 
 		HaetaeServer server = new HaetaeServer(8080, 8);
 		server.register("/whitecontrol").with("Hello white!")
@@ -272,7 +274,7 @@ TODO LIST
 
 	{"status":429,"message":"Too Many Requests"}
 
-### 全局流量设置功能
+#### 全局流量设置功能
 
 		HaetaeServer server = new HaetaeServer(8080, 8);
 		server.register("/control").with("Hello control!").every(30,
@@ -289,7 +291,7 @@ TODO LIST
 
 	{"status":429,"message":"Too Many Requests"}
 
-### URL地址匹配功能
+#### URL地址匹配功能
 
 		HaetaeServer server = new HaetaeServer(port, 4);
 		server.register("/name/:name").with("Hello :name");
@@ -301,7 +303,7 @@ TODO LIST
 
 	{"status":200,"message":"OK","result":"Hello zhangsan"}
 
-### URL地址匹配正则限制功能
+#### URL地址匹配正则限制功能
 
 		HaetaeServer server = new HaetaeServer(port, 4);
 		server.register("/name/:name<[A-Za-z]+>").with("Hello :name");
@@ -319,7 +321,7 @@ TODO LIST
 
 	{"status":503,"message":"Service Unavailable"}
 
-### URL地址多参数匹配功能
+#### URL地址多参数匹配功能
 
 		HaetaeServer server = new HaetaeServer(port, 4);
 		server.register("/multi/*/*").with("Hello *[0] *[1]");
@@ -332,7 +334,7 @@ TODO LIST
 	{"status":200,"message":"OK","result":"Hello zhangsan 123"}
 
 
-### 自定义响应处理功能(不推荐,这种方式已经放弃)
+#### 自定义响应处理功能(不推荐,这种方式已经放弃)
 
 		HaetaeServer server = new HaetaeServer(port, 4);
 		server.register("/custom", HttpMethod.GET)
@@ -351,7 +353,7 @@ TODO LIST
 	{"status":200,"message":"OK","result":"ni hao"}
 
 
-### 自定义服务(推荐)
+#### 自定义服务(推荐)
 
 自定义服务类
 
@@ -389,12 +391,31 @@ TODO LIST
 
 	{"status":200,"message":"OK","result":"lisi"}
 
-### 性能监控页面
+## 服务API文档描述说明
+
+	public class UserService {
+		@Api(value = "/user/:id", method = MethodType.DELETE)
+		@ApiDoc(name = "根据用户ID删除当前用户数据", params = {
+				@ApiParam(param = "id", type = ParamType.URI, desc = "用户ID", required = true),
+				@ApiParam(param = "sign", desc = "数据签名", required = true),
+				@ApiParam(param = "timestamp", desc = "时间戳", required = true) })
+		public String deleteUser(Context context) {
+			String id = context.getCapturedParameter(":id");
+			return "delete-" + id;
+		}
+
+	｝
+启动服务
+请求地址 http://localhost:8080/doc
+![DOC页面](http://on36.github.io/20160919095402.png)
+
+
+## 性能监控页面
 
 请求地址 http://localhost:8080/services
 
 ![性能页面](http://on36.github.io/20160908150141.png)
 
-### 作者
+## 作者
 
 [点击联系我](mailto:say_hello_plz@qq.com)<br />

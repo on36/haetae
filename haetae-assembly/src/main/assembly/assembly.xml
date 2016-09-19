@@ -4,6 +4,7 @@
 	<formats>
 		<format>tar.gz</format>
 	</formats>
+	<includeBaseDirectory>true</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
 			<directory>src/main/scripts</directory>
@@ -26,7 +27,6 @@
 			<excludes>
 				<exclude>com.on36.haetae:haetae-test:jar</exclude>
 				<exclude>com.on36.haetae:haetae-manager:jar</exclude>
-				<exclude>org.mapdb:mapdb:jar</exclude>
 
 				<exclude>log4j:log4j:jar</exclude>
 				<exclude>org.slf4j:slf4j-log4j12:jar</exclude>
@@ -55,7 +55,6 @@
 			<includes>
 				<include>com.on36.haetae:haetae-manager:jar</include>
 				<include>com.on36.haetae:haetae-test:jar</include>
-				<include>org.mapdb:mapdb:jar</include>
 			</includes>
 		</dependencySet>
 	</dependencySets>

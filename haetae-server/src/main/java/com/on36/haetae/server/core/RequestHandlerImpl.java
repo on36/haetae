@@ -20,6 +20,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.on36.haetae.api.Context;
+import com.on36.haetae.api.annotation.Api;
+import com.on36.haetae.api.annotation.ApiDoc;
 import com.on36.haetae.api.core.HttpHandler;
 import com.on36.haetae.api.manager.ContextManager;
 import com.on36.haetae.common.log.LogLevel;
@@ -64,6 +66,9 @@ public class RequestHandlerImpl implements RequestHandler {
 	private AtomicInteger successHandlTimes = new AtomicInteger(0);
 	private AtomicInteger failHandlTimes = new AtomicInteger(0);
 
+	private final ApiDoc apiDoc;
+	private final Api api;
+
 	private Set<SimpleImmutableEntry<String, String>> headers = new HashSet<SimpleImmutableEntry<String, String>>();
 
 	private HttpHandler<?> httpHandler;
@@ -80,6 +85,13 @@ public class RequestHandlerImpl implements RequestHandler {
 	private final Scheduler scheduler = HaetaeServer.getScheduler();
 
 	public RequestHandlerImpl() {
+		this(null, null);
+	}
+
+	public RequestHandlerImpl(Api api, ApiDoc apiDoc) {
+		this.api = api;
+		this.apiDoc = apiDoc;
+
 		this.authList = new ArrayList<IAuthentication>();
 		this.authList.add(signature);
 		this.authList.add(blackList);
@@ -254,7 +266,9 @@ public class RequestHandlerImpl implements RequestHandler {
 			if (cause instanceof InvocationTargetException) {
 				InvocationTargetException target = (InvocationTargetException) cause;
 				throw (Exception) target.getTargetException();
-			}
+			} else
+				throw (Exception) cause;
+
 		} finally {
 
 		}
@@ -399,6 +413,14 @@ public class RequestHandlerImpl implements RequestHandler {
 
 	public boolean hasVerify() {
 		return verify;
+	}
+
+	public ApiDoc getApiDoc() {
+		return apiDoc;
+	}
+
+	public Api getApi() {
+		return api;
 	}
 
 	public HttpResponseStatus validation(Context context,

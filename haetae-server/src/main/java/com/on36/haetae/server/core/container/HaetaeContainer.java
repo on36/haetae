@@ -155,9 +155,4 @@ public class HaetaeContainer implements Container {
 		return requestResolver.addHandler(handler, methodName, resource, version,
 				contentType);
 	}
-
-	@Override
-	public List<?> getStatistics() {
-		return requestResolver.getStatistics();
-	}
 }

@@ -1,21 +1,27 @@
 package com.on36.haetae.server.core.stats;
 
+import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_ROOT;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.core.HttpHandler;
 import com.on36.haetae.api.http.MediaType;
-import com.on36.haetae.http.Container;
+import com.on36.haetae.http.HandlerKey;
+import com.on36.haetae.server.core.RequestHandlerImpl;
 
 public class StatisticsHandler implements HttpHandler<Object> {
 
-	private final Container container;
+	private final Map<HandlerKey, TreeMap<String, RequestHandlerImpl>> handlerMap;
 
-	public StatisticsHandler(Container container) {
-		this.container = container;
+	public StatisticsHandler(
+			Map<HandlerKey, TreeMap<String, RequestHandlerImpl>> handlerMap) {
+		this.handlerMap = handlerMap;
 	}
 
 	@Override
@@ -23,7 +29,7 @@ public class StatisticsHandler implements HttpHandler<Object> {
 		String contentType = context.getHeaderValue(CONTENT_TYPE);
 		String path = context.getRequestParameter("path");
 		String method = context.getRequestParameter("method");
-		List<?> stats = container.getStatistics();
+		List<Statistics> stats = getStatistics();
 		if (MediaType.APPLICATION_JSON.value().equals(contentType)
 				|| MediaType.TEXT_JSON.value().equals(contentType)) {
 			return filterStats(stats, path, method);
@@ -31,8 +37,8 @@ public class StatisticsHandler implements HttpHandler<Object> {
 		return createHTML(stats, path, method);
 	}
 
-	@SuppressWarnings("rawtypes")
-	private List filterStats(List<?> stats, String path, String method) {
+	private List<Statistics> filterStats(List<Statistics> stats, String path,
+			String method) {
 		if (stats.size() > 0) {
 			if (path == null)
 				return stats;
@@ -55,8 +61,8 @@ public class StatisticsHandler implements HttpHandler<Object> {
 		return null;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private String createHTML(List<?> stats, String path, String method) {
+	private String createHTML(List<Statistics> stats, String path,
+			String method) {
 		StringBuffer sb = new StringBuffer(
 				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">");
 		sb.append("<html><head>");
@@ -89,7 +95,7 @@ public class StatisticsHandler implements HttpHandler<Object> {
 		sb.append("<td class=\"column\">current RPS</td>");
 		sb.append("<td class=\"column\">max RPS</td></tr>");
 		if (stats.size() > 0) {
-			List result = filterStats(stats, path, method);
+			List<Statistics> result = filterStats(stats, path, method);
 			for (Object obj : result) {
 				Statistics stat = (Statistics) obj;
 				sb.append("<tr><td>" + stat.getPath() + "</td>");
@@ -110,4 +116,40 @@ public class StatisticsHandler implements HttpHandler<Object> {
 		return sb.toString();
 	}
 
+	private List<Statistics> getStatistics() {
+		List<Statistics> stats = new ArrayList<Statistics>();
+
+		for (Map.Entry<HandlerKey, TreeMap<String, RequestHandlerImpl>> entry : handlerMap
+				.entrySet()) {
+			String resourcePath = entry.getKey().getRoute().getResourcePath();
+			TreeMap<String, RequestHandlerImpl> treeMap = entry.getValue();
+			int size = treeMap.size();
+			Statistics stat = entry.getValue().lastEntry().getValue()
+					.getStatistics();
+			stat.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT)
+					? resourcePath.replace(PATH_ELEMENT_ROOT, "")
+					: resourcePath);
+			stat.setMethod(entry.getKey().getMethod());
+			stat.setVersion(entry.getValue().lastEntry().getKey());
+			stats.add(stat);
+			if (size > 1) {
+				List<Statistics> children = new ArrayList<Statistics>();
+				for (Map.Entry<String, RequestHandlerImpl> versionHandler : treeMap
+						.entrySet()) {
+					String version = versionHandler.getKey();
+					Statistics child = versionHandler.getValue()
+							.getStatistics();
+					child.setPath(resourcePath.startsWith(PATH_ELEMENT_ROOT)
+							? resourcePath.replace(PATH_ELEMENT_ROOT, "")
+							: resourcePath);
+					child.setMethod(entry.getKey().getMethod());
+					child.setVersion(version);
+					children.add(0, child);
+				}
+				stat.setChildStatisticsList(children);
+			}
+		}
+		Collections.sort(stats);
+		return stats;
+	}
 }

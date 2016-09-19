@@ -11,7 +11,7 @@ import com.on36.haetae.api.http.MethodType;
 
 public class UserService {
 
-	@Api(value = "/user", method = MethodType.PUT, version = "6.1")
+	@Api(value = "/user", method = MethodType.PUT)
 	public String addUser(Context context) {
 
 		return "Put-lisi-6.1";

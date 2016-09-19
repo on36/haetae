@@ -93,8 +93,8 @@ public class ConfigClient {
 			return result;
 		} catch (Exception e) {
 			LOG.warn(
-					"It will get data from default resource file [haetae-default.conf,haetae.conf]",
-					e);
+					"It will get data from default resource file [haetae-default.conf,haetae.conf], cause by "
+							+ e.getMessage());
 		}
 		return config.getString(key);
 	}
