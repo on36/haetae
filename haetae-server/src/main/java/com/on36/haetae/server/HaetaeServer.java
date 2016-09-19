@@ -69,6 +69,12 @@ public class HaetaeServer {
 	}
 
 	public HaetaeServer(int port, int threadPoolSize, String rootPath,
+			List<String> clazzes) {
+		this(port, threadPoolSize, rootPath, clazzes,
+				Thread.currentThread().getContextClassLoader());
+	}
+
+	public HaetaeServer(int port, int threadPoolSize, String rootPath,
 			List<String> clazzes, ClassLoader classLoader) {
 		Exception excp = conf.addResource("haetae.conf");
 		if (rootPath != null)
