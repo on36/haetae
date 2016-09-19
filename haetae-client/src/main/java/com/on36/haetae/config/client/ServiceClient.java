@@ -1,14 +1,10 @@
 package com.on36.haetae.config.client;
 
-import com.on36.haetae.common.log.Logger;
-import com.on36.haetae.common.log.LoggerFactory;
-
 /**
  * @author zhanghr
  * @date 2016年5月13日
  */
 public class ServiceClient {
-	private static Logger LOG = LoggerFactory.getLogger(ServiceClient.class);
 
 	private static String getURI(String path) {
 		if (path != null && path.startsWith("http"))

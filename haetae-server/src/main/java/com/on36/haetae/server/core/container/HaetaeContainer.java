@@ -4,7 +4,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERR
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 import java.util.AbstractMap.SimpleImmutableEntry;
-import java.util.List;
 import java.util.Set;
 
 import com.on36.haetae.api.Context;

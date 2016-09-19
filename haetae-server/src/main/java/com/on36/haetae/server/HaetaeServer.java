@@ -139,7 +139,10 @@ public class HaetaeServer {
 										object = clazz.newInstance();
 									register(api, apiDoc).with(object, method);
 								}
-							}
+							} else
+								scheduler.trace(clazz, LogLevel.WARN,
+										method.getName()
+												+ " has no argurment Context");
 						}
 					}
 				}
@@ -250,7 +253,7 @@ public class HaetaeServer {
 
 		if (runningMode == MODE.CLASSES)
 			runningMode = MODE.MIX;
-		RequestHandlerImpl handler = new RequestHandlerImpl(api,apiDoc);
+		RequestHandlerImpl handler = new RequestHandlerImpl(api, apiDoc);
 		container.addHandler(handler, api.method().value(), api.value(),
 				api.version(), contentType);
 		return handler;

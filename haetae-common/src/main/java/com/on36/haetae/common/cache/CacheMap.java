@@ -1,7 +1,5 @@
 package com.on36.haetae.common.cache;
 
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.cache.CacheBuilder;

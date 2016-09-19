@@ -63,12 +63,12 @@ public class SessionManager {
 		return session;
 	}
 
-	private void checkSession() {
-		for (Map.Entry<String, Session> entry : sessions.entrySet()) {
-			Session session = entry.getValue();
-			if (!session.valid()) {
-				sessions.remove(entry.getKey());
-			}
-		}
-	}
+//	private void checkSession() {
+//		for (Map.Entry<String, Session> entry : sessions.entrySet()) {
+//			Session session = entry.getValue();
+//			if (!session.valid()) {
+//				sessions.remove(entry.getKey());
+//			}
+//		}
+//	}
 }

@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
@@ -11,6 +12,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
 import com.on36.haetae.api.annotation.ApiDoc;
@@ -22,6 +24,16 @@ import com.on36.haetae.api.annotation.ApiDoc;
 @SupportedAnnotationTypes({ "com.on36.haetae.api.annotation.Api" })
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class AnnotationProcessor extends AbstractProcessor {
+
+	// 元素操作的辅助类
+	Elements elementUtils;
+
+	@Override
+	public synchronized void init(ProcessingEnvironment processingEnv) {
+		super.init(processingEnv);
+		elementUtils = processingEnv.getElementUtils();
+	}
+
 	public boolean process(Set<? extends TypeElement> annotations,
 			RoundEnvironment env) {
 		Messager messager = processingEnv.getMessager();

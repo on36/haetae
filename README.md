@@ -165,12 +165,13 @@ TODO LIST
 				if (clazzs.length == 1
 						&& clazzs[0].getName().equals(Context.class.getName())) {
 
-					Post post = method.getAnnotation(Post.class);
-					Get get = method.getAnnotation(Get.class);
-					if (post != null)
-						server.register(post).with(clazz.newInstance(), method);
-					else
-						server.register(get).with(clazz.newInstance(), method);
+					Api api = method.getAnnotation(Api.class);
+					ApiDoc apiDoc = method.getAnnotation(ApiDoc.class);
+					if (api != null) {
+						if (object == null)
+							object = clazz.newInstance();
+						server.register(api, apiDoc).with(object, method);
+					}
 				}
 			}
 			server.start();
@@ -358,7 +359,7 @@ TODO LIST
 自定义服务类
 
 	public class UserService {
-		@Get(value="/user/add",version="1.1")
+		@Api(value="/user/add",version="1.1")
 		public String addUser(Context context) {
 			return "lisi";
 		}
@@ -375,12 +376,13 @@ TODO LIST
 			if (clazzs.length == 1
 					&& clazzs[0].getName().equals(Context.class.getName())) {
 
-				Post post = method.getAnnotation(Post.class);
-				Get get = method.getAnnotation(Get.class);
-				if (post != null)
-					server.register(post).with(clazz.newInstance(), method);
-				else
-					server.register(get).with(clazz.newInstance(), method);
+				Api api = method.getAnnotation(Api.class);
+				ApiDoc apiDoc = method.getAnnotation(ApiDoc.class);
+				if (api != null) {
+					if (object == null)
+						object = clazz.newInstance();
+					server.register(api, apiDoc).with(object, method);
+				}
 			}
 		}
 		server.start();		
