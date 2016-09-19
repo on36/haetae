@@ -289,7 +289,7 @@ public class ConfigAgentService {
 	public List<String> getNodes(Context context) throws Exception {
 		String path = app + "/nodes";
 		if (client.exists(path))
-			return client.getChildren(path);
+			return client.getChildren(path); 
 		else
 			throw new Exception("Node [" + app + "] is not existed!");
 	}

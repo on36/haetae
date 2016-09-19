@@ -68,8 +68,8 @@ public class SimpleContext implements Context {
 		this.parentId = getHeaderValue(HEADER_PARENT_ID);
 		try {
 			if (this.traceId == null) {
-				this.parentId = this.spanId = this.traceId = ShortUUID
-						.randomUUID();
+				this.traceId = ShortUUID.randomUUID();
+				this.spanId = this.parentId = ShortUUID.randomUUID();
 			} else {
 				this.spanId = ShortUUID.randomUUID();
 			}
@@ -79,13 +79,15 @@ public class SimpleContext implements Context {
 			e.printStackTrace();
 		}
 	}
+
 	public String getClientIP() {
-	 return request.getRemoteAddress();
+		return request.getRemoteAddress();
 	}
 
 	public int getClientPort() {
 		return request.getRemotePort();
 	}
+
 	public String getClientAddress() {
 		return request.getRemoteAddress() + ":" + request.getRemotePort();
 	}

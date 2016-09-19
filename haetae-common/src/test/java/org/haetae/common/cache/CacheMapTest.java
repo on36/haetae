@@ -21,6 +21,7 @@ public class CacheMapTest {
 			System.out.println(i++);
 			System.out.println("nihao = " + cache.get("nihao"));
 			System.out.println("hello = " + cache.get("hello"));
+			System.out.println("meyou = " + cache.get("meiyou"));
 			Thread.sleep(5000);
 		}
 	}

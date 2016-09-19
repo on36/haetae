@@ -39,18 +39,18 @@ public class CacheMap<K, V> {
 	 *            设置写缓存后过期时间，单位为分钟 当值为-1时，写缓存后不过期，以读过期为主
 	 * @param rexprieTime
 	 *            设置读缓存后过期时间，单位为分钟 当值为-1时，读缓存后不过期，以写过期为主
-	 * @param minCapacity
+	 * @param initialCapacity
 	 *            设置缓存容器的初始容量
 	 * @param maxCapacity
 	 *            设置缓存最大容量
 	 */
 	public CacheMap(int level, long wexprieTime, long rexprieTime,
-			int minCapacity, int maxCapacity) {
+			int initialCapacity, int maxCapacity) {
 		CacheBuilder<Object, Object> cachebuilder = CacheBuilder.newBuilder()
 				// 设置并发级别为8，并发级别是指可以同时写缓存的线程数
 				.concurrencyLevel(level)
 				// 设置缓存容器的初始容量为10
-				.initialCapacity(minCapacity).recordStats()
+				.initialCapacity(initialCapacity).recordStats()
 				// 设置缓存最大容量为100，超过100之后就会按照LRU算法来移除缓存项
 				.maximumSize(maxCapacity);
 		if (wexprieTime > 0) // 设置写缓存后过期
@@ -90,7 +90,7 @@ public class CacheMap<K, V> {
 		return get(key) != null;
 	}
 
-	public Set<Map.Entry<K, V>> entrySet() {
-		return loadingCache.asMap().entrySet();
-	}
+	// public Set<Map.Entry<K, V>> entrySet() {
+	// return loadingCache.asMap().entrySet();
+	// }
 }
