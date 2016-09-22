@@ -2,17 +2,10 @@ package com.on36.haetae.server;
 
 import com.lmax.disruptor.EventTranslator;
 import com.on36.haetae.common.log.LogLevel;
-import com.on36.haetae.http.Container;
-import com.on36.haetae.net.udp.Message;
-import com.on36.haetae.net.udp.Scheduler;
+import com.on36.haetae.http.Scheduler;
 import com.on36.haetae.server.core.manager.DisruptorManager;
-import com.on36.haetae.server.core.manager.event.HttpRequestEvent;
+import com.on36.haetae.server.core.manager.event.EndpointEvent;
 import com.on36.haetae.server.core.manager.event.LogEvent;
-import com.on36.haetae.server.core.manager.event.RecievedEvent;
-import com.on36.haetae.server.core.manager.event.SendEvent;
-
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.HttpRequest;
 
 /**
  * @author zhanghr
@@ -27,24 +20,14 @@ public class MessageScheduler implements Scheduler {
 	}
 
 	@Override
-	public void revieve(final Message message) {
-		disruptorManager.getRecievedEventDisruptor(message)
-				.publishEvent(new EventTranslator<RecievedEvent>() {
+	public void endpoint(final String channel, final String endpoint) {
+		disruptorManager.getEndpointEventDisruptor()
+				.publishEvent(new EventTranslator<EndpointEvent>() {
 					@Override
-					public void translateTo(RecievedEvent event,
+					public void translateTo(EndpointEvent event,
 							long sequence) {
-						event.setSendMessage(message);
-					}
-				});
-	}
-
-	@Override
-	public void send(final Message message) {
-		disruptorManager.getSendEventDisruptor()
-				.publishEvent(new EventTranslator<SendEvent>() {
-					@Override
-					public void translateTo(SendEvent event, long sequence) {
-						event.setSendMessage(message);
+						event.setChannel(channel);
+						event.setEndpoint(endpoint);
 					}
 				});
 	}
@@ -66,21 +49,6 @@ public class MessageScheduler implements Scheduler {
 						event.setClazz(clazz);
 						event.setMessage(message);
 						event.setExcp(e);
-					}
-				});
-	}
-
-	@Override
-	public void handleHTTPRequest(ChannelHandlerContext ctx,
-			HttpRequest request, Container container) {
-		disruptorManager.getHttpRequestEventDisruptor()
-				.publishEvent(new EventTranslator<HttpRequestEvent>() {
-					@Override
-					public void translateTo(HttpRequestEvent event,
-							long sequence) {
-						event.setContainer(container);
-						event.setContext(ctx);
-						event.setRequest(request);
 					}
 				});
 	}

@@ -6,7 +6,7 @@ package com.on36.haetae.http;
  */
 public class Version {
 
-	public static String V_SNAPSHOT = "0.0.3";
+	public static String V_SNAPSHOT = "0.0.4";
 
 	public static String V_1_0_0 = "1.0.0";
 

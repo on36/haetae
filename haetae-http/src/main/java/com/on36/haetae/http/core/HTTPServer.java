@@ -63,17 +63,17 @@ public class HTTPServer implements Server {
 	public void start() throws Exception {
 
 		if (channel == null || !channel.isActive()) {
-			final SslContext sslCtx;
+			SslContext sslCtx = null;
 			boolean ssl = ConfigClient.getBoolean(Constant.K_SERVER_SSL_ENABLED,
 					Constant.V_SERVER_SSL_ENABLED);
+			boolean ws = ConfigClient.getBoolean(Constant.K_SERVER_WS_ENABLED,
+					Constant.V_SERVER_WS_ENABLED);
 			if (ssl) {
 				SelfSignedCertificate ssc = new SelfSignedCertificate(
 						"on36.com");
 				sslCtx = SslContextBuilder
 						.forServer(ssc.certificate(), ssc.privateKey()).build();
-			} else {
-				sslCtx = null;
-			}
+			} 
 			// Configure the server.
 			EventLoopGroup bossGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
@@ -102,7 +102,7 @@ public class HTTPServer implements Server {
 						.channel(NioServerSocketChannel.class)
 						.handler(new LoggingHandler(LogLevel.DEBUG))
 						.childHandler(
-								new HttpServerInitializer(sslCtx, container));
+								new HttpServerInitializer(sslCtx, container, ws));
 
 				channel = b.bind(socketAddress).sync().channel();
 				RUNNING = true;

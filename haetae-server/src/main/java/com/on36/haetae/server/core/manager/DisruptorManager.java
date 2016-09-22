@@ -2,25 +2,13 @@ package com.on36.haetae.server.core.manager;
 
 import java.util.concurrent.ExecutorService;
 
-import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.ProducerType;
-import com.on36.haetae.net.udp.Message;
-import com.on36.haetae.net.udp.Message.Title;
-import com.on36.haetae.server.core.manager.event.HttpRequestEvent;
-import com.on36.haetae.server.core.manager.event.HttpRequestEventFactory;
+import com.on36.haetae.server.core.manager.event.EndpointEvent;
+import com.on36.haetae.server.core.manager.event.EndpointEventFactory;
 import com.on36.haetae.server.core.manager.event.LogEvent;
 import com.on36.haetae.server.core.manager.event.LogEventFactory;
-import com.on36.haetae.server.core.manager.event.RecievedEvent;
-import com.on36.haetae.server.core.manager.event.RecievedEventFactory;
-import com.on36.haetae.server.core.manager.event.SendEvent;
-import com.on36.haetae.server.core.manager.event.SendEventFactory;
-import com.on36.haetae.server.core.manager.event.handler.HttpRequestEventHandler;
+import com.on36.haetae.server.core.manager.event.handler.EndpointEventHandler;
 import com.on36.haetae.server.core.manager.event.handler.LogEventHandler;
-import com.on36.haetae.server.core.manager.event.handler.RecievedEndpointEventHandler;
-import com.on36.haetae.server.core.manager.event.handler.RecievedEventHandler;
-import com.on36.haetae.server.core.manager.event.handler.RecievedSessionEventHandler;
-import com.on36.haetae.server.core.manager.event.handler.SendEventHandler;
 
 /**
  * @author zhanghr
@@ -32,85 +20,37 @@ public class DisruptorManager {
 
 	private static final int DEFAULT_SMALL_RINGBUFFER_SIZE = 64;
 
-	private Disruptor<SendEvent> sendEventDisruptor;
-	private Disruptor<RecievedEvent> recievedEndpointEventDisruptor;
-	private Disruptor<RecievedEvent> recievedSessionEventDisruptor;
-	private Disruptor<RecievedEvent> recievedTestEventDisruptor;
+	private Disruptor<EndpointEvent> endpointEventDisruptor;
 
 	private Disruptor<LogEvent> logEventDisruptor;
-	private Disruptor<HttpRequestEvent> httpRequestEventDisruptor;
 
 	@SuppressWarnings("unchecked")
 	public DisruptorManager(ExecutorService executorService) {
 		this.disruptorExecutors = executorService;
 
-		this.sendEventDisruptor = new Disruptor<>(new SendEventFactory(),
-				DEFAULT_SMALL_RINGBUFFER_SIZE, disruptorExecutors);
-		this.sendEventDisruptor.handleEventsWith(new SendEventHandler());
-		this.sendEventDisruptor.start();
-
-		this.recievedEndpointEventDisruptor = new Disruptor<>(
-				new RecievedEventFactory(), DEFAULT_SMALL_RINGBUFFER_SIZE,
+		this.endpointEventDisruptor = new Disruptor<>(
+				new EndpointEventFactory(), DEFAULT_SMALL_RINGBUFFER_SIZE,
 				disruptorExecutors);
-		this.recievedEndpointEventDisruptor
-				.handleEventsWith(new RecievedEndpointEventHandler());
-		this.recievedEndpointEventDisruptor.start();
-
-		this.recievedSessionEventDisruptor = new Disruptor<>(
-				new RecievedEventFactory(), DEFAULT_SMALL_RINGBUFFER_SIZE,
-				disruptorExecutors);
-		this.recievedSessionEventDisruptor
-				.handleEventsWith(new RecievedSessionEventHandler());
-		this.recievedSessionEventDisruptor.start();
+		this.endpointEventDisruptor
+				.handleEventsWith(new EndpointEventHandler());
+		this.endpointEventDisruptor.start();
 
 		this.logEventDisruptor = new Disruptor<>(new LogEventFactory(),
 				DEFAULT_SMALL_RINGBUFFER_SIZE, disruptorExecutors);
 		this.logEventDisruptor.handleEventsWith(new LogEventHandler());
 		this.logEventDisruptor.start();
-
-		this.httpRequestEventDisruptor = new Disruptor<>(
-				new HttpRequestEventFactory(), DEFAULT_SMALL_RINGBUFFER_SIZE,
-				disruptorExecutors, ProducerType.MULTI,
-				new YieldingWaitStrategy());
-		this.httpRequestEventDisruptor
-				.handleEventsWith(new HttpRequestEventHandler());
-		this.httpRequestEventDisruptor.start();
-
-		this.recievedTestEventDisruptor = new Disruptor<>(
-				new RecievedEventFactory(), DEFAULT_SMALL_RINGBUFFER_SIZE,
-				disruptorExecutors);
-		this.recievedTestEventDisruptor
-				.handleEventsWith(new RecievedEventHandler());
-		this.recievedTestEventDisruptor.start();
 	}
 
-	public Disruptor<SendEvent> getSendEventDisruptor() {
-		return sendEventDisruptor;
+	public Disruptor<EndpointEvent> getEndpointEventDisruptor() {
+		return endpointEventDisruptor;
 	}
 
 	public Disruptor<LogEvent> getLogEventDisruptor() {
 		return logEventDisruptor;
 	}
 
-	public Disruptor<HttpRequestEvent> getHttpRequestEventDisruptor() {
-		return httpRequestEventDisruptor;
-	}
-
-	public Disruptor<RecievedEvent> getRecievedEventDisruptor(Message message) {
-		if (Title.ENDPOINT.equals(message.title()))
-			return recievedEndpointEventDisruptor;
-		else if (Title.SESSSION.equals(message.title()))
-			return recievedSessionEventDisruptor;
-		else
-			return recievedTestEventDisruptor;
-	}
-
 	public void close() {
-		sendEventDisruptor.shutdown();
-		recievedEndpointEventDisruptor.shutdown();
-		recievedSessionEventDisruptor.shutdown();
-		recievedTestEventDisruptor.shutdown();
+		endpointEventDisruptor.shutdown();
 		logEventDisruptor.shutdown();
-		httpRequestEventDisruptor.shutdown();
 	}
 }

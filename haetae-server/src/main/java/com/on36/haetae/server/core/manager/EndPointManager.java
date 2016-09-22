@@ -9,10 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class EndPointManager {
 
-	private static Map<String, Long> epMap = new ConcurrentHashMap<String, Long>();
+	private static Map<String, String> epMap = new ConcurrentHashMap<String, String>();
 
-	public static void update(String endPoint) {
-		long current = System.currentTimeMillis();
-		epMap.put(endPoint, current);
+	public static void put(String channel, String endPoint) {
+		epMap.put(channel, endPoint);
+	}
+	public static void remove(String channel) {
+		epMap.remove(channel);
 	}
 }

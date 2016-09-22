@@ -240,19 +240,20 @@ public class HaetaeAsynHttpClientTest {
 							@Override
 							public void onOpen(WebSocket websocket) {
 								// TODO Auto-generated method stub
-								websocket.sendMessage("hello server");
+								websocket.sendMessage("127.0.0.1:8888");
 							}
 
 							@Override
 							public void onError(Throwable t) {
 								// TODO Auto-generated method stub
 
+								System.out.println("onError");
 							}
 
 							@Override
 							public void onClose(WebSocket websocket) {
 								// TODO Auto-generated method stub
-
+								System.out.println("onClose");
 							}
 
 							@Override
@@ -263,7 +264,9 @@ public class HaetaeAsynHttpClientTest {
 						}).build())
 				.get();
 
-		asyncHttpClient.close();
+		//asyncHttpClient.close();
+		
+		Thread.sleep(10000);
 	}
 
 }

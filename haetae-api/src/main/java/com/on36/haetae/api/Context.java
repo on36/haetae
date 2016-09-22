@@ -3,6 +3,7 @@ package com.on36.haetae.api;
 import java.util.Map;
 import java.util.Set;
 
+import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.api.http.Session;
 
 public interface Context {
@@ -13,12 +14,14 @@ public interface Context {
 	 * @return
 	 */
 	String getClientIP();
+
 	/**
 	 * 请求客户端端口.
 	 * 
 	 * @return
 	 */
 	int getClientPort();
+
 	/**
 	 * 请求客户端地址 IP+端口.
 	 * 
@@ -151,58 +154,50 @@ public interface Context {
 	 * 
 	 * @param resource
 	 *            请求的URI路径
+	 * @param method
+	 *            方法名
+	 * @param queryParam
+	 *            查询参数
 	 * @return
 	 * @throws Exception
 	 */
-	String getURI(String resource) throws Exception;
-
-	String getURI(String resource, Map<String, String> queryParam)
-			throws Exception;
-
+	String request(String resource, MethodType method,
+			Map<String, String> queryParam) throws Exception;
+	/**
+	 * 调用其他请求，返回字符串结果,默认传递当前请求参数
+	 * 
+	 * @param resource
+	 *            请求的URI路径
+	 * @param method
+	 *            方法名
+	 * @return
+	 * @throws Exception
+	 */
+	String request(String resource, MethodType method) throws Exception;
+	/**
+	 * 调用其他请求，返回字符串结果,默认使用GET请求且传递当前请求参数
+	 * 
+	 * @param resource
+	 *            请求的URI路径
+	 * @return
+	 * @throws Exception
+	 */
+	String request(String resource) throws Exception;
+	
 	/**
 	 * 调用其他请求，如果结果数据是JSON对象格式，返回获取请求体的值对象，否则抛出异常
 	 * 
 	 * @param resource
 	 *            请求的URI路径
+	 * @param method
+	 *            方法名
 	 * @param clazz
 	 *            返回对象类型
 	 * @return
 	 * @throws Exception
 	 */
-	<T> T getURI(String resource, Class<T> clazz) throws Exception;
-
-	/**
-	 * 调用其他请求，返回字符串结果
-	 * 
-	 * @param resource
-	 *            请求的URI路径
-	 * @return
-	 * @throws Exception
-	 */
-	String postURI(String resource) throws Exception;
-
-	String postURI(String resource, String body) throws Exception;
-
-	String postURI(String resource, Map<String, String> queryParam)
+	<T> T request(String resource, MethodType method, Class<T> clazz)
 			throws Exception;
-
-	/**
-	 * 调用其他请求，如果结果数据是JSON对象格式，返回获取请求体的值对象，否则抛出异常
-	 * 
-	 * @param resource
-	 *            请求的URI路径
-	 * @param clazz
-	 *            返回对象类型
-	 * @return
-	 * @throws Exception
-	 */
-	<T> T postURI(String resource, Class<T> clazz) throws Exception;
-
-	<T> T postURI(String resource, String body, Class<T> clazz)
-			throws Exception;
-
-	<T> T postURI(String resource, Map<String, String> queryParam,
-			Class<T> clazz) throws Exception;
 
 	/**
 	 * 异步输出日志,仅仅用于用户自定义的服务类中使用，其它地方使用可能带来上下文信息不准确
@@ -215,5 +210,13 @@ public interface Context {
 	 *            异常
 	 */
 	void trace(String level, String message, Throwable t);
+	/**
+	 * 异步输出日志,仅仅用于用户自定义的服务类中使用，其它地方使用可能带来上下文信息不准确
+	 * 
+	 * @param level
+	 *            日志级别 ,可选值有：INFO、WARN、ERROR、DEBUG
+	 * @param message
+	 *            输出信息
+	 */
 	void trace(String level, String message);
 }

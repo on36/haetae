@@ -6,10 +6,10 @@ import com.lmax.disruptor.EventFactory;
  * @author zhanghr
  * @date 2016年1月8日
  */
-public class SendEventFactory implements EventFactory<SendEvent> {
+public class EndpointEventFactory implements EventFactory<EndpointEvent> {
 
-	public SendEvent newInstance() {
-		return new SendEvent();
+	public EndpointEvent newInstance() {
+		return new EndpointEvent();
 	}
 
 }

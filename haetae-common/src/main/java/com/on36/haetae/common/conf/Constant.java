@@ -19,10 +19,16 @@ public class Constant {
 	public static final String V_SERVER_ROOT_PATH = "/services";
 
 	/**
-	 * 指定服务是否使用https协议
+	 * 指定服务是否使用ssl协议
 	 */
 	public static final String K_SERVER_SSL_ENABLED = "httpServer.ssl.enabled";
 	public static final boolean V_SERVER_SSL_ENABLED = false;
+
+	/**
+	 * 指定开启websocket,默认为true
+	 */
+	public static final String K_SERVER_WS_ENABLED = "httpServer.ws.enabled";
+	public static final boolean V_SERVER_WS_ENABLED = false;
 
 	/**
 	 * 指定netty线程池大小,默认为0 取CPU物理核数的两倍

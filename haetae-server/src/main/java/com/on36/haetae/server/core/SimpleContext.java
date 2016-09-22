@@ -53,6 +53,7 @@ public class SimpleContext implements Context {
 	private Map<String, String> parmMap = new HashMap<String, String>();
 	private Map<String, String> extraParamMap = null;
 	private String extraBody = null;
+	private String bodyString = null;
 
 	private String path;
 	private JSONObject jsonObject;
@@ -200,10 +201,10 @@ public class SimpleContext implements Context {
 			return this.extraBody;
 
 		ByteBuf content = request.content();
-		if (content.isReadable()) {
-			return content.toString(CharsetUtil.UTF_8);
+		if (bodyString == null && content.isReadable()) {
+			bodyString = content.toString(CharsetUtil.UTF_8);
 		}
-		return null;
+		return bodyString;
 	}
 
 	@Override
@@ -220,96 +221,35 @@ public class SimpleContext implements Context {
 	}
 
 	@Override
-	public String getURI(String resource) throws Exception {
+	public String request(String resource) throws Exception {
 
-		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, MethodType.GET.name(), null);
-		if (requestHandler != null) {
-			return requestHandler.body(this, resource);
-		} else {
-			return HttpClient.getInstance().get(resource);
-		}
+		return request(resource, MethodType.GET);
 	}
 
 	@Override
-	public String getURI(String resource, Map<String, String> queryParam)
-			throws Exception {
+	public String request(String resource, MethodType method) throws Exception {
+
+		return request(resource, method, getRequestParameters());
+	}
+
+	@Override
+	public String request(String resource, MethodType method,
+			Map<String, String> queryParam) throws Exception {
 		this.extraParamMap = queryParam;
 		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, MethodType.GET.name(), null);
+				.findHandler(resource, method.name(), null);
 		if (requestHandler != null) {
 			return requestHandler.body(this, resource);
 		} else {
-			return HttpClient.getInstance().get(resource, queryParam);
+			return HttpClient.getInstance().send(resource, method, queryParam,
+					null, null);
 		}
 	}
 
 	@Override
-	public <T> T getURI(String resource, Class<T> clazz) throws Exception {
-
-		String result = getURI(resource);
-		if (result != null)
-			return JSONUtils.fromJson(clazz, result);
-		return null;
-	}
-
-	@Override
-	public String postURI(String resource) throws Exception {
-		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, HttpMethod.POST.name(), null);
-		if (requestHandler != null) {
-			return requestHandler.body(this, resource);
-		} else {
-			return HttpClient.getInstance().post(resource);
-		}
-	}
-
-	@Override
-	public String postURI(String resource, String body) throws Exception {
-		this.extraBody = body;
-		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, MethodType.POST.name(), null);
-		if (requestHandler != null) {
-			return requestHandler.body(this, resource);
-		} else {
-			return HttpClient.getInstance().postBody(resource, body);
-		}
-	}
-
-	@Override
-	public String postURI(String resource, Map<String, String> queryParam)
+	public <T> T request(String resource, MethodType method, Class<T> clazz)
 			throws Exception {
-		this.extraParamMap = queryParam;
-		RequestHandlerImpl requestHandler = (RequestHandlerImpl) container
-				.findHandler(resource, MethodType.POST.name(), null);
-		if (requestHandler != null) {
-			return requestHandler.body(this, resource);
-		} else {
-			return HttpClient.getInstance().post(resource, queryParam);
-		}
-	}
-
-	@Override
-	public <T> T postURI(String resource, Class<T> clazz) throws Exception {
-		String result = postURI(resource);
-		if (result != null)
-			return JSONUtils.fromJson(clazz, result);
-		return null;
-	}
-
-	@Override
-	public <T> T postURI(String resource, String body, Class<T> clazz)
-			throws Exception {
-		String result = postURI(resource, body);
-		if (result != null)
-			return JSONUtils.fromJson(clazz, result);
-		return null;
-	}
-
-	@Override
-	public <T> T postURI(String resource, Map<String, String> queryParam,
-			Class<T> clazz) throws Exception {
-		String result = postURI(resource, queryParam);
+		String result = request(resource, method);
 		if (result != null)
 			return JSONUtils.fromJson(clazz, result);
 		return null;

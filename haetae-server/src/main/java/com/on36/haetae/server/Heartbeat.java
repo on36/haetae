@@ -7,8 +7,8 @@ import com.on36.haetae.config.client.ConfigClient;
 import com.on36.haetae.config.client.HttpClient;
 import com.on36.haetae.config.client.ServiceClient;
 import com.on36.haetae.http.Environment;
+import com.on36.haetae.http.Scheduler;
 import com.on36.haetae.http.core.HTTPServer;
-import com.on36.haetae.net.udp.Scheduler;
 
 /**
  * @author zhanghr

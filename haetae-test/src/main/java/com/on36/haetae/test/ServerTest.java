@@ -68,7 +68,7 @@ public class ServerTest {
 						Thread.sleep(2000);
 
 						System.out.println(Thread.currentThread().getName());
-						return context.getURI("/hello");
+						return context.request("/hello");
 					}
 				});
 		server.register("/custombody/*/*", MethodType.POST)

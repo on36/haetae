@@ -1,7 +1,6 @@
 package com.on36.haetae.http;
 
 import com.on36.haetae.http.request.HttpRequestExt;
-import com.on36.haetae.net.udp.Scheduler;
 
 import io.netty.handler.codec.http.HttpResponse;
 

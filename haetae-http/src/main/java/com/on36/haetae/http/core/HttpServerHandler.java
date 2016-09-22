@@ -4,6 +4,7 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
 import static io.netty.handler.codec.http.HttpHeaders.Names.DATE;
 import static io.netty.handler.codec.http.HttpHeaders.Names.LAST_MODIFIED;
+import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -13,19 +14,18 @@ import java.net.InetSocketAddress;
 import com.on36.haetae.common.utils.DateUtils;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.request.HttpRequestExt;
-import com.on36.haetae.net.udp.Message;
-import com.on36.haetae.net.udp.Message.Title;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaders.Names;
 import io.netty.handler.codec.http.HttpHeaders.Values;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.ContinuationWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
@@ -33,19 +33,20 @@ import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
+import io.netty.handler.ssl.SslHandler;
 
 public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private final Container container;
-	private final String wsUri;
+	private static final String WEBSOCKET_PATH = "/ws";
+	private final boolean wsAliveabel;
 
 	protected WebSocketServerHandshaker handshaker;
-	protected WebSocketServerHandler handler;
-	private StringBuilder frameBuffer = null;
+	private String frameBuffer = null;
 
-	public HttpServerHandler(Container container, String wsuri) {
+	public HttpServerHandler(Container container, boolean wsAliveable) {
+		this.wsAliveabel = wsAliveable;
 		this.container = container;
-		this.wsUri = wsuri;
-		handler = new WebSocketServerHandler(wsuri);
 	}
 
 	@Override
@@ -56,7 +57,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
-		if (msg instanceof HttpRequest) {
+		if (msg instanceof FullHttpRequest) {
 			this.handleHttpRequest(ctx, (FullHttpRequest) msg);
 		} else if (msg instanceof WebSocketFrame) {
 			this.handleWebSocketFrame(ctx, (WebSocketFrame) msg);
@@ -67,9 +68,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 			WebSocketFrame frame) {
 		// Check for closing frame
 		if (frame instanceof CloseWebSocketFrame) {
-			if (frameBuffer != null) {
-				handleMessageCompleted(ctx, frameBuffer.toString());
-			}
+			handleMessageCompleted(ctx, null);
 			handshaker.close(ctx.channel(),
 					(CloseWebSocketFrame) frame.retain());
 			return;
@@ -80,11 +79,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 		} else if (frame instanceof PongWebSocketFrame) {
 			return;
 		} else if (frame instanceof TextWebSocketFrame) {
-			frameBuffer = new StringBuilder();
-			frameBuffer.append(((TextWebSocketFrame) frame).text());
+			frameBuffer = ((TextWebSocketFrame) frame).text();
 		} else if (frame instanceof ContinuationWebSocketFrame) {
 			if (frameBuffer != null) {
-				frameBuffer.append(((ContinuationWebSocketFrame) frame).text());
+				frameBuffer = ((TextWebSocketFrame) frame).text();
 			}
 		} else {
 			throw new UnsupportedOperationException(
@@ -95,20 +93,17 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 		// Check if Text or Continuation Frame is final fragment and handle if
 		// needed.
 		if (frame.isFinalFragment()) {
-			handleMessageCompleted(ctx, frameBuffer.toString());
+			handleMessageCompleted(ctx, frameBuffer);
 			frameBuffer = null;
 		}
+
 	}
 
 	private void handleMessageCompleted(ChannelHandlerContext ctx,
 			String frameText) {
-		// String response = wsMessageHandler.handleMessage(ctx, frameText);
-		// if (response != null) {
-		ctx.channel().writeAndFlush(new TextWebSocketFrame("hi hao client"));
-		// }
-		System.out.println(frameText);
-		container.getScheduler().revieve(
-				Message.newMessage(Title.ENDPOINT, frameText.getBytes()));
+		// ctx.channel().writeAndFlush(new TextWebSocketFrame("hi hao client"));
+		container.getScheduler()
+				.endpoint(ctx.channel().remoteAddress().toString(), frameText);
 	}
 
 	private void handleHttpRequest(ChannelHandlerContext ctx,
@@ -117,8 +112,18 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 		// container.getScheduler().handleHTTPRequest(ctx, request, container);
 
 		long start = System.currentTimeMillis();
-		if (wsUri.equalsIgnoreCase(request.getUri())) {
-			handler.channelRead(ctx, request);
+		if (wsAliveabel && request.getMethod() == GET
+				&& WEBSOCKET_PATH.equalsIgnoreCase(request.getUri())) {
+			// Websocket Handshake
+			WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
+					getWebSocketLocation(ctx.pipeline(), request), null, true);
+			handshaker = wsFactory.newHandshaker(request);
+			if (handshaker == null) {
+				WebSocketServerHandshakerFactory
+						.sendUnsupportedVersionResponse(ctx.channel());
+			} else {
+				handshaker.handshake(ctx.channel(), request);
+			}
 		} else if (HttpHeaders.is100ContinueExpected(request)) {
 			ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
 		} else {
@@ -156,6 +161,17 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 		}
 	}
 
+	private static String getWebSocketLocation(ChannelPipeline cp,
+			FullHttpRequest req) {
+		String protocol = "ws";
+		if (cp.get(SslHandler.class) != null) {
+			// SSL in use so use Secure WebSockets
+			protocol = "wss";
+		}
+		return protocol + "://" + req.headers().get(Names.HOST)
+				+ WEBSOCKET_PATH;
+	}
+
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		ctx.close();
@@ -163,6 +179,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+		container.getScheduler()
+				.endpoint(ctx.channel().remoteAddress().toString(), null);
 		ctx.close();
 	}
 }
