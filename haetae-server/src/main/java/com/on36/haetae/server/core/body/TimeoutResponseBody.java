@@ -19,4 +19,14 @@ public class TimeoutResponseBody extends StringResponseBody {
 		super.sendAndCommit(response, contentType);
 	}
 
+	protected String build(HttpResponse response, String contentType) {
+		StringBuilder sb = new StringBuilder("{");
+		sb.append("\"status\":").append(response.getStatus().code())
+				.append(",");
+		sb.append("\"message\":\"").append(response.getStatus().reasonPhrase())
+				.append("\"");
+		sb.append("}");
+		return sb.toString();
+	}
+
 }

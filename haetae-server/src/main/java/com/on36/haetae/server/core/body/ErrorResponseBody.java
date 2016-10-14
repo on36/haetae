@@ -3,6 +3,10 @@ package com.on36.haetae.server.core.body;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import com.on36.haetae.api.http.MediaType;
+
+import io.netty.handler.codec.http.HttpResponse;
+
 /**
  * @author zhanghr
  * @date 2016年3月26日
@@ -26,5 +30,21 @@ public class ErrorResponseBody extends StringResponseBody {
 		} finally {
 			p.close();
 		}
+	}
+
+	@Override
+	protected String build(HttpResponse response, String contentType) {
+		if (MediaType.TEXT_HTML.value().equals(contentType))
+			return content();
+
+		StringBuilder sb = new StringBuilder("{");
+		sb.append("\"status\":").append(response.getStatus().code())
+				.append(",");
+		sb.append("\"message\":\"").append(response.getStatus().reasonPhrase())
+				.append("\"");
+		if (hasContent())
+			sb.append(",\"result\":\"").append(body).append("\"");
+		sb.append("}");
+		return sb.toString();
 	}
 }
