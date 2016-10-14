@@ -125,17 +125,17 @@ public class ProcessUtil {
 
 	public static String execAndAutoCloseble(List<String> args) {
 		try {
-			StringBuffer sb = new StringBuffer();
+			String result = null;
 			ProcessBuilder pb = new ProcessBuilder(args);
 			pb.redirectErrorStream(true);
 			Process process = pb.start();
 			process.waitFor();
 			Scanner scanner = new Scanner(process.getInputStream());
 			if (scanner.hasNextLine()) {
-				sb.append(scanner.nextLine());
+				result = scanner.nextLine();
 			}
 			scanner.close();
-			return sb.toString();
+			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
