@@ -48,6 +48,20 @@ public class HttpClient {
 		return HttpClientHolder.instance;
 	}
 
+	public String put(String url) throws Exception {
+		return put(url, null);
+	}
+
+	public String put(String url, Map<String, String> queryParam)
+			throws Exception {
+		return put(url, queryParam, null);
+	}
+
+	public String put(String url, Map<String, String> queryParam,
+			Map<String, String> header) throws Exception {
+		return send(url, MethodType.PUT, queryParam, null, header);
+	}
+
 	public String get(String url) throws Exception {
 		return get(url, null);
 	}
@@ -60,6 +74,20 @@ public class HttpClient {
 	public String get(String url, Map<String, String> queryParam,
 			Map<String, String> header) throws Exception {
 		return send(url, MethodType.GET, queryParam, null, header);
+	}
+
+	public String delete(String url) throws Exception {
+		return delete(url, null);
+	}
+
+	public String delete(String url, Map<String, String> queryParam)
+			throws Exception {
+		return delete(url, queryParam, null);
+	}
+
+	public String delete(String url, Map<String, String> queryParam,
+			Map<String, String> header) throws Exception {
+		return send(url, MethodType.DELETE, queryParam, null, header);
 	}
 
 	public String post(String url) throws Exception {
@@ -91,7 +119,8 @@ public class HttpClient {
 		Response resp = null;
 		try {
 			BoundRequestBuilder request = HttpClientHolder.asyncHttpClient
-					.prepareRequest(new RequestBuilder(method.name()));
+					.prepareRequest(new RequestBuilder(method.name()))
+					.setUrl(url);
 
 			if (header != null) {
 				for (Map.Entry<String, String> entry : header.entrySet()) {

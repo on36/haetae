@@ -45,8 +45,8 @@ public class ServiceClient {
 			throws Exception {
 		if (address == null)
 			return false;
-		HttpClient.getInstance().post(
-				getURI("/node/register?address=" + address + "&data=" + data));
+		HttpClient.getInstance()
+				.post(getURI("/node?address=" + address + "&data=" + data));
 		return true;
 	}
 
@@ -60,8 +60,7 @@ public class ServiceClient {
 		if (address == null)
 			return false;
 		try {
-			HttpClient.getInstance()
-					.post(getURI("/node/unregister?address=" + address));
+			HttpClient.getInstance().delete(getURI("/node?address=" + address));
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
