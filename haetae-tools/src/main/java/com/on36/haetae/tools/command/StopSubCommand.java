@@ -26,7 +26,7 @@ public class StopSubCommand implements SubCommand {
 	@Override
 	public Options buildCommandlineOptions(Options options) {
 		options.addOption("h", "help", false,
-				"usage: haetae stop <arg>; default:8080");
+				"usage: haetae stop <port>; default:8080");
 		return options;
 	}
 
