@@ -24,8 +24,11 @@ public class HaetaeServerStartup {
 	private static int port = 8080;
 	private static int threadPoolSize = 0;
 	private static String rootPath = null;
-	private static String coords = "";
+	private static String coords = "com.on36.crm:crm-cust:1.0-SNAPSHOT";
 	private static String source = "directory";
+	private static String path = "../ext";
+	private static String url = null;
+	private static int centralType = 0;
 	private static String packageName = "com.on36.haetae.test";
 	private static IClassLoader cl = null;
 
@@ -34,7 +37,12 @@ public class HaetaeServerStartup {
 		options.addOption("s", "source", true,
 				"optional value:directory,maven; default: directory");
 		options.addOption("c", "coords", true,
-				"maven coords, example: com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT");
+				"maven coords, example: com.on36.crm:crm-cust:1.0-SNAPSHOT");
+		options.addOption("pa", "path", true,
+				"directory classloader jar file path, default: ../ext");
+		options.addOption("u", "url", true, "maven central url");
+		options.addOption("ct", "type", true,
+				"maven central type optional value:0 snapshot;1 release");
 		options.addOption("pn", "package", true,
 				"service package name, example: com.ideal.shcrm.service");
 		options.addOption("p", "port", true, "service port, default: 8080");
@@ -96,6 +104,16 @@ public class HaetaeServerStartup {
 		if (line.hasOption("coords")) {
 			coords = line.getOptionValue("coords");
 		}
+		if (line.hasOption("path")) {
+			path = line.getOptionValue("path");
+		}
+		if (line.hasOption("url")) {
+			url = line.getOptionValue("url");
+		}
+		if (line.hasOption("type")) {
+			String ct = line.getOptionValue("type");
+			centralType = Integer.parseInt(ct);
+		}
 		if (line.hasOption("root")) {
 			String root = line.getOptionValue("root");
 
@@ -112,9 +130,9 @@ public class HaetaeServerStartup {
 
 	private static IClassLoader getClassLoader() throws Exception {
 		if ("directory".equals(source))
-			return new DirectoryClassLoader();
+			return new DirectoryClassLoader(path);
 		else if ("maven".equals(source))
-			return new MavenClassLoader(coords);
+			return new MavenClassLoader(url, centralType, coords);
 		else
 			throw new IllegalArgumentException(
 					"illegal value of source =" + source);
