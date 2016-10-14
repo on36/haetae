@@ -125,9 +125,21 @@ public class HaetaeServer {
 									+ runningMode);
 				else {
 
-					LoggerUtils.start("com.on36.haetae.manager", "biz", "biz",
-							"INFO");
 					for (String classString : clazzes) {
+						if (classString.startsWith("com.on36.haetae.manager")) {
+							LoggerUtils.start("com.on36.haetae.manager", "MGR",
+									"biz", "INFO");
+						} else {
+							String packageName = classString
+									.substring(0,
+											classString.indexOf(".",
+													classString.indexOf(".",
+															classString.indexOf(
+																	".") + 1)
+															+ 1));
+							LoggerUtils.start(packageName, "biz", "biz",
+									"INFO");
+						}
 						Class<?> clazz = classLoader.loadClass(classString);
 						Method[] methods = clazz.getDeclaredMethods();
 						Object object = null;
@@ -145,10 +157,10 @@ public class HaetaeServer {
 										object = clazz.newInstance();
 									register(api, apiDoc).with(object, method);
 								}
-							} else
-								scheduler.trace(clazz, LogLevel.WARN,
-										method.getName()
-												+ " has no argurment Context");
+							} // else
+								// scheduler.trace(clazz, LogLevel.WARN,
+								// method.getName()
+								// + " has no argurment Context");
 						}
 					}
 				}

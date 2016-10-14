@@ -65,4 +65,15 @@ public class LoggerAppender implements Logger {
 		log.warn(message, t);
 	}
 
+	// private String build(String log) {
+	// StackTraceElement[] lvStacks = Thread.currentThread().getStackTrace();
+	// String className = lvStacks[3].getClassName();
+	// String methodname = lvStacks[3].getMethodName();
+	// StringBuilder sb = new StringBuilder(className);
+	// sb.append(" ");
+	// sb.append(methodname);
+	// sb.append("- ");
+	// sb.append(log);
+	// return sb.toString();
+	// }
 }

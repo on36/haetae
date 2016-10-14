@@ -1,9 +1,8 @@
 package com.on36.haetae.manager;
 
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.on36.haetae.api.Context;
-import com.on36.haetae.api.annotation.Api;
 import com.on36.haetae.server.HaetaeServer;
 
 /**
@@ -18,24 +17,10 @@ public class ClusterManagerServerTest {
 		if (args != null && args.length == 1)
 			port = Integer.parseInt(args[0]);
 
-		HaetaeServer server = new HaetaeServer(port, "/cluster");
-
-		Class<?> clazz = ClusterManagerService.class;
-		Method[] methods = clazz.getDeclaredMethods();
-		Object object = null;
-		for (Method method : methods) {
-			Class<?>[] clazzs = method.getParameterTypes();
-			if (clazzs.length == 1
-					&& clazzs[0].getName().equals(Context.class.getName())) {
-
-				Api api = method.getAnnotation(Api.class);
-				if (object == null)
-					object = clazz.newInstance();
-				if (api != null) {
-					server.register(api).with(object, method);
-				}
-			}
-		}
+		List<String> classes = new ArrayList<String>();
+		classes.add(ClusterManagerService.class.getName());
+		classes.add(ConfigAgentService.class.getName());
+		HaetaeServer server = new HaetaeServer(port, 0, "/cluster", classes);
 		server.start();
 	}
 }

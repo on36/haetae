@@ -41,13 +41,16 @@ public class LoggerUtils {
 		if (!logPath.endsWith("/"))
 			sb.append("/");
 		sb.append(fileName);
+		String pattern = "%m%n";
+		if (!suffix.equals("access"))
+			pattern = "%-d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%p] %c- %m%n";
 		if (!StringUtils.isEmpty(suffix))
 			sb.append("-" + suffix);
-		Layout layout = PatternLayout.createLayout("%m%n", null, config, null,
+		Layout layout = PatternLayout.createLayout(pattern, null, config, null,
 				null, false, false, null, null);
 		Appender appender = RollingFileAppender.createAppender(
 				sb.toString() + ".log",
-				sb.toString() + "-%d{yyyy-MM-dd-HH}.log", "false", name, null,
+				sb.toString() + "-%d{yyyy-MM-dd-HH}.log", "true", name, null,
 				null, null, TimeBasedTriggeringPolicy.createPolicy("1", "true"),
 				null, layout, null, null, "false", null, config);
 		appender.start();

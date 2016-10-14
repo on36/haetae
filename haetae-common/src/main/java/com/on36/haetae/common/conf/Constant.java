@@ -28,7 +28,7 @@ public class Constant {
 	 * 指定开启websocket,默认为true
 	 */
 	public static final String K_SERVER_WS_ENABLED = "httpServer.ws.enabled";
-	public static final boolean V_SERVER_WS_ENABLED = false;
+	public static final boolean V_SERVER_WS_ENABLED = true;
 
 	/**
 	 * 指定netty线程池大小,默认为0 取CPU物理核数的两倍
@@ -53,12 +53,6 @@ public class Constant {
 	 */
 	public static final String K_SERVER_HEARTBEAT_PERIOD = "httpServer.heartbeat.period";
 	public static final int V_SERVER_HEARTBEAT_PERIOD = 3000;
-
-	/**
-	 * 指定服务扫描的classloader加载的类
-	 */
-	public static final String K_SERVER_SCAN_CLASSLOADER = "httpServer.scan.classloader";
-	public static final String V_SERVER_SCAN_CLASSLOADER = "com.on36.haetae.hotswap.classloader.DirectoryClassLoader";
 
 	/**
 	 * 指定HttpClient客户端keepalive的值,默认值:true

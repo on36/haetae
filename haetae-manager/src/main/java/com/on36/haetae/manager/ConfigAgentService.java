@@ -14,6 +14,9 @@ import com.on36.haetae.common.cache.CacheMap;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.zk.ZKClient;
 import com.on36.haetae.config.client.ConfigClient;
+import com.on36.haetae.server.core.manager.EndPointManager;
+import com.on36.haetae.server.core.manager.listener.ActiveListener;
+import com.on36.haetae.server.core.manager.listener.InactiveListener;
 
 /**
  * @author zhanghr
@@ -28,8 +31,8 @@ public class ConfigAgentService {
 	private ZKClient client;
 
 	public ConfigAgentService() {
-		propMap = new CacheMap<String, String>(-1, 30);
-		servicesMap = new CacheMap<String, List<String>>(-1, 30);
+		propMap = new CacheMap<String, String>(-1, 30, 100);
+		servicesMap = new CacheMap<String, List<String>>(-1, 30, 100);
 
 		client = new ZKClient(connectString) {
 			@Override
@@ -47,6 +50,44 @@ public class ConfigAgentService {
 				}
 			}
 		};
+
+		EndPointManager.getInstance().addActiveListener(new ActiveListener() {
+
+			@Override
+			public void handler(String... values) {
+				String root = values[0];
+				String endpoint = values[1];
+				String pid = values[2];
+				String path = app + "/nodes" + root + checkPrefix(endpoint);
+
+				try {
+					Stat stat = client.exists(path, false);
+					if (stat == null)
+						client.createEphemeral(path, pid, true);
+					else if (stat.getEphemeralOwner() != client
+							.getSesssionId()) {
+						client.delete(path);
+						client.createEphemeral(path, pid, true);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}).addInactiveListener(new InactiveListener() {
+
+			@Override
+			public void handler(String... values) {
+				String root = values[0];
+				String endpoint = values[1];
+				String path = app + "/nodes" + root + checkPrefix(endpoint);
+				try {
+					if (client.exists(path))
+						client.delete(path);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	private CacheMap<String, String> propMap;
@@ -289,7 +330,7 @@ public class ConfigAgentService {
 	public List<String> getNodes(Context context) throws Exception {
 		String path = app + "/nodes";
 		if (client.exists(path))
-			return client.getChildren(path); 
+			return client.getChildren(path);
 		else
 			throw new Exception("Node [" + app + "] is not existed!");
 	}

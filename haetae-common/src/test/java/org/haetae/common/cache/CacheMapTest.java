@@ -17,12 +17,10 @@ public class CacheMapTest {
 		Thread.sleep(10000);
 		cache.put("hello", "world");
 		int i = 0;
-		while (true) {
-			System.out.println(i++);
-			System.out.println("nihao = " + cache.get("nihao"));
-			System.out.println("hello = " + cache.get("hello"));
-			System.out.println("meyou = " + cache.get("meiyou"));
-			Thread.sleep(5000);
-		}
+		System.out.println(i++);
+		System.out.println("nihao = " + cache.get("nihao"));
+		System.out.println("hello = " + cache.get("hello"));
+		System.out.println("meyou = " + cache.get("meiyou"));
+		Thread.sleep(5000);
 	}
 }
