@@ -27,7 +27,7 @@ public class ProcessManagerUnixImpl extends BaseProcessManager {
 				+ " |grep '(LISTEN)'| awk '{print $2}'";
 		String result = ProcessUtil.execAndAutoCloseble("/bin/sh", "-c",
 				command);
-		if (result != null)
+		if (result != null && result.trim().length() > 0)
 			return Integer.parseInt(result);
 		return -1;
 	}

@@ -27,7 +27,7 @@ public class ProcessManagerWindowImpl extends BaseProcessManager {
 				+ "|findstr LISTENING";
 		String result = ProcessUtil.execAndAutoCloseble("cmd.exe", "/c",
 				command);
-		if (result != null) {
+		if (result != null && result.trim().length() > 0) {
 			String[] arr = result.split(" ");
 			int length = arr.length;
 			if (length > 4)
