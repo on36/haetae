@@ -338,14 +338,14 @@ public class RequestHandlerImpl implements RequestHandler {
 			sb.append("-");
 		sb.append(" ");
 		sb.append(clazz.getName());
-		sb.append(".");
+		sb.append(" ");
 		sb.append(methodName);
-		sb.append("[");
+		sb.append(" [");
 		sb.append(queryParam);
 		sb.append("] ");
 		sb.append(elapsedTime);
 		sb.append("ms");
-		sb.append(" at Haetae server version : ");
+		sb.append(" at Haetae server version: ");
 		sb.append(Version.CURRENT_VERSION);
 		scheduler.trace(RequestHandlerImpl.class, LogLevel.INFO, sb.toString());
 	}
