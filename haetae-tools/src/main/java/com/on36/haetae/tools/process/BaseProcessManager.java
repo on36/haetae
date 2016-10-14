@@ -24,7 +24,8 @@ public abstract class BaseProcessManager implements ProcessManager {
 		if (pid > 0) {
 			ProcessUtil.execAndAutoCloseble(killPid(pid));
 			return pid;
-		}
+		} else
+			System.out.println("No found any process at port " + port);
 		return -1;
 	}
 
