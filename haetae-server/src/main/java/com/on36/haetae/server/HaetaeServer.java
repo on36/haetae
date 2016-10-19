@@ -82,6 +82,8 @@ public class HaetaeServer {
 
 		String root = conf.getString(Constant.K_SERVER_ROOT_PATH,
 				Constant.V_SERVER_ROOT_PATH);
+		if (!root.equals("/cluster"))
+			conf.set(Constant.K_SERVER_WS_ENABLED, "false");
 
 		String rootName = root.replace("/", "");
 		System.setProperty("haetae.log.name",

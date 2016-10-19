@@ -27,6 +27,10 @@ public class ConfigClient {
 		return sb.toString();
 	}
 
+	public static Configuration config() {
+		return config;
+	}
+
 	/**
 	 * 设置key-value键值对配置.
 	 * 

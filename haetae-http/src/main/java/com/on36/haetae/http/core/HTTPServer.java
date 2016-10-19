@@ -66,8 +66,8 @@ public class HTTPServer implements Server {
 			SslContext sslCtx = null;
 			boolean ssl = ConfigClient.getBoolean(Constant.K_SERVER_SSL_ENABLED,
 					Constant.V_SERVER_SSL_ENABLED);
-			boolean ws = ConfigClient.getBoolean(Constant.K_SERVER_WS_ENABLED,
-					Constant.V_SERVER_WS_ENABLED);
+			boolean ws = ConfigClient.config().getBoolean(
+					Constant.K_SERVER_WS_ENABLED, Constant.V_SERVER_WS_ENABLED);
 			if (ssl) {
 				SelfSignedCertificate ssc = new SelfSignedCertificate(
 						"on36.com");
