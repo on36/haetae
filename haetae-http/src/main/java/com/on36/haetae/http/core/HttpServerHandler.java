@@ -102,8 +102,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private void handleMessageCompleted(ChannelHandlerContext ctx,
 			String frameText) {
 		// ctx.channel().writeAndFlush(new TextWebSocketFrame("hi hao client"));
-		container.getScheduler()
-				.endpoint(ctx.channel().remoteAddress().toString(), frameText);
+		if (frameText != null)
+			container.getScheduler().endpoint(
+					ctx.channel().remoteAddress().toString(), frameText);
 	}
 
 	private void handleHttpRequest(ChannelHandlerContext ctx,
@@ -174,13 +175,13 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		container.getScheduler()
+				.endpoint(ctx.channel().remoteAddress().toString(), null);
 		ctx.close();
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-		container.getScheduler()
-				.endpoint(ctx.channel().remoteAddress().toString(), null);
 		ctx.close();
 	}
 }

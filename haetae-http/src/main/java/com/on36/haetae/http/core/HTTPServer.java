@@ -73,7 +73,7 @@ public class HTTPServer implements Server {
 						"on36.com");
 				sslCtx = SslContextBuilder
 						.forServer(ssc.certificate(), ssc.privateKey()).build();
-			} 
+			}
 			// Configure the server.
 			EventLoopGroup bossGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
@@ -101,8 +101,8 @@ public class HTTPServer implements Server {
 				b.group(bossGroup, workerGroup)
 						.channel(NioServerSocketChannel.class)
 						.handler(new LoggingHandler(LogLevel.DEBUG))
-						.childHandler(
-								new HttpServerInitializer(sslCtx, container, ws));
+						.childHandler(new HttpServerInitializer(sslCtx,
+								container, ws));
 
 				channel = b.bind(socketAddress).sync().channel();
 				RUNNING = true;

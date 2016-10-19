@@ -47,6 +47,9 @@ public class HttpClient {
 	public static HttpClient getInstance() {
 		return HttpClientHolder.instance;
 	}
+	public static AsyncHttpClient getAsyncHttpClient() {
+		return HttpClientHolder.asyncHttpClient;
+	}
 
 	public String put(String url) throws Exception {
 		return put(url, null);

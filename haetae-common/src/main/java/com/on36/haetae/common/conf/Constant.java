@@ -46,19 +46,19 @@ public class Constant {
 	 * 指定连接超时，单位毫秒
 	 */
 	public static final String K_SERVER_CONNECTTIMEOUT_MILLIS = "httpServer.connectTimeouMillis";
-	public static final int V_SERVER_CONNECTTIMEOUT_MILLIS = 5000;
+	public static final int V_SERVER_CONNECTTIMEOUT_MILLIS = 3000;
 
 	/**
 	 * 指定服务心跳间隔时间，单位毫秒
 	 */
 	public static final String K_SERVER_HEARTBEAT_PERIOD = "httpServer.heartbeat.period";
-	public static final int V_SERVER_HEARTBEAT_PERIOD = 3000;
+	public static final int V_SERVER_HEARTBEAT_PERIOD = 5000;
 
 	/**
 	 * 指定HttpClient客户端keepalive的值,默认值:true
 	 */
 	public static final String K_HTTPCLIENT_KEEPALIVE = "http.client.keepalive";
-	public static final boolean V_HTTPCLIENT_KEEPALIVE = true;
+	public static final boolean V_HTTPCLIENT_KEEPALIVE = false;
 	/**
 	 * 指定HttpClient客户端requestTimeout的值,默认值：5000
 	 */
