@@ -9,6 +9,8 @@ import com.on36.haetae.api.core.HttpHandler;
  * @author zhanghr
  * @date 2015年12月30日
  */
+
+@SuppressWarnings("deprecation")
 public interface RequestHandler {
 
 	/**

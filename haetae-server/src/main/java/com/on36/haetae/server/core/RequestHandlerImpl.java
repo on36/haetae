@@ -46,6 +46,7 @@ import com.on36.haetae.server.core.stats.Statistics;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+@SuppressWarnings("deprecation")
 public class RequestHandlerImpl implements RequestHandler {
 
 	private int statusCode = -1;

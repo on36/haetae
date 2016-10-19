@@ -15,6 +15,7 @@ import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.http.HandlerKey;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 
+@SuppressWarnings("deprecation")
 public class StatisticsHandler implements HttpHandler<Object> {
 
 	private final Map<HandlerKey, TreeMap<String, RequestHandlerImpl>> handlerMap;

@@ -15,6 +15,7 @@ import com.on36.haetae.server.core.RequestHandlerImpl;
  * @author zhanghr
  * @date 2016年9月14日
  */
+@SuppressWarnings("deprecation")
 public class DocHttpHandler implements HttpHandler<Object> {
 
 	private final Map<HandlerKey, TreeMap<String, RequestHandlerImpl>> handlerMap;

@@ -10,6 +10,8 @@ import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.on36.haetae.config.client.HttpClient;
+
 /**
  * @author zhanghr
  * @date 2016年1月3日
@@ -232,8 +234,8 @@ public class HaetaeAsynHttpClientTest {
 
 	@Test
 	public void testWS() throws Exception {
-		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient();
-		asyncHttpClient.prepareGet("ws://localhost:8080/ws")
+
+		HttpClient.getAsyncHttpClient().prepareGet("ws://localhost:8080/ws")
 				.execute(new WebSocketUpgradeHandler.Builder()
 						.addWebSocketListener(new WebSocketTextListener() {
 
@@ -264,9 +266,6 @@ public class HaetaeAsynHttpClientTest {
 						}).build())
 				.get();
 
-		//asyncHttpClient.close();
-		
-		Thread.sleep(10000);
 	}
 
 }

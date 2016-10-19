@@ -95,6 +95,7 @@ public class JSONUtils {
 		return get(clazz, je);
 	}
 
+	@SuppressWarnings("unchecked")
 	private static <T> T get(Class<T> clazz, JsonElement je) {
 		Object value = null;
 		if (je.isJsonPrimitive()) {
