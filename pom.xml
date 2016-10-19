@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.on36.haetae</groupId>
 	<artifactId>haetae-parent</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>haetae-http</module>
@@ -19,6 +19,7 @@
 		<module>haetae-manager</module>
 		<module>haetae-client</module>
 		<module>haetae-assembly</module>
+		<module>haetae-orm</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -227,13 +228,26 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<!--repositories> <repository> <id>nexus</id> <name>local private nexus</name> 
-		<url>http://192.168.153.129:8081/repository/maven-public</url> </repository> 
-		</repositories> <distributionManagement> <repository> <id>releases</id> <name>Internal 
-		Releases</name> <url>http://192.168.153.129:8081/repository/maven-releases</url> 
-		</repository> <snapshotRepository> <id>snapshots</id> <name>Internal Snapshots</name> 
-		<url>http://192.168.153.129:8081/repository/maven-snapshots</url> </snapshotRepository> 
-		</distributionManagement -->
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>local private nexus</name>
+			<url>http://192.168.153.129:8081/repository/maven-public</url>
+		</repository>
+	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<name>Internal 
+		Releases</name>
+			<url>http://192.168.153.129:8081/repository/maven-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Internal Snapshots</name>
+			<url>http://192.168.153.129:8081/repository/maven-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<pluginManagement>
 			<plugins>
