@@ -16,9 +16,9 @@ public class EndpointEventHandler implements EventHandler<EndpointEvent> {
 		String endPoint = event.getEndpoint();
 		String channel = event.getChannel();
 		if (endPoint != null)
-			EndPointManager.put(channel, endPoint);
+			EndPointManager.getInstance().put(channel, endPoint);
 		else
-			EndPointManager.remove(channel);
+			EndPointManager.getInstance().remove(channel);
 	}
 
 }

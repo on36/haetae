@@ -1,12 +1,14 @@
 package com.on36.haetae.server;
 
+import org.asynchttpclient.ws.WebSocket;
+import org.asynchttpclient.ws.WebSocketTextListener;
+import org.asynchttpclient.ws.WebSocketUpgradeHandler;
+
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.common.utils.NetworkUtils;
 import com.on36.haetae.config.client.ConfigClient;
 import com.on36.haetae.config.client.HttpClient;
-import com.on36.haetae.config.client.ServiceClient;
-import com.on36.haetae.http.Environment;
 import com.on36.haetae.http.Scheduler;
 import com.on36.haetae.http.core.HTTPServer;
 
@@ -28,6 +30,8 @@ public class Heartbeat implements Runnable {
 
 	private static int RETRIES = 10;
 	private static long FAIL_NEXT_PERIOD = 30;
+	private static boolean connected = false;
+	private static WebSocket hbWebSocket;
 
 	public Heartbeat(String root, int port, Scheduler scheduler) {
 		this.port = port;
@@ -48,20 +52,53 @@ public class Heartbeat implements Runnable {
 		while (running) {
 			try {
 				Thread.sleep(period);// 休眠一次
-				if (HTTPServer.RUNNING)
-					ServiceClient.registerNode(root + "/" + mineEndPoint,
-							Environment.pid());
+				if (!connected && HTTPServer.RUNNING)
+					HttpClient.getAsyncHttpClient()
+							.prepareGet("ws://localhost:1025/ws")
+							.execute(new WebSocketUpgradeHandler.Builder()
+									.addWebSocketListener(
+											new WebSocketTextListener() {
+
+												@Override
+												public void onOpen(
+														WebSocket websocket) {
+													hbWebSocket = websocket;
+													connected = true;
+												}
+
+												@Override
+												public void onError(
+														Throwable t) {
+													connected = false;
+												}
+
+												@Override
+												public void onClose(
+														WebSocket websocket) {
+													connected = false;
+												}
+
+												@Override
+												public void onMessage(
+														String message) {
+													System.out.println(message);
+												}
+											})
+									.build())
+							.get();
+				if (connected)
+					hbWebSocket.sendMessage(root + "://" + mineEndPoint);
 			} catch (Exception e) {
 				retry--;
 				if (retry > 0) {
 					scheduler
 							.trace(this.getClass(), LogLevel.WARN,
-									"Config Agent connected failed. Already tried "
+									"Cluster Manager connected failed. Already tried "
 											+ (RETRIES - retry) + " time(s)",
 									e);
 				} else {
 					scheduler.trace(this.getClass(), LogLevel.WARN,
-							"Config Agent connected failed and counld not register node. Already tried "
+							"Cluster Manager connected failed and counld not register node. Already tried "
 									+ (RETRIES - retry)
 									+ " time(s), will sleep " + FAIL_NEXT_PERIOD
 									+ " minutes and try again!",
@@ -70,7 +107,6 @@ public class Heartbeat implements Runnable {
 						Thread.sleep(FAIL_NEXT_PERIOD * 60 * 1000);
 						retry = RETRIES;
 					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
@@ -80,8 +116,6 @@ public class Heartbeat implements Runnable {
 
 	public void close() {
 		running = false;
-		if (HTTPServer.RUNNING)
-			ServiceClient.unregisterNode(root + "/" + mineEndPoint);
 		HttpClient.getInstance().close();
 	}
 }
