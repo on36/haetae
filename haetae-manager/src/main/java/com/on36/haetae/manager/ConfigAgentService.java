@@ -9,7 +9,10 @@ import org.apache.zookeeper.data.Stat;
 
 import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Api;
+import com.on36.haetae.api.annotation.ApiDoc;
+import com.on36.haetae.api.annotation.ApiParam;
 import com.on36.haetae.api.http.MethodType;
+import com.on36.haetae.api.http.ParamType;
 import com.on36.haetae.common.cache.CacheMap;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.zk.ZKClient;
@@ -34,7 +37,7 @@ public class ConfigAgentService {
 		propMap = new CacheMap<String, String>(-1, 30, 100);
 		servicesMap = new CacheMap<String, List<String>>(-1, 30, 100);
 
-		client = new ZKClient(connectString) {
+		client = new ZKClient(connectString, null, null) {
 			@Override
 			public void process(WatchedEvent event) {
 				EventType type = event.getType();
@@ -54,20 +57,22 @@ public class ConfigAgentService {
 		EndPointManager.getInstance().addActiveListener(new ActiveListener() {
 
 			@Override
-			public void handler(String... values) {
-				String root = values[0];
-				String endpoint = values[1];
-				String pid = values[2];
-				String path = app + "/nodes" + root + checkPrefix(endpoint);
-
+			public void handler(String endpoint) {
+				String[] arr = endpoint.split("://");
+				String path = null;
+				if (arr.length == 2)
+					path = app + "/nodes" + checkPrefix(arr[0])
+							+ checkPrefix(arr[1]);
+				else if (arr.length == 1)
+					path = app + "/nodes" + checkPrefix(arr[0]);
 				try {
 					Stat stat = client.exists(path, false);
 					if (stat == null)
-						client.createEphemeral(path, pid, true);
+						client.createEphemeral(path, null, true);
 					else if (stat.getEphemeralOwner() != client
 							.getSesssionId()) {
 						client.delete(path);
-						client.createEphemeral(path, pid, true);
+						client.createEphemeral(path, null, true);
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -76,10 +81,14 @@ public class ConfigAgentService {
 		}).addInactiveListener(new InactiveListener() {
 
 			@Override
-			public void handler(String... values) {
-				String root = values[0];
-				String endpoint = values[1];
-				String path = app + "/nodes" + root + checkPrefix(endpoint);
+			public void handler(String endpoint) {
+				String[] arr = endpoint.split("://");
+				String path = null;
+				if (arr.length == 2)
+					path = app + "/nodes" + checkPrefix(arr[0])
+							+ checkPrefix(arr[1]);
+				else if (arr.length == 1)
+					path = app + "/nodes" + checkPrefix(arr[0]);
 				try {
 					if (client.exists(path))
 						client.delete(path);
@@ -139,6 +148,7 @@ public class ConfigAgentService {
 	}
 
 	@Api(value = "/property", method = MethodType.POST)
+	@ApiDoc(name = "生成key-value属性配置", params = {})
 	public void changeProperty(Context context) throws Exception {
 		Map<String, String> map = context.getRequestParameters();
 
@@ -158,6 +168,7 @@ public class ConfigAgentService {
 	}
 
 	@Api(value = "/property", method = MethodType.PUT)
+	@ApiDoc(name = "生成key-value属性配置", params = {})
 	public void addProperty(Context context) throws Exception {
 		Map<String, String> map = context.getRequestParameters();
 
@@ -181,6 +192,8 @@ public class ConfigAgentService {
 	}
 
 	@Api("/property")
+	@ApiDoc(name = "查询属性key的值", params = {
+			@ApiParam(param = "key", required = true, type = ParamType.REQUEST, desc = "需要查询的属性名") })
 	public String getProperty(Context context) throws Exception {
 		String key = context.getRequestParameter("key");
 		if (key != null) {
@@ -196,6 +209,8 @@ public class ConfigAgentService {
 	}
 
 	@Api("/property/:key")
+	@ApiDoc(name = "查询属性key的值", params = {
+			@ApiParam(param = "key", required = true, type = ParamType.URI, desc = "需要查询的属性名") })
 	public String getPropertyByURI(Context context) throws Exception {
 		String key = context.getCapturedParameter(":key");
 		if (key != null) {
@@ -211,6 +226,8 @@ public class ConfigAgentService {
 	}
 
 	@Api(value = "/property/:key", method = MethodType.DELETE)
+	@ApiDoc(name = "删除属性key", params = {
+			@ApiParam(param = "key", required = true, type = ParamType.URI, desc = "需要删除的属性名") })
 	public void deleteProperty(Context context) throws Exception {
 		String key = context.getCapturedParameter(":key");
 		if (key != null) {
@@ -238,93 +255,93 @@ public class ConfigAgentService {
 			throw new IllegalArgumentException("route should not be null");
 	}
 
-	@Api(value = "/service", method = MethodType.PUT)
-	public void putServices(Context context) throws Exception {
-		String address = context.getRequestParameter("address");
-		if (address != null) {
-			String path = app + "/services" + checkPrefix(address);
-			if (!client.exists(path))
-				client.createEphemeral(path, true);
-			else
-				throw new Exception(
-						"Node [" + address + "] is already existed!");
-		} else
-			throw new IllegalArgumentException("address should not be null");
-	}
-
-	@Api(value = "/service", method = MethodType.POST)
-	public void registerServices(Context context) throws Exception {
-		String address = context.getRequestParameter("address");
-		if (address != null) {
-			String path = app + "/services" + checkPrefix(address);
-			Stat stat = client.exists(path, false);
-			if (stat == null)
-				client.createEphemeral(path, true);
-			else if (stat.getEphemeralOwner() != client.getSesssionId()) {
-				client.delete(path);
-				client.createEphemeral(path, true);
-			}
-		} else
-			throw new IllegalArgumentException("address should not be null");
-	}
-
-	@Api(value = "/node", method = MethodType.PUT)
-	public void putNode(Context context) throws Exception {
-		String address = context.getRequestParameter("node");
-		String data = context.getRequestParameter("data");
-		if (address != null) {
-			String path = app + "/nodes" + checkPrefix(address);
-			if (!client.exists(path))
-				client.createEphemeral(path, data, true);
-			else
-				throw new Exception(
-						"Node [" + address + "] is already existed!");
-		} else
-			throw new IllegalArgumentException("node should not be null");
-	}
-
-	@Api(value = "/node", method = MethodType.POST)
-	public void postNode(Context context) throws Exception {
-		String address = context.getRequestParameter("node");
-		String data = context.getRequestParameter("data");
-		if (address != null) {
-			String path = app + "/nodes" + checkPrefix(address);
-			Stat stat = client.exists(path, false);
-			if (stat == null)
-				client.createEphemeral(path, data, true);
-			else if (stat.getEphemeralOwner() != client.getSesssionId()) {
-				client.delete(path);
-				client.createEphemeral(path, data, true);
-			}
-		} else
-			throw new IllegalArgumentException("node should not be null");
-	}
-
-	@Api(value = "/node", method = MethodType.DELETE)
-	public void unregisterNode(Context context) throws Exception {
-		String address = context.getRequestParameter("node");
-		if (address != null) {
-			String path = app + "/nodes" + checkPrefix(address);
-			if (client.exists(path))
-				client.delete(path);
-			else
-				throw new Exception("Node [" + address + "] is not existed!");
-		} else
-			throw new IllegalArgumentException("node should not be null");
-	}
-
-	@Api(value = "/node/:node", method = MethodType.DELETE)
-	public void deleteNode(Context context) throws Exception {
-		String address = context.getCapturedParameter(":node");
-		if (address != null) {
-			String path = app + "/nodes" + checkPrefix(address);
-			if (client.exists(path))
-				client.delete(path);
-			else
-				throw new Exception("Node [" + address + "] is not existed!");
-		} else
-			throw new IllegalArgumentException("node should not be null");
-	}
+	// @Api(value = "/service", method = MethodType.PUT)
+	// public void putServices(Context context) throws Exception {
+	// String address = context.getRequestParameter("address");
+	// if (address != null) {
+	// String path = app + "/services" + checkPrefix(address);
+	// if (!client.exists(path))
+	// client.createEphemeral(path, true);
+	// else
+	// throw new Exception(
+	// "Node [" + address + "] is already existed!");
+	// } else
+	// throw new IllegalArgumentException("address should not be null");
+	// }
+	//
+	// @Api(value = "/service", method = MethodType.POST)
+	// public void registerServices(Context context) throws Exception {
+	// String address = context.getRequestParameter("address");
+	// if (address != null) {
+	// String path = app + "/services" + checkPrefix(address);
+	// Stat stat = client.exists(path, false);
+	// if (stat == null)
+	// client.createEphemeral(path, true);
+	// else if (stat.getEphemeralOwner() != client.getSesssionId()) {
+	// client.delete(path);
+	// client.createEphemeral(path, true);
+	// }
+	// } else
+	// throw new IllegalArgumentException("address should not be null");
+	// }
+	//
+	// @Api(value = "/node", method = MethodType.PUT)
+	// public void putNode(Context context) throws Exception {
+	// String address = context.getRequestParameter("node");
+	// String data = context.getRequestParameter("data");
+	// if (address != null) {
+	// String path = app + "/nodes" + checkPrefix(address);
+	// if (!client.exists(path))
+	// client.createEphemeral(path, data, true);
+	// else
+	// throw new Exception(
+	// "Node [" + address + "] is already existed!");
+	// } else
+	// throw new IllegalArgumentException("node should not be null");
+	// }
+	//
+	// @Api(value = "/node", method = MethodType.POST)
+	// public void postNode(Context context) throws Exception {
+	// String address = context.getRequestParameter("node");
+	// String data = context.getRequestParameter("data");
+	// if (address != null) {
+	// String path = app + "/nodes" + checkPrefix(address);
+	// Stat stat = client.exists(path, false);
+	// if (stat == null)
+	// client.createEphemeral(path, data, true);
+	// else if (stat.getEphemeralOwner() != client.getSesssionId()) {
+	// client.delete(path);
+	// client.createEphemeral(path, data, true);
+	// }
+	// } else
+	// throw new IllegalArgumentException("node should not be null");
+	// }
+	//
+	// @Api(value = "/node", method = MethodType.DELETE)
+	// public void unregisterNode(Context context) throws Exception {
+	// String address = context.getRequestParameter("node");
+	// if (address != null) {
+	// String path = app + "/nodes" + checkPrefix(address);
+	// if (client.exists(path))
+	// client.delete(path);
+	// else
+	// throw new Exception("Node [" + address + "] is not existed!");
+	// } else
+	// throw new IllegalArgumentException("node should not be null");
+	// }
+	//
+	// @Api(value = "/node/:node", method = MethodType.DELETE)
+	// public void deleteNode(Context context) throws Exception {
+	// String address = context.getCapturedParameter(":node");
+	// if (address != null) {
+	// String path = app + "/nodes" + checkPrefix(address);
+	// if (client.exists(path))
+	// client.delete(path);
+	// else
+	// throw new Exception("Node [" + address + "] is not existed!");
+	// } else
+	// throw new IllegalArgumentException("node should not be null");
+	// }
 
 	@Api("/node")
 	public List<String> getNodes(Context context) throws Exception {
@@ -334,17 +351,17 @@ public class ConfigAgentService {
 		else
 			throw new Exception("Node [" + app + "] is not existed!");
 	}
-
-	@Api("/node/:node")
-	public int getNode(Context context) throws Exception {
-		String address = context.getCapturedParameter(":node");
-		if (address != null) {
-			String path = app + "/nodes" + checkPrefix(address);
-			if (client.exists(path))
-				return client.getData2Integer(path);
-			else
-				throw new Exception("Node [" + address + "] is not existed!");
-		} else
-			throw new IllegalArgumentException("node should not be null");
-	}
+	//
+	// @Api("/node/:node")
+	// public int getNode(Context context) throws Exception {
+	// String address = context.getCapturedParameter(":node");
+	// if (address != null) {
+	// String path = app + "/nodes" + checkPrefix(address);
+	// if (client.exists(path))
+	// return client.getData2Integer(path);
+	// else
+	// throw new Exception("Node [" + address + "] is not existed!");
+	// } else
+	// throw new IllegalArgumentException("node should not be null");
+	// }
 }
