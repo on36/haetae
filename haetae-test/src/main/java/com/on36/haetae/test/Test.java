@@ -1,27 +1,49 @@
 package com.on36.haetae.test;
 
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.DefaultAsyncHttpClient;
-import org.asynchttpclient.DefaultAsyncHttpClientConfig;
-import org.asynchttpclient.Response;
+import org.asynchttpclient.ws.WebSocket;
+import org.asynchttpclient.ws.WebSocketTextListener;
+import org.asynchttpclient.ws.WebSocketUpgradeHandler;
+
+import com.on36.haetae.config.client.HttpClient;
 
 /**
  * @author zhanghr
- * @date 2016年8月23日
+ * @date 2016年6月23日
  */
 public class Test {
 
 	public static void main(String[] args) throws Exception {
 
-		AsyncHttpClient asyncHttpClient = new DefaultAsyncHttpClient(
-				new DefaultAsyncHttpClientConfig.Builder()
-						.setPooledConnectionIdleTimeout(5000)
-						.setRequestTimeout(5000).build());// 请求5S超时
-		Response resp = asyncHttpClient
-				.preparePut("http://localhost:8080/services/user/").addHeader("VERSION", "6.1")
-				.execute().get();
-		String result = resp.getResponseBody().trim();
-		System.out.println(result);
-		asyncHttpClient.close();
+		HttpClient.getAsyncHttpClient().prepareGet("ws://localhost:1025/ws")
+				.execute(new WebSocketUpgradeHandler.Builder()
+						.addWebSocketListener(new WebSocketTextListener() {
+
+							@Override
+							public void onOpen(WebSocket websocket) {
+								// TODO Auto-generated method stub
+								websocket.sendMessage(
+										"shanghai://127.0.0.1:8888");
+							}
+
+							@Override
+							public void onError(Throwable t) {
+								// TODO Auto-generated method stub
+
+								System.out.println("onError");
+							}
+
+							@Override
+							public void onClose(WebSocket websocket) {
+								// TODO Auto-generated method stub
+								System.out.println("onClose");
+							}
+
+							@Override
+							public void onMessage(String message) {
+								// TODO Auto-generated method stub
+								System.out.println(message);
+							}
+						}).build())
+				.get();
 	}
 }

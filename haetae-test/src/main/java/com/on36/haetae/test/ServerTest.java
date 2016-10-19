@@ -14,6 +14,7 @@ import com.on36.haetae.server.HaetaeServer;
  * @author zhanghr
  * @date 2016年1月3日
  */
+@SuppressWarnings("deprecation")
 public class ServerTest {
 
 	public static void main(String[] args) throws Exception {
