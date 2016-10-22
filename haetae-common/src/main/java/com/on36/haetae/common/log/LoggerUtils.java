@@ -21,8 +21,7 @@ import com.on36.haetae.common.utils.StringUtils;
 public class LoggerUtils {
 
 	public static void startAccess() {
-		start("com.on36.haetae.server.core.RequestHandlerImpl", "HAETAE",
-				"access", "INFO");
+		start("haetae-access", "HAETAE", "access", "INFO");
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

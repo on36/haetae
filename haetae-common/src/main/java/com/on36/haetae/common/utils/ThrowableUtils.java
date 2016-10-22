@@ -20,16 +20,21 @@ public class ThrowableUtils {
 		List<StackTraceElement> stes = new ArrayList<StackTraceElement>();
 		while (scanner.hasNextLine()) {
 			line = scanner.nextLine();
-			if (i == 0) {
-				String[] excs = line.split(": ");
 
-				try {
-					Class<?> clazz = Class.forName(excs[0]);
-					exception = (Throwable) clazz.getConstructor(String.class)
-							.newInstance(excs[1]);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			if (i == 0) {
+				if (line.indexOf("Exception:") == -1)
+					i = -1;
+				else {
+					String[] excs = line.split(": ");
+
+					try {
+						Class<?> clazz = Class.forName(excs[0]);
+						exception = (Throwable) clazz
+								.getConstructor(String.class)
+								.newInstance(excs[1]);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			} else if (i > 0) {
 				if (line.startsWith("\tat ")) {
