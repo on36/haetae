@@ -10,10 +10,12 @@ import org.asynchttpclient.DefaultAsyncHttpClientConfig;
 import org.asynchttpclient.RequestBuilder;
 import org.asynchttpclient.Response;
 
+import com.on36.haetae.api.JSONObject;
 import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.utils.ThrowableUtils;
+import com.on36.haetae.config.client.json.JSONObjectImpl;
 import com.on36.haetae.config.client.json.util.JSONUtils;
 
 /**
@@ -47,6 +49,7 @@ public class HttpClient {
 	public static HttpClient getInstance() {
 		return HttpClientHolder.instance;
 	}
+
 	public static AsyncHttpClient getAsyncHttpClient() {
 		return HttpClientHolder.asyncHttpClient;
 	}
@@ -77,6 +80,11 @@ public class HttpClient {
 	public String get(String url, Map<String, String> queryParam,
 			Map<String, String> header) throws Exception {
 		return send(url, MethodType.GET, queryParam, null, header);
+	}
+
+	public JSONObject getJSON(String url, Map<String, String> queryParam,
+			Map<String, String> header) throws Exception {
+		return new JSONObjectImpl(get(url, queryParam, header));
 	}
 
 	public String delete(String url) throws Exception {
