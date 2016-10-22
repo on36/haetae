@@ -117,7 +117,7 @@ public class ProcessUtil {
 			result.put("pid", pid);
 		result.put("success",
 				message != null
-						? (message.indexOf("java.lang.Exception") > -1 ? false
+						? (message.indexOf("Exception:") > -1 ? false
 								: (resultCode == -1 ? true : false))
 						: (resultCode == -1 ? true : false));
 		return result;
