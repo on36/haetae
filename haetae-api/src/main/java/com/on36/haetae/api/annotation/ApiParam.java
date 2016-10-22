@@ -26,5 +26,7 @@ public @interface ApiParam {
 
 	String testValue() default "";
 
+	String defaultValue() default "";
+
 	String desc();
 }
