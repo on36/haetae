@@ -22,7 +22,7 @@ public class ProcessManagerWindowImpl extends BaseProcessManager {
 	}
 
 	@Override
-	protected int findPid(int port) {
+	public int findPid(int port) {
 		String command = "netstat -ano -p TCP|findstr " + port
 				+ "|findstr LISTENING";
 		String result = ProcessUtil.execAndAutoCloseble("cmd.exe", "/c",

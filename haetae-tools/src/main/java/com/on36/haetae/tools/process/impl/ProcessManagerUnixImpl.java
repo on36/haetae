@@ -22,7 +22,7 @@ public class ProcessManagerUnixImpl extends BaseProcessManager {
 	}
 
 	@Override
-	protected int findPid(int port) {
+	public int findPid(int port) {
 		String command = "lsof -i :" + port
 				+ " |grep '(LISTEN)'| awk '{print $2}'";
 		String result = ProcessUtil.execAndAutoCloseble("/bin/sh", "-c",

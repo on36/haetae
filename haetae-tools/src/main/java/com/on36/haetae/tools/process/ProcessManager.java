@@ -11,6 +11,8 @@ public interface ProcessManager {
 
 	Map<String, Object> process(String...args);
 
+	int findPid(int port);
+	
 	int killProcess(int port);
 
 	int killProcess(String port);

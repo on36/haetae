@@ -47,8 +47,6 @@ public abstract class BaseProcessManager implements ProcessManager {
 
 	protected abstract List<String> killPid(int pid);
 
-	protected abstract int findPid(int port);
-
 	protected int getPid(int port) {
 		if (getProcess(port) != null)
 			return getProcess(port).getPid();
