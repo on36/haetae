@@ -125,14 +125,14 @@ public class Statistics implements Comparable<Statistics> {
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer("{");
-		sb.append("path:" + path + ", ");
-		sb.append("version:" + version + ", ");
-		sb.append("method:" + method + ", ");
-		sb.append("success:" + successCount + ", ");
-		sb.append("failure:" + failureCount + ", ");
-		sb.append("minElapsedTime(ms):" + minElapsedTime + ", ");
-		sb.append("avgElapsedTime(ms):" + avgElapsedTime + ", ");
-		sb.append("maxElapsedTime(ms):" + maxElapsedTime);
+		sb.append("\"path\":\"" + path + "\", ");
+		sb.append("\"version\":\"" + version + "\", ");
+		sb.append("\"method\":\"" + method + "\", ");
+		sb.append("\"success\":" + successCount + ", ");
+		sb.append("\"failure\":" + failureCount + ", ");
+		sb.append("\"minElapsedTime\":" + minElapsedTime + ", ");
+		sb.append("\"avgElapsedTime\":" + avgElapsedTime + ", ");
+		sb.append("\"maxElapsedTime\":" + maxElapsedTime);
 		sb.append("}");
 		return sb.toString();
 	}

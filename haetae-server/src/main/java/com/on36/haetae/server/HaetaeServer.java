@@ -82,8 +82,8 @@ public class HaetaeServer {
 
 		String root = conf.getString(Constant.K_SERVER_ROOT_PATH,
 				Constant.V_SERVER_ROOT_PATH);
-		if (!root.equals("/cluster"))
-			conf.set(Constant.K_SERVER_WS_ENABLED, "false");
+		if (root.equals("/cluster"))
+			conf.set(Constant.K_SERVER_WS_ENABLED, "true");
 
 		String rootName = root.replace("/", "");
 		System.setProperty("haetae.log.name",
@@ -126,19 +126,13 @@ public class HaetaeServer {
 							"there is no found any service class at running mode:"
 									+ runningMode);
 				else {
-
 					for (String classString : clazzes) {
 						if (classString.startsWith("com.on36.haetae.manager")) {
 							LoggerUtils.start("com.on36.haetae.manager", "MGR",
 									"biz", "INFO");
 						} else {
-							String packageName = classString
-									.substring(0,
-											classString.indexOf(".",
-													classString.indexOf(".",
-															classString.indexOf(
-																	".") + 1)
-															+ 1));
+							String packageName = classString.substring(0,
+									classString.lastIndexOf("."));
 							LoggerUtils.start(packageName, "biz", "biz",
 									"INFO");
 						}

@@ -348,7 +348,7 @@ public class RequestHandlerImpl implements RequestHandler {
 		sb.append("ms");
 		sb.append(" at Haetae server version: ");
 		sb.append(Version.CURRENT_VERSION);
-		scheduler.trace(RequestHandlerImpl.class, LogLevel.INFO, sb.toString());
+		scheduler.trace("haetae-access", LogLevel.INFO, sb.toString());
 	}
 
 	public void stats(HttpResponse response, long elapsedTime,

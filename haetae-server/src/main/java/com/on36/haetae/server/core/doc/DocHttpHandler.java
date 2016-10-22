@@ -63,7 +63,8 @@ public class DocHttpHandler implements HttpHandler<Object> {
 		sb.append("<td class=\"column\">data type</td>");
 		sb.append("<td class=\"column\">required</td>");
 		sb.append("<td class=\"column\">description</td>");
-		sb.append("<td class=\"column\">testValue</td></tr>");
+		sb.append("<td class=\"column\">default Value</td>");
+		sb.append("<td class=\"column\">test Value</td></tr>");
 		if (handlerMap.size() > 0) {
 			for (Map.Entry<HandlerKey, TreeMap<String, RequestHandlerImpl>> entry : handlerMap
 					.entrySet()) {
@@ -81,7 +82,7 @@ public class DocHttpHandler implements HttpHandler<Object> {
 				sb.append("<td>" + (api != null ? api.method().value()
 						: entry.getKey().getMethod()) + "</td>");
 				if (apiDoc != null) {
-					sb.append("<td colspan=6>" + apiDoc.name() + "</td></tr>");
+					sb.append("<td colspan=7>" + apiDoc.name() + "</td></tr>");
 					ApiParam[] params = apiDoc.params();
 					if (params != null && params.length > 0) {
 						for (ApiParam apiParam : params) {
@@ -91,13 +92,15 @@ public class DocHttpHandler implements HttpHandler<Object> {
 							sb.append("<td>" + apiParam.dataType() + "</td>");
 							sb.append("<td>" + apiParam.required() + "</td>");
 							sb.append("<td>" + apiParam.desc() + "</td>");
+							sb.append(
+									"<td>" + apiParam.defaultValue() + "</td>");
 							sb.append("<td>" + apiParam.testValue()
 									+ "</td></tr>");
 						}
 					}
 
 				} else
-					sb.append("<td colspan=6>no any api doc</td></tr>");
+					sb.append("<td colspan=7>no any api doc</td></tr>");
 			}
 		} else {
 			sb.append("<tr><h2>no found api doc</h2></tr>");
