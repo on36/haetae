@@ -23,19 +23,17 @@ public class HaetaeServerStartup {
 
 	private static int port = 8080;
 	private static int threadPoolSize = 0;
-	private static String rootPath = null;
+	private static String rootPath = "/services";
 	private static String coords = "com.on36.crm:crm-cust:1.0-SNAPSHOT";
 	private static String source = "directory";
 	private static String path = "../ext";
-	private static String url = null;
+	private static String url = "http://192.168.153.129:8081/repository/maven-public";
 	private static int centralType = 0;
 	private static String packageName = "com.on36.haetae.test";
 	private static IClassLoader cl = null;
 
 	public static void main(String[] args) {
 		Options options = new Options();
-		options.addOption("s", "source", true,
-				"optional value:directory,maven; default: directory");
 		options.addOption("c", "coords", true,
 				"maven coords, example: com.on36.crm:crm-cust:1.0-SNAPSHOT");
 		options.addOption("pa", "path", true,
@@ -62,12 +60,20 @@ public class HaetaeServerStartup {
 			} else {
 				parse(line);
 
+				String rootName = rootPath.replace("/", "");
+				System.setProperty("haetae.log.name",
+						"haetae-" + rootName + "-" + port);
+
 				cl = getClassLoader();
 				ClassLoader classLoader = cl.load();
 				Class<?> haetaeServerClass = classLoader
 						.loadClass("com.on36.haetae.server.HaetaeServer");
 				List<String> clazzStrings = ClassPathPackageScanner
 						.scan(classLoader, packageName);
+				if (clazzStrings == null || clazzStrings.size() == 0)
+					throw new IllegalArgumentException(
+							"There is no found any class in " + packageName
+									+ " at " + coords);
 				Object obj = haetaeServerClass.getConstructor(int.class,
 						int.class, String.class, List.class, ClassLoader.class)
 						.newInstance(port, threadPoolSize, rootPath,
@@ -77,6 +83,9 @@ public class HaetaeServerStartup {
 			}
 		} catch (InvocationTargetException e) {
 			e.getTargetException().printStackTrace();
+			System.exit(0);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -95,15 +104,20 @@ public class HaetaeServerStartup {
 			String size = line.getOptionValue("threadPoolSize");
 			threadPoolSize = Integer.parseInt(size);
 		}
-		if (line.hasOption("source")) {
-			source = line.getOptionValue("source");
-		}
 		if (line.hasOption("package")) {
 			packageName = line.getOptionValue("package");
 		}
 		if (line.hasOption("coords")) {
 			coords = line.getOptionValue("coords");
-		}
+			if (coords.indexOf("-SNAPSHOT") > -1)
+				centralType = 0;
+			else
+				centralType = 1;
+
+			source = "maven";
+		} else
+			source = "directory";
+
 		if (line.hasOption("path")) {
 			path = line.getOptionValue("path");
 		}
