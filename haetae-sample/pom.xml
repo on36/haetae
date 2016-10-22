@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.on36.haetae</groupId>
 		<artifactId>haetae-parent</artifactId>
-		<version>${project.version}</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>haetae-sample</artifactId>
 	<dependencies>
