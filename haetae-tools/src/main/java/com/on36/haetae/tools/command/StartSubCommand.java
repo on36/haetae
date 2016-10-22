@@ -27,7 +27,7 @@ public class StartSubCommand implements SubCommand {
 				"optional value:directory,maven; default: directory");
 		options.addOption("c", "coords", true,
 				"maven coords, example: com.ideal.shcrm:shcrm-cust-domain:1.0-SNAPSHOT");
-		options.addOption("P", "package", true,
+		options.addOption("pn", "package", true,
 				"service package name, example: com.ideal.shcrm.service");
 		options.addOption("p", "port", true, "service port, default: 8080");
 		options.addOption("r", "root", true,
