@@ -393,6 +393,11 @@ TODO LIST
 请求地址 http://localhost:8080/doc
 ![DOC页面](http://on36.github.io/20160919095402.png)
 
+#### 管理端API文档说明
+
+请求地址 http://localhost:1025/doc
+
+![DOC页面](http://on36.github.io/20161022121541.png)
 
 ## 性能监控页面
 
