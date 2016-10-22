@@ -363,24 +363,10 @@ TODO LIST
 
 启动服务
 
-		HaetaeServer server = new HaetaeServer(port, 4);
-		Class<?> clazz = UserService.class;
-		Method[] methods = clazz.getDeclaredMethods();
-
-		for (Method method : methods) {
-			Class<?>[] clazzs = method.getParameterTypes();
-			if (clazzs.length == 1
-					&& clazzs[0].getName().equals(Context.class.getName())) {
-
-				Api api = method.getAnnotation(Api.class);
-				ApiDoc apiDoc = method.getAnnotation(ApiDoc.class);
-				if (api != null) {
-					if (object == null)
-						object = clazz.newInstance();
-					server.register(api, apiDoc).with(object, method);
-				}
-			}
-		}
+		List<String> classes = new ArrayList<String>();
+		classes.add(UserService.class.getName());
+		
+		HaetaeServer server = new HaetaeServer(port, 4, "/test", classes);
 		server.start();		
 
 请求地址 http://localhost:8080/services/user/add
