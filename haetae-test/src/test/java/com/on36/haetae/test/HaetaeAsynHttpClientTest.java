@@ -235,7 +235,7 @@ public class HaetaeAsynHttpClientTest {
 	@Test
 	public void testWS() throws Exception {
 
-		HttpClient.getAsyncHttpClient().prepareGet("ws://localhost:8080/ws")
+		HttpClient.getAsyncHttpClient().prepareGet("ws://localhost:1025/ws")
 				.execute(new WebSocketUpgradeHandler.Builder()
 						.addWebSocketListener(new WebSocketTextListener() {
 
