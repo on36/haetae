@@ -65,18 +65,8 @@ public class ConfigAgentService {
 							+ checkPrefix(arr[1]);
 				else if (arr.length == 1)
 					path = app + "/nodes" + checkPrefix(arr[0]);
-				try {
-					Stat stat = client.exists(path, false);
-					if (stat == null)
-						client.createEphemeral(path, null, true);
-					else if (stat.getEphemeralOwner() != client
-							.getSesssionId()) {
-						client.delete(path);
-						client.createEphemeral(path, null, true);
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+
+				createEphemeral(path);
 			}
 		}).addInactiveListener(new InactiveListener() {
 
@@ -89,12 +79,8 @@ public class ConfigAgentService {
 							+ checkPrefix(arr[1]);
 				else if (arr.length == 1)
 					path = app + "/nodes" + checkPrefix(arr[0]);
-				try {
-					if (client.exists(path))
-						client.delete(path);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+
+				delete(path);
 			}
 		});
 	}
@@ -145,6 +131,29 @@ public class ConfigAgentService {
 			return data;
 		else
 			return "/" + data;
+	}
+
+	private void createEphemeral(String path) {
+		try {
+			Stat stat = client.exists(path, false);
+			if (stat == null)
+				client.createEphemeral(path, null, true);
+			else if (stat.getEphemeralOwner() != client.getSesssionId()) {
+				client.delete(path);
+				client.createEphemeral(path, null, true);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void delete(String path) {
+		try {
+			if (client.exists(path))
+				client.delete(path);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Api(value = "/property", method = MethodType.POST)
