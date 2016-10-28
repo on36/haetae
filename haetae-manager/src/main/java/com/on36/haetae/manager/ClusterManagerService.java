@@ -92,10 +92,9 @@ public class ClusterManagerService {
 			LOG.error(message);
 			throw new Exception("start failed!",
 					ThrowableUtils.makeThrowable(message));
-		} else {
-			LOG.info(message);
+		} else
 			defaultPort++;
-		}
+
 		StringBuilder sb = new StringBuilder(NetworkUtils.getInnerIP());
 		sb.append(":");
 		sb.append(port);
