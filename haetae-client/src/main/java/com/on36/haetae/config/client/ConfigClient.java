@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.on36.haetae.common.conf.Configuration;
+import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.log.Logger;
 import com.on36.haetae.common.log.LoggerFactory;
 import com.on36.haetae.config.client.json.util.JSONUtils;
@@ -18,6 +19,8 @@ import com.on36.haetae.config.client.json.util.JSONUtils;
 public class ConfigClient {
 
 	private static Configuration config = Configuration.create();
+	private static String app = config.get(Constant.K_SERVER_APP_NAME,
+			Constant.V_SERVER_APP_NAME);
 	private static Logger LOG = LoggerFactory.getLogger(ConfigClient.class);
 
 	private static String getURI(String path) {
@@ -59,7 +62,7 @@ public class ConfigClient {
 		if (map == null || map.isEmpty())
 			return false;
 		try {
-			HttpClient.getInstance().post(getURI("/property/set"), map);
+			HttpClient.getInstance().post(getURI("/property/" + app), map);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -93,14 +96,14 @@ public class ConfigClient {
 			return null;
 		try {
 			String result = HttpClient.getInstance()
-					.get(getURI("/property/get?key=" + key));
+					.get(getURI("/property/" + app), new QueryPart("key", key));
 			return result;
 		} catch (Exception e) {
 			LOG.warn(
 					"It will get data from default resource file [haetae-default.conf,haetae.conf], cause by "
 							+ e.getMessage());
 		}
-		return config.getString(key);
+		return config.get(key);
 	}
 
 	/**

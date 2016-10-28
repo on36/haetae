@@ -80,7 +80,7 @@ public class HaetaeServer {
 		if (rootPath != null)
 			conf.set(Constant.K_SERVER_ROOT_PATH, rootPath);
 
-		String root = conf.getString(Constant.K_SERVER_ROOT_PATH,
+		String root = conf.get(Constant.K_SERVER_ROOT_PATH,
 				Constant.V_SERVER_ROOT_PATH);
 		if (root.equals("/cluster"))
 			conf.set(Constant.K_SERVER_WS_ENABLED, "true");

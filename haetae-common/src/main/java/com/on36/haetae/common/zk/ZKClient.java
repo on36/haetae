@@ -64,10 +64,10 @@ public abstract class ZKClient implements Watcher {
 
 	public ZKClient(String connectString) {
 		this(connectString,
-				Configuration.create().getString(
+				Configuration.create().get(
 						Constant.K_ZOOKEEPER_AUTH_DIGEST_ADMIN,
 						Constant.V_ZOOKEEPER_AUTH_DIGEST_ADMIN),
-				Configuration.create().getString(
+				Configuration.create().get(
 						Constant.K_ZOOKEEPER_AUTH_DIGEST_GUEST,
 						Constant.V_ZOOKEEPER_AUTH_DIGEST_GUEST));
 	}

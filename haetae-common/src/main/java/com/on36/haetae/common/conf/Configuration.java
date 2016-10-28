@@ -84,7 +84,7 @@ public class Configuration {
 	 * @return
 	 * @author zhanghr
 	 */
-	public String getString(String key) {
+	public String get(String key) {
 		String value = prop.getProperty(key);
 		return StringUtils.isEmpty(value) ? null : value;
 	}
@@ -98,7 +98,7 @@ public class Configuration {
 	 * @return
 	 * @author zhanghr
 	 */
-	public String getString(String key, String defaultValue) {
+	public String get(String key, String defaultValue) {
 		return prop.getProperty(key) == null ? defaultValue
 				: prop.getProperty(key);
 	}
@@ -187,7 +187,7 @@ public class Configuration {
 	 */
 	public List<String> getStringList(String key) {
 		List<String> result = null;
-		String value = getString(key);
+		String value = get(key);
 		if (value == null)
 			return result;
 		result = Arrays.asList(value.split(","));
@@ -203,7 +203,7 @@ public class Configuration {
 	 */
 	public List<Integer> getIntList(String key) {
 		List<Integer> result = null;
-		String value = getString(key);
+		String value = get(key);
 		if (value == null)
 			return result;
 		String[] values = value.split(",");
