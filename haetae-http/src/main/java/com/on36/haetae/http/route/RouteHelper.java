@@ -10,14 +10,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
-import com.on36.haetae.config.client.ConfigClient;
 
 public class RouteHelper {
 
 	public static final String PATH_ELEMENT_SEPARATOR = "/";
 	public static final String PATH_ELEMENT_DOC = "/doc";
-	public static final String PATH_ELEMENT_ROOT = ConfigClient
+	public static final String PATH_ELEMENT_ROOT = Configuration.create()
 			.get(Constant.K_SERVER_ROOT_PATH, Constant.V_SERVER_ROOT_PATH);
 	public static final String PARAM_PREFIX = ":";
 	public static final char CUSTOM_REGEX_START = '<';
