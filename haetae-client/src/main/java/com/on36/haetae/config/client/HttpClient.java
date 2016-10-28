@@ -164,7 +164,9 @@ public class HttpClient {
 			else
 				throw new Exception(responseBody);
 		} else
-			throw new Exception(method.name() + " " + url + " failed !");
+			throw new Exception(
+					method.name() + " " + url + " [query=" + (queryParam == null
+							? "" : queryParam) + "] failed !");
 	}
 
 	public void close() {
