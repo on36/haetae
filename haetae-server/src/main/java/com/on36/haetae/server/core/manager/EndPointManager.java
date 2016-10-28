@@ -29,9 +29,11 @@ public class EndPointManager {
 	}
 
 	public void put(String channel, String endPoint) {
-		if (activeListener != null)
-			activeListener.handler(endPoint);
-		epMap.put(channel, endPoint);
+		if (epMap.get(channel) == null) {
+			if (activeListener != null)
+				activeListener.handler(endPoint);
+			epMap.put(channel, endPoint);
+		}
 	}
 
 	public void remove(String channel) {
