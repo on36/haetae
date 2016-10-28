@@ -7,10 +7,10 @@ package com.on36.haetae.common.conf;
 public class Constant {
 
 	/**
-	 * 指定应用名称，默认为 /app/crm
+	 * 指定应用名称，默认为 crm
 	 */
 	public static final String K_SERVER_APP_NAME = "app.name";
-	public static final String V_SERVER_APP_NAME = "/apps/crm";
+	public static final String V_SERVER_APP_NAME = "crm";
 
 	/**
 	 * 指定根路径地址，默认为 /services
