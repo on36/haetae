@@ -18,7 +18,7 @@ public class ConfigurationTest {
 
 	@Test
 	public void testString() {
-		String value = config.getString("nihao.http", "default");
+		String value = config.get("nihao.http", "default");
 		assertEquals("default", value);
 	}
 	@Test
