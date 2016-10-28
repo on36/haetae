@@ -50,7 +50,9 @@ public class ThrowableUtils {
 		for (int index = 0; index < len; index++)
 			steArr[index] = stes.get(index);
 
-		exception.setStackTrace(steArr);
+		if (exception != null)
+			exception.setStackTrace(steArr);
+			
 		scanner.close();
 
 		return exception;
