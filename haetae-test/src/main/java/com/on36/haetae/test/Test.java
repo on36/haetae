@@ -50,7 +50,7 @@ public class Test {
 //		Map<String, String> header = new HashMap<String, String>();
 //		header.put("Content-Type", MediaType.TEXT_JSON.value());
 //		JSONObject result = HttpClient.getInstance()
-//				.getJSON("http://localhost:8080/services", null, header);
+//				.getJSON("http://192.168.153.129:8080/shanghai", null, header);
 //		System.out.println(result.getList(String.class, "result"));
 
 		Thread current = Thread.currentThread();
@@ -73,5 +73,7 @@ public class Test {
 					classPath.replace(jettyjar, ""));
 			System.out.println( System.getProperty("java.class.path"));
 		}
+		
+		System.out.println(String.format("/apps/%s","crm"));
 	}
 }
