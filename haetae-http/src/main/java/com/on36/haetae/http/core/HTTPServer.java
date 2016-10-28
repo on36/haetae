@@ -75,11 +75,7 @@ public class HTTPServer implements Server {
 						.forServer(ssc.certificate(), ssc.privateKey()).build();
 			}
 			// Configure the server.
-			EventLoopGroup bossGroup = new NioEventLoopGroup(
-					threadPoolSize > 0 ? threadPoolSize
-							: ConfigClient.getInt(
-									Constant.K_SERVER_THREADPOOL_SIZE,
-									Constant.V_SERVER_THREADPOOL_SIZE));
+			EventLoopGroup bossGroup = new NioEventLoopGroup();
 			EventLoopGroup workerGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
 							: ConfigClient.getInt(
