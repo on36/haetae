@@ -9,6 +9,12 @@ public class EndpointEvent {
 	private String channel;
 	private String endpoint;
 
+	public EndpointEvent(String channel, String endpoint) {
+		super();
+		this.channel = channel;
+		this.endpoint = endpoint;
+	}
+
 	public String getChannel() {
 		return channel;
 	}

@@ -31,5 +31,10 @@
 			<artifactId>haetae-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.on36.haetae</groupId>
+			<artifactId>haetae-hsr</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

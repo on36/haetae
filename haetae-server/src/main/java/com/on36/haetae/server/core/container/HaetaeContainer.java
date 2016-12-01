@@ -12,6 +12,7 @@ import com.on36.haetae.api.http.Session;
 import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.common.log.Logger;
 import com.on36.haetae.common.log.LoggerFactory;
+import com.on36.haetae.hsr.EventBus;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.Scheduler;
@@ -22,7 +23,10 @@ import com.on36.haetae.server.core.body.EntityResponseBody;
 import com.on36.haetae.server.core.body.ErrorResponseBody;
 import com.on36.haetae.server.core.body.ResponseBody;
 import com.on36.haetae.server.core.manager.SessionManager;
+import com.on36.haetae.server.core.manager.event.HttpRequestEvent;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -42,6 +46,11 @@ public class HaetaeContainer implements Container {
 
 	public Scheduler getScheduler() {
 		return scheduler;
+	}
+
+	public void handle(FullHttpRequest request, ChannelHandlerContext ctx) {
+
+		EventBus.dispatch(new HttpRequestEvent(request, ctx, this));
 	}
 
 	public void handle(HttpRequestExt request, HttpResponse response) {
@@ -151,7 +160,7 @@ public class HaetaeContainer implements Container {
 
 	public boolean addHandler(RequestHandler handler, String methodName,
 			String resource, String version, String contentType) {
-		return requestResolver.addHandler(handler, methodName, resource, version,
-				contentType);
+		return requestResolver.addHandler(handler, methodName, resource,
+				version, contentType);
 	}
 }

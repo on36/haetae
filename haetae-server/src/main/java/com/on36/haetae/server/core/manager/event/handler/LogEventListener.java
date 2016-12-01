@@ -1,18 +1,17 @@
 package com.on36.haetae.server.core.manager.event.handler;
 
-import com.lmax.disruptor.EventHandler;
 import com.on36.haetae.common.log.LoggerFactory;
+import com.on36.haetae.hsr.EventListener;
 import com.on36.haetae.server.core.manager.event.LogEvent;
 
 /**
  * @author zhanghr
- * @date 2016年1月8日
+ * @date 2016年1月30日
  */
-public class LogEventHandler implements EventHandler<LogEvent> {
+public class LogEventListener implements EventListener<LogEvent> {
 
 	@Override
-	public void onEvent(LogEvent event, long sequence, boolean endOfBatch)
-			throws Exception {
+	public void doHandler(LogEvent event) {
 		switch (event.getLevel()) {
 		case ERROR:
 			LoggerFactory.getLogger(event.getClazz()).error(event.getMessage(),

@@ -16,6 +16,16 @@ public class LogEvent {
 
 	private Throwable excp;
 
+	
+	public LogEvent(Object clazz, String message, LogLevel level,
+			Throwable excp) {
+		super();
+		this.clazz = clazz;
+		this.message = message;
+		this.level = level;
+		this.excp = excp;
+	}
+
 	public Object getClazz() {
 		return clazz;
 	}

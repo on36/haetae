@@ -14,6 +14,7 @@ import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.log.LogLevel;
 import com.on36.haetae.common.log.LoggerUtils;
+import com.on36.haetae.hsr.EventBus;
 import com.on36.haetae.http.Container;
 import com.on36.haetae.http.RequestHandler;
 import com.on36.haetae.http.Scheduler;
@@ -21,7 +22,12 @@ import com.on36.haetae.http.Server;
 import com.on36.haetae.http.core.HTTPServer;
 import com.on36.haetae.server.core.RequestHandlerImpl;
 import com.on36.haetae.server.core.container.HaetaeContainer;
-import com.on36.haetae.server.core.manager.DisruptorManager;
+import com.on36.haetae.server.core.manager.event.EndpointEvent;
+import com.on36.haetae.server.core.manager.event.HttpRequestEvent;
+import com.on36.haetae.server.core.manager.event.LogEvent;
+import com.on36.haetae.server.core.manager.event.handler.EndpointEventListener;
+import com.on36.haetae.server.core.manager.event.handler.HttpRequestEventListener;
+import com.on36.haetae.server.core.manager.event.handler.LogEventListener;
 
 /**
  * 
@@ -37,7 +43,6 @@ public class HaetaeServer {
 
 	private final Container container;
 	private final Server server;
-	private final DisruptorManager disruptorManager;
 	private final Heartbeat hbThread;
 	private final List<String> clazzes;
 	private final ClassLoader classLoader;
@@ -98,12 +103,15 @@ public class HaetaeServer {
 
 		threadPools = Executors.newCachedThreadPool();
 
-		disruptorManager = new DisruptorManager(threadPools);
-		scheduler = new MessageScheduler(disruptorManager);
+		scheduler = new MessageScheduler();
 		container = new HaetaeContainer(scheduler);
 		server = new HTTPServer(port, threadPoolSize, container);
 		hbThread = new Heartbeat(root, port, scheduler);
 
+		EventBus.addListener(LogEvent.class, new LogEventListener());
+		EventBus.addListener(EndpointEvent.class, new EndpointEventListener());
+		EventBus.addListener(HttpRequestEvent.class, new HttpRequestEventListener());
+		
 		if (excp != null)
 			scheduler.trace(Configuration.class, LogLevel.WARN,
 					excp.getMessage());
@@ -175,7 +183,6 @@ public class HaetaeServer {
 
 	public void close() {
 		hbThread.close();
-		disruptorManager.close();
 		threadPools.shutdown();
 		server.stop();
 	}
