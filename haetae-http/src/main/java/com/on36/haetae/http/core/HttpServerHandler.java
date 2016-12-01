@@ -1,31 +1,18 @@
 package com.on36.haetae.http.core;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
-import static io.netty.handler.codec.http.HttpHeaders.Names.DATE;
-import static io.netty.handler.codec.http.HttpHeaders.Names.LAST_MODIFIED;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
-import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-import java.net.InetSocketAddress;
-
-import com.on36.haetae.common.utils.DateUtils;
 import com.on36.haetae.http.Container;
-import com.on36.haetae.http.request.HttpRequestExt;
 
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpHeaders.Names;
-import io.netty.handler.codec.http.HttpHeaders.Values;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.ContinuationWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
@@ -112,7 +99,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
 		// container.getScheduler().handleHTTPRequest(ctx, request, container);
 
-		long start = System.currentTimeMillis();
 		if (wsAliveabel && request.getMethod() == GET
 				&& WEBSOCKET_PATH.equalsIgnoreCase(request.getUri())) {
 			// Websocket Handshake
@@ -128,37 +114,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 		} else if (HttpHeaders.is100ContinueExpected(request)) {
 			ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
 		} else {
-
-			String remoteAddress = request.headers().get("X-Forwarded-For");
-
-			InetSocketAddress is = (InetSocketAddress) ctx.channel()
-					.remoteAddress();
-			int remotePort = is.getPort();
-			if (remoteAddress == null) {
-				remoteAddress = is.getAddress().getHostAddress();
-			} else {
-				remoteAddress = remoteAddress.split(",")[0].trim();
-			}
-
-			boolean keepAlive = HttpHeaders.isKeepAlive(request);
-			FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,
-					NOT_FOUND, Unpooled.directBuffer());
-			response.headers().set(DATE, DateUtils.getTimeZoneTime());
-			HttpRequestExt httpRequestExt = new HttpRequestExt(request,
-					remoteAddress, remotePort, start);
-			if (container != null)
-				container.handle(httpRequestExt, response);
-
-			response.headers().set(CONTENT_LENGTH,
-					response.content().readableBytes());
-
-			response.headers().set(LAST_MODIFIED, DateUtils.getTimeZoneTime());
-			if (!keepAlive) {
-				ctx.write(response).addListener(ChannelFutureListener.CLOSE);
-			} else {
-				response.headers().set(CONNECTION, Values.KEEP_ALIVE);
-				ctx.write(response);
-			}
+			container.handle(request, ctx);
 		}
 	}
 
