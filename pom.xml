@@ -20,26 +20,29 @@
 		<module>haetae-client</module>
 		<module>haetae-assembly</module>
 		<module>haetae-orm</module>
+		<module>haetae-tiny</module>
+		<module>haetae-hsr</module>
 	</modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<junit.version>4.12</junit.version>
 		<slf4j.version>1.7.13</slf4j.version>
-		<log4j.version>2.6.2</log4j.version>
+		<log4j.version>2.7</log4j.version>
 
-		<zookeeper.version>3.4.8</zookeeper.version>
-		<guava.version>19.0</guava.version>
-		<netty.version>4.0.41.Final</netty.version>
-		<asynchttpclient.version>2.0.11</asynchttpclient.version>
-		<disruptor.version>3.3.2</disruptor.version>
+		<zookeeper.version>3.4.9</zookeeper.version>
+		<guava.version>20.0</guava.version>
+		<netty.version>4.1.6.Final</netty.version>
+		<asynchttpclient.version>2.0.24</asynchttpclient.version>
+		<disruptor.version>3.3.6</disruptor.version>
 		<common-cli.version>1.3.1</common-cli.version>
-		<gson.version>2.6.2</gson.version>
+		<gson.version>2.8.0</gson.version>
 
 		<aether.version>1.1.0</aether.version>
+		<httpclient.version>4.5.2</httpclient.version>
 		<maven.version>3.3.9</maven.version>
 
-		<jetty.runner.version>9.3.11.v20160721</jetty.runner.version>
+		<jetty.runner.version>9.3.14.v20161028</jetty.runner.version>
 
 	</properties>
 
@@ -169,7 +172,11 @@
 				<artifactId>maven-aether-provider</artifactId>
 				<version>${maven.version}</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${httpclient.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-runner</artifactId>
@@ -227,7 +234,7 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
+<!--  
 	<repositories>
 		<repository>
 			<id>nexus</id>
@@ -248,6 +255,7 @@
 			<url>http://192.168.153.129:8081/repository/maven-snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+	-->
 	<build>
 		<pluginManagement>
 			<plugins>
