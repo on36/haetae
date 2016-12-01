@@ -39,8 +39,6 @@ public class HaetaeServerStartup {
 		options.addOption("pa", "path", true,
 				"directory classloader jar file path, default: ../ext");
 		options.addOption("u", "url", true, "maven central url");
-		options.addOption("ct", "type", true,
-				"maven central type optional value:0 snapshot;1 release");
 		options.addOption("pn", "package", true,
 				"service package name, example: com.ideal.shcrm.service");
 		options.addOption("p", "port", true, "service port, default: 8080");
@@ -146,7 +144,8 @@ public class HaetaeServerStartup {
 		if ("directory".equals(source))
 			return new DirectoryClassLoader(path);
 		else if ("maven".equals(source))
-			return new MavenClassLoader(url, centralType, coords);
+			return new MavenClassLoader(url, centralType,
+					"com.on36.haetae:haetae-server:0.0.4-SNAPSHOT", coords);
 		else
 			throw new IllegalArgumentException(
 					"illegal value of source =" + source);
