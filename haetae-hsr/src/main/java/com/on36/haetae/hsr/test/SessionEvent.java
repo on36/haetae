@@ -6,12 +6,12 @@ package com.on36.haetae.hsr.test;
  */
 public class SessionEvent {
 
-	public int sessionId;
+	public long sessionId;
 
 	/**
 	 * @param sessionId
 	 */
-	public SessionEvent(int sessionId) {
+	public SessionEvent(long sessionId) {
 		super();
 		this.sessionId = sessionId;
 	}
