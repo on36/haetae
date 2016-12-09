@@ -110,8 +110,9 @@ public class HaetaeServer {
 
 		EventBus.addListener(LogEvent.class, new LogEventListener());
 		EventBus.addListener(EndpointEvent.class, new EndpointEventListener());
-		EventBus.addListener(HttpRequestEvent.class, new HttpRequestEventListener());
-		
+		EventBus.addListener(HttpRequestEvent.class,
+				new HttpRequestEventListener(), 2048, false);
+
 		if (excp != null)
 			scheduler.trace(Configuration.class, LogLevel.WARN,
 					excp.getMessage());
@@ -185,6 +186,7 @@ public class HaetaeServer {
 		hbThread.close();
 		threadPools.shutdown();
 		server.stop();
+		EventBus.close();
 	}
 
 	/**
