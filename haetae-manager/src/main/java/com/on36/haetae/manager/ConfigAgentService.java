@@ -1,6 +1,5 @@
 package com.on36.haetae.manager;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,14 +11,12 @@ import com.on36.haetae.api.Context;
 import com.on36.haetae.api.annotation.Api;
 import com.on36.haetae.api.annotation.ApiDoc;
 import com.on36.haetae.api.annotation.ApiParam;
-import com.on36.haetae.api.http.MediaType;
 import com.on36.haetae.api.http.MethodType;
 import com.on36.haetae.api.http.ParamType;
 import com.on36.haetae.common.cache.CacheMap;
 import com.on36.haetae.common.conf.Configuration;
 import com.on36.haetae.common.conf.Constant;
 import com.on36.haetae.common.zk.ZKClient;
-import com.on36.haetae.config.client.HttpClient;
 import com.on36.haetae.server.core.manager.EndPointManager;
 import com.on36.haetae.server.core.manager.listener.ActiveListener;
 import com.on36.haetae.server.core.manager.listener.InactiveListener;
@@ -38,14 +35,14 @@ public class ConfigAgentService {
 	private boolean ssl = config.getBoolean(Constant.K_SERVER_SSL_ENABLED,
 			Constant.V_SERVER_SSL_ENABLED);
 
-	@SuppressWarnings("serial")
-	private Map<String, String> header = new HashMap<String, String>() {
-		{
-			put("Content-Type", MediaType.TEXT_JSON.value());
-		}
-	};
-
-	private Map<String, String> endpointMap = new HashMap<String, String>();
+//	@SuppressWarnings("serial")
+//	private Map<String, String> header = new HashMap<String, String>() {
+//		{
+//			put("Content-Type", MediaType.TEXT_JSON.value());
+//		}
+//	};
+//
+//	private Map<String, String> endpointMap = new HashMap<String, String>();
 
 	private ZKClient client;
 
