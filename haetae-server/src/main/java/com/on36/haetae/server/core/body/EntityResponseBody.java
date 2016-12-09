@@ -17,9 +17,9 @@ public class EntityResponseBody extends StringResponseBody {
 			return content();
 
 		StringBuilder sb = new StringBuilder("{");
-		sb.append("\"status\":").append(response.getStatus().code())
+		sb.append("\"status\":").append(response.status().code())
 				.append(",");
-		sb.append("\"message\":\"").append(response.getStatus().reasonPhrase())
+		sb.append("\"message\":\"").append(response.status().reasonPhrase())
 				.append("\"");
 		if (hasContent())
 			translate(sb, body);

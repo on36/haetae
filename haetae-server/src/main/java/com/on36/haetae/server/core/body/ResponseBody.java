@@ -1,7 +1,7 @@
 package com.on36.haetae.server.core.body;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
-import static io.netty.handler.codec.http.HttpHeaders.Names.SERVER;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderNames.SERVER;
 
 import com.on36.haetae.http.Version;
 
