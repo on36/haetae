@@ -2,8 +2,8 @@ package com.on36.haetae.hsr;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.EventTranslator;
@@ -17,9 +17,8 @@ import com.lmax.disruptor.dsl.ProducerType;
  */
 public class EventBus {
 
-	private static final ExecutorService disruptorExecutors = Executors
-			.newCachedThreadPool();
-
+	private static final ThreadFactory DEFAULT_THREADFACTORY = Executors
+			.defaultThreadFactory();
 	private static final int DEFAULT_RINGBUFFER_SIZE = 128;
 	private static final boolean DEFAULT_ISBLOCKING = true;
 
@@ -33,8 +32,10 @@ public class EventBus {
 	 * @param listener
 	 *            事件监听器执行类
 	 */
-	public static <T> void addListener(Class<T> clazz, EventListener<T> listener) {
-		addListener(clazz, listener, DEFAULT_RINGBUFFER_SIZE, DEFAULT_ISBLOCKING);
+	public static <T> void addListener(Class<T> clazz,
+			EventListener<T> listener) {
+		addListener(clazz, listener, DEFAULT_RINGBUFFER_SIZE,
+				DEFAULT_ISBLOCKING);
 	}
 
 	/**
@@ -45,8 +46,10 @@ public class EventBus {
 	 * @param listener
 	 *            事件监听器执行类
 	 */
-	public static <T> void addListener(String eventName, EventListener<T> listener) {
-		addListener(eventName, listener, DEFAULT_RINGBUFFER_SIZE, DEFAULT_ISBLOCKING);
+	public static <T> void addListener(String eventName,
+			EventListener<T> listener) {
+		addListener(eventName, listener, DEFAULT_RINGBUFFER_SIZE,
+				DEFAULT_ISBLOCKING);
 	}
 
 	/**
@@ -59,8 +62,8 @@ public class EventBus {
 	 * @param ringSize
 	 *            队列大小
 	 */
-	public static <T> void addListener(Class<T> clazz, EventListener<T> listener,
-			int ringSize) {
+	public static <T> void addListener(Class<T> clazz,
+			EventListener<T> listener, int ringSize) {
 		addListener(clazz, listener, ringSize, DEFAULT_ISBLOCKING);
 	}
 
@@ -74,8 +77,8 @@ public class EventBus {
 	 * @param ringSize
 	 *            队列大小
 	 */
-	public static <T> void addListener(String eventName, EventListener<T> listener,
-			int ringSize) {
+	public static <T> void addListener(String eventName,
+			EventListener<T> listener, int ringSize) {
 		addListener(eventName, listener, ringSize, DEFAULT_ISBLOCKING);
 	}
 
@@ -89,8 +92,8 @@ public class EventBus {
 	 * @param isBlocking
 	 *            是否加锁，影响延时和吞吐量
 	 */
-	public static <T> void addListener(Class<T> clazz, EventListener<T> listener,
-			boolean isBlocking) {
+	public static <T> void addListener(Class<T> clazz,
+			EventListener<T> listener, boolean isBlocking) {
 		addListener(clazz, listener, DEFAULT_RINGBUFFER_SIZE, isBlocking);
 	}
 
@@ -104,8 +107,8 @@ public class EventBus {
 	 * @param isBlocking
 	 *            是否加锁，影响延时和吞吐量
 	 */
-	public static <T> void addListener(String eventName, EventListener<T> listener,
-			boolean isBlocking) {
+	public static <T> void addListener(String eventName,
+			EventListener<T> listener, boolean isBlocking) {
 		addListener(eventName, listener, DEFAULT_RINGBUFFER_SIZE, isBlocking);
 	}
 
@@ -121,8 +124,8 @@ public class EventBus {
 	 * @param isBlocking
 	 *            是否加锁，影响延时和吞吐量
 	 */
-	public static <T> void addListener(Class<T> clazz, EventListener<T> listener,
-			int ringSize, boolean isBlocking) {
+	public static <T> void addListener(Class<T> clazz,
+			EventListener<T> listener, int ringSize, boolean isBlocking) {
 		addListener(clazz.getName(), listener, ringSize, isBlocking);
 	}
 
@@ -138,19 +141,19 @@ public class EventBus {
 	 * @param isBlocking
 	 *            是否加锁，影响延时和吞吐量
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T> void addListener(String eventName, EventListener<T> listener,
-			int ringSize, boolean isBlocking) {
+	@SuppressWarnings({ "unchecked" })
+	public static <T> void addListener(String eventName,
+			EventListener<T> listener, int ringSize, boolean isBlocking) {
 		Disruptor<Event<T>> eventDisruptor = (Disruptor<Event<T>>) mapDisruptor
 				.get(eventName.toLowerCase());
 		if (eventDisruptor == null) {
 			if (isBlocking)
 				eventDisruptor = new Disruptor<Event<T>>(new EventFactory<T>(),
-						ringSize, disruptorExecutors, ProducerType.SINGLE,
+						ringSize, DEFAULT_THREADFACTORY, ProducerType.MULTI,
 						new BlockingWaitStrategy());
 			else
 				eventDisruptor = new Disruptor<Event<T>>(new EventFactory<T>(),
-						ringSize, disruptorExecutors, ProducerType.SINGLE,
+						ringSize, DEFAULT_THREADFACTORY, ProducerType.MULTI,
 						new YieldingWaitStrategy());
 
 			eventDisruptor
@@ -230,7 +233,5 @@ public class EventBus {
 		for (Disruptor<?> value : mapDisruptor.values()) {
 			value.shutdown();
 		}
-
-		disruptorExecutors.shutdown();
 	}
 }
