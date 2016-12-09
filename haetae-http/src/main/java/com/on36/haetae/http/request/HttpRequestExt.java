@@ -6,6 +6,7 @@ import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 
 public class HttpRequestExt {
@@ -31,7 +32,7 @@ public class HttpRequestExt {
 	}
 
 	public long getContentLength() {
-		return HttpHeaders.getContentLength(request);
+		return HttpUtil.getContentLength(request);
 	}
 
 	public long getStartHandleTime() {
@@ -43,7 +44,7 @@ public class HttpRequestExt {
 	}
 
 	public HttpVersion getProtocolVersion() {
-		return request.getProtocolVersion();
+		return request.protocolVersion();
 	}
 
 	public HttpHeaders headers() {
@@ -51,7 +52,7 @@ public class HttpRequestExt {
 	}
 
 	public DecoderResult getDecoderResult() {
-		return request.getDecoderResult();
+		return request.decoderResult();
 	}
 
 	public ByteBuf content() {
@@ -87,11 +88,11 @@ public class HttpRequestExt {
 	}
 
 	public HttpMethod getMethod() {
-		return request.getMethod();
+		return request.method();
 	}
 
 	public String getUri() {
-		return request.getUri();
+		return request.uri();
 	}
 
 	public String getRemoteAddress() {
