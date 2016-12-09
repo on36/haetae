@@ -11,8 +11,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpHeaders.Names;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.ContinuationWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
@@ -34,11 +34,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	public HttpServerHandler(Container container, boolean wsAliveable) {
 		this.wsAliveabel = wsAliveable;
 		this.container = container;
-	}
-
-	@Override
-	public void channelReadComplete(ChannelHandlerContext ctx) {
-		ctx.flush();
 	}
 
 	@Override
@@ -97,10 +92,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 	private void handleHttpRequest(ChannelHandlerContext ctx,
 			FullHttpRequest request) {
 
-		// container.getScheduler().handleHTTPRequest(ctx, request, container);
-
-		if (wsAliveabel && request.getMethod() == GET
-				&& WEBSOCKET_PATH.equalsIgnoreCase(request.getUri())) {
+		if (wsAliveabel && request.method() == GET
+				&& WEBSOCKET_PATH.equalsIgnoreCase(request.uri())) {
 			// Websocket Handshake
 			WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
 					getWebSocketLocation(ctx.pipeline(), request), null, true);
@@ -111,7 +104,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 			} else {
 				handshaker.handshake(ctx.channel(), request);
 			}
-		} else if (HttpHeaders.is100ContinueExpected(request)) {
+		} else if (HttpUtil.is100ContinueExpected(request)) {
 			ctx.write(new DefaultFullHttpResponse(HTTP_1_1, CONTINUE));
 		} else {
 			container.handle(request, ctx);
@@ -125,7 +118,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 			// SSL in use so use Secure WebSockets
 			protocol = "wss";
 		}
-		return protocol + "://" + req.headers().get(Names.HOST)
+		return protocol + "://" + req.headers().get(HttpHeaderNames.HOST)
 				+ WEBSOCKET_PATH;
 	}
 
