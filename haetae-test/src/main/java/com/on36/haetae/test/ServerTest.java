@@ -23,7 +23,7 @@ public class ServerTest {
 		if (args != null && args.length == 1)
 			port = Integer.parseInt(args[0]);
 
-		HaetaeServer server = new HaetaeServer(port, 4);
+		HaetaeServer server = new HaetaeServer(port, 256);
 		server.register("/hello").with("Hello xiongdi!").auth(false);
 		server.register("/name/:name<[A-Za-z]+>").with("Hello :name");
 		server.register("/multi/*/*").with("Hello *[0] *[1]");
