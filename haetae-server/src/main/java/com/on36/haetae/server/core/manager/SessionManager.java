@@ -8,7 +8,7 @@ import com.on36.haetae.api.http.Session;
 import com.on36.haetae.common.utils.ShortUUID;
 import com.on36.haetae.http.request.HttpRequestExt;
 
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
@@ -23,7 +23,7 @@ public class SessionManager {
 
 	public Session getSessionIfExists(HttpRequestExt request) {
 
-		String value = request.headers().get(HttpHeaders.Names.COOKIE);
+		String value = request.headers().get(HttpHeaderNames.COOKIE);
 		if (value == null)
 			return null;
 
@@ -57,7 +57,7 @@ public class SessionManager {
 
 		Cookie cookie = new DefaultCookie(SESSION_COOKIE_NAME, sessionid);
 		ServerCookieEncoder cookieEncoder = ServerCookieEncoder.STRICT;
-		response.headers().add(HttpHeaders.Names.SET_COOKIE,
+		response.headers().add(HttpHeaderNames.SET_COOKIE,
 				cookieEncoder.encode(cookie));
 
 		return session;
