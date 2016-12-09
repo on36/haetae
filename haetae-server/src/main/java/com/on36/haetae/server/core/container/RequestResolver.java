@@ -3,7 +3,7 @@ package com.on36.haetae.server.core.container;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_DOC;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_ROOT;
 import static com.on36.haetae.http.route.RouteHelper.PATH_ELEMENT_SEPARATOR;
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 
 import java.net.URI;
@@ -188,7 +188,8 @@ public class RequestResolver {
 		ResolvedRequest resolved = new ResolvedRequest();
 		String method = request.getMethod().name();
 		String path = new URI(request.getUri()).getPath();
-		String version = request.headers().get("VERSION");// TODO 请求服务版本号如何处理？
+		// TODO 请求服务版本号如何处理？
+		String version = request.headers().get("VERSION");
 		String contentType = request.headers().get(CONTENT_TYPE);
 
 		if (path.endsWith(PATH_ELEMENT_SEPARATOR))
