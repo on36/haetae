@@ -1,9 +1,9 @@
 package com.on36.haetae.server.core.manager.event.handler;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONNECTION;
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
-import static io.netty.handler.codec.http.HttpHeaders.Names.DATE;
-import static io.netty.handler.codec.http.HttpHeaders.Names.LAST_MODIFIED;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
+import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
+import static io.netty.handler.codec.http.HttpHeaderNames.DATE;
+import static io.netty.handler.codec.http.HttpHeaderNames.LAST_MODIFIED;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
@@ -20,8 +20,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpHeaders.Values;
+import io.netty.handler.codec.http.HttpHeaderValues;
+import io.netty.handler.codec.http.HttpUtil;
 
 /**
  * @author zhanghr
@@ -47,7 +47,7 @@ public class HttpRequestEventListener
 			remoteAddress = remoteAddress.split(",")[0].trim();
 		}
 
-		boolean keepAlive = HttpHeaders.isKeepAlive(request);
+		boolean keepAlive = HttpUtil.isKeepAlive(request);
 		FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1,
 				NOT_FOUND, Unpooled.directBuffer());
 		response.headers().set(DATE, DateUtils.getTimeZoneTime());
@@ -60,10 +60,10 @@ public class HttpRequestEventListener
 
 		response.headers().set(LAST_MODIFIED, DateUtils.getTimeZoneTime());
 		if (!keepAlive) {
-			ctx.write(response).addListener(ChannelFutureListener.CLOSE);
+			ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
 		} else {
-			response.headers().set(CONNECTION, Values.KEEP_ALIVE);
-			ctx.write(response);
+			response.headers().set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+			ctx.writeAndFlush(response);
 		}
 	}
 
