@@ -7,6 +7,7 @@ import java.util.concurrent.ThreadFactory;
 
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.EventTranslator;
+import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -177,6 +178,15 @@ public class EventBus {
 	public static <T> void dispatch(final T value) {
 		dispatch(value.getClass().getName(), value);
 	}
+	/**
+	 * 发出指定类的事件操作
+	 * 
+	 * @param value
+	 *            发送批量值对象
+	 */
+	public static <T> void dispatch(final T[] values) {
+		dispatch(values[0].getClass().getName(), values);
+	}
 
 	/**
 	 * 发出指定事件的操作
@@ -197,6 +207,30 @@ public class EventBus {
 					event.setValue(value);
 				}
 			});
+		else
+			throw new IllegalArgumentException(String.format(
+					"Not found any listener of event name [%s]", eventName));
+	}
+	
+	/**
+	 * 发出指定事件的操作
+	 * 
+	 * @param eventName
+	 *            事件名
+	 * @param values
+	 *            发送批量值对象
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> void dispatch(final String eventName, final T[] values) {
+		Disruptor<Event<T>> disruptor = (Disruptor<Event<T>>) mapDisruptor
+				.get(eventName.toLowerCase());
+		if (disruptor != null)
+			disruptor.publishEvents(new EventTranslatorOneArg<Event<T>,T>() {
+				@Override
+				public void translateTo(Event<T> event, long sequence, T value) {
+					event.setValue(value);
+				}
+			},values);
 		else
 			throw new IllegalArgumentException(String.format(
 					"Not found any listener of event name [%s]", eventName));
