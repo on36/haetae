@@ -75,7 +75,7 @@ public class HTTPServer implements Server {
 						.forServer(ssc.certificate(), ssc.privateKey()).build();
 			}
 			// Configure the server.
-			EventLoopGroup bossGroup = new NioEventLoopGroup(4);
+			EventLoopGroup bossGroup = new NioEventLoopGroup();
 			EventLoopGroup workerGroup = new NioEventLoopGroup(
 					threadPoolSize > 0 ? threadPoolSize
 							: ConfigClient.getInt(
@@ -93,7 +93,7 @@ public class HTTPServer implements Server {
 						PooledByteBufAllocator.DEFAULT);
 				b.childOption(ChannelOption.ALLOCATOR,
 						PooledByteBufAllocator.DEFAULT);
-				// b.childOption(ChannelOption.AUTO_READ, false);
+//				b.childOption(ChannelOption.AUTO_READ, false);
 				b.group(bossGroup, workerGroup)
 						.channel(NioServerSocketChannel.class)
 						.handler(new LoggingHandler(LogLevel.DEBUG))
