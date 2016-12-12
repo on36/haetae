@@ -19,8 +19,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
@@ -96,7 +94,6 @@ public class HTTPServer implements Server {
 //				b.childOption(ChannelOption.AUTO_READ, false);
 				b.group(bossGroup, workerGroup)
 						.channel(NioServerSocketChannel.class)
-						.handler(new LoggingHandler(LogLevel.DEBUG))
 						.childHandler(new HttpServerInitializer(sslCtx,
 								container, ws));
 
