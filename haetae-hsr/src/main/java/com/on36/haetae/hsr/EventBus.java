@@ -127,6 +127,9 @@ public class EventBus {
 	 */
 	public static <T> void addListener(Class<T> clazz,
 			EventListener<T> listener, int ringSize, boolean isBlocking) {
+		if (clazz == null || listener == null)
+			throw new IllegalArgumentException(
+					"clazz or listener should not be null");
 		addListener(clazz.getName(), listener, ringSize, isBlocking);
 	}
 
@@ -145,6 +148,9 @@ public class EventBus {
 	@SuppressWarnings({ "unchecked" })
 	public static <T> void addListener(String eventName,
 			EventListener<T> listener, int ringSize, boolean isBlocking) {
+		if (eventName == null || listener == null)
+			throw new IllegalArgumentException(
+					"EventName or listener should not be null");
 		Disruptor<Event<T>> eventDisruptor = (Disruptor<Event<T>>) mapDisruptor
 				.get(eventName.toLowerCase());
 		if (eventDisruptor == null) {
@@ -176,8 +182,11 @@ public class EventBus {
 	 *            发送值对象
 	 */
 	public static <T> void dispatch(final T value) {
+		if (value == null)
+			throw new IllegalArgumentException("value should not be null");
 		dispatch(value.getClass().getName(), value);
 	}
+
 	/**
 	 * 发出指定类的事件操作
 	 * 
@@ -185,6 +194,9 @@ public class EventBus {
 	 *            发送批量值对象
 	 */
 	public static <T> void dispatch(final T[] values) {
+		if (values == null || values.length == 0)
+			throw new IllegalArgumentException(
+					"values should not be null or length should not be zero");
 		dispatch(values[0].getClass().getName(), values);
 	}
 
@@ -198,6 +210,9 @@ public class EventBus {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> void dispatch(final String eventName, final T value) {
+		if (eventName == null || value == null)
+			throw new IllegalArgumentException(
+					"EventName or value should not be null");
 		Disruptor<Event<T>> disruptor = (Disruptor<Event<T>>) mapDisruptor
 				.get(eventName.toLowerCase());
 		if (disruptor != null)
@@ -211,7 +226,7 @@ public class EventBus {
 			throw new IllegalArgumentException(String.format(
 					"Not found any listener of event name [%s]", eventName));
 	}
-	
+
 	/**
 	 * 发出指定事件的操作
 	 * 
@@ -225,12 +240,13 @@ public class EventBus {
 		Disruptor<Event<T>> disruptor = (Disruptor<Event<T>>) mapDisruptor
 				.get(eventName.toLowerCase());
 		if (disruptor != null)
-			disruptor.publishEvents(new EventTranslatorOneArg<Event<T>,T>() {
+			disruptor.publishEvents(new EventTranslatorOneArg<Event<T>, T>() {
 				@Override
-				public void translateTo(Event<T> event, long sequence, T value) {
+				public void translateTo(Event<T> event, long sequence,
+						T value) {
 					event.setValue(value);
 				}
-			},values);
+			}, values);
 		else
 			throw new IllegalArgumentException(String.format(
 					"Not found any listener of event name [%s]", eventName));
