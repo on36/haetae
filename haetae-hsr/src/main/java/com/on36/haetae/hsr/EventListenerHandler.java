@@ -10,15 +10,26 @@ import com.lmax.disruptor.EventHandler;
 public class EventListenerHandler<T> implements EventHandler<Event<T>> {
 
 	private EventListener<T> listener;
+	private boolean isLocal;
 
 	public EventListenerHandler(EventListener<T> listener) {
+		this(listener, false);
+	}
+
+	public EventListenerHandler(EventListener<T> listener, boolean isLocal) {
 		this.listener = listener;
+		this.isLocal = isLocal;
 	}
 
 	@Override
 	public void onEvent(Event<T> event, long sequence, boolean endOfBatch)
 			throws Exception {
-		listener.doHandler(event.getValue());
+		if (isLocal)
+			listener.doHandler(event.getValue());
+		else {
+			//TODO 调用远端接口
+			System.out.println("hello remote");
+		}
 	}
 
 }

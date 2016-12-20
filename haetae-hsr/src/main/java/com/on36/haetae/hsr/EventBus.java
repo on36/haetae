@@ -6,10 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import com.lmax.disruptor.BlockingWaitStrategy;
-import com.lmax.disruptor.EventTranslator;
-import com.lmax.disruptor.EventTranslatorOneArg;
 import com.lmax.disruptor.YieldingWaitStrategy;
-import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 
 /**
@@ -23,7 +20,7 @@ public class EventBus {
 	private static final int DEFAULT_RINGBUFFER_SIZE = 128;
 	private static final boolean DEFAULT_ISBLOCKING = true;
 
-	private static Map<String, Disruptor<?>> mapDisruptor = new HashMap<String, Disruptor<?>>();
+	private static Map<String, DisruptorExt<?>> mapDisruptor = new HashMap<String, DisruptorExt<?>>();
 
 	/**
 	 * 注册一个类事件监听器，默认加锁、队列大小为128，适用于对延时和吞吐量要求不高的场景.
@@ -145,26 +142,44 @@ public class EventBus {
 	 * @param isBlocking
 	 *            是否加锁，影响延时和吞吐量
 	 */
-	@SuppressWarnings({ "unchecked" })
 	public static <T> void addListener(String eventName,
+			EventListener<T> listener, int ringSize, boolean isBlocking) {
+		addListener(null, eventName, listener, ringSize, isBlocking);
+	}
+
+	/**
+	 * 注册事件监听器.
+	 * 
+	 * @param connUrl
+	 *            接收端地址
+	 * @param eventName
+	 *            事件名
+	 * @param listener
+	 *            事件监听器执行类
+	 * @param ringSize
+	 *            队列大小
+	 * @param isBlocking
+	 *            是否加锁，影响延时和吞吐量
+	 */
+	@SuppressWarnings({ "unchecked" })
+	public static <T> void addListener(String connUrl, String eventName,
 			EventListener<T> listener, int ringSize, boolean isBlocking) {
 		if (eventName == null || listener == null)
 			throw new IllegalArgumentException(
 					"EventName or listener should not be null");
-		Disruptor<Event<T>> eventDisruptor = (Disruptor<Event<T>>) mapDisruptor
+		DisruptorExt<T> eventDisruptor = (DisruptorExt<T>) mapDisruptor
 				.get(eventName.toLowerCase());
 		if (eventDisruptor == null) {
 			if (isBlocking)
-				eventDisruptor = new Disruptor<Event<T>>(new EventFactory<T>(),
-						ringSize, DEFAULT_THREADFACTORY, ProducerType.MULTI,
-						new BlockingWaitStrategy());
+				eventDisruptor = new DisruptorExt<T>(connUrl,
+						new EventFactory<T>(), ringSize, DEFAULT_THREADFACTORY,
+						ProducerType.MULTI, new BlockingWaitStrategy());
 			else
-				eventDisruptor = new Disruptor<Event<T>>(new EventFactory<T>(),
-						ringSize, DEFAULT_THREADFACTORY, ProducerType.MULTI,
-						new YieldingWaitStrategy());
+				eventDisruptor = new DisruptorExt<T>(connUrl,
+						new EventFactory<T>(), ringSize, DEFAULT_THREADFACTORY,
+						ProducerType.MULTI, new YieldingWaitStrategy());
 
-			eventDisruptor
-					.handleEventsWith(new EventListenerHandler<T>(listener));
+			eventDisruptor.handleEventsWith(listener);
 			eventDisruptor.start();
 
 			mapDisruptor.put(eventName.toLowerCase(), eventDisruptor);
@@ -213,15 +228,10 @@ public class EventBus {
 		if (eventName == null || value == null)
 			throw new IllegalArgumentException(
 					"EventName or value should not be null");
-		Disruptor<Event<T>> disruptor = (Disruptor<Event<T>>) mapDisruptor
+		DisruptorExt<T> disruptor = (DisruptorExt<T>) mapDisruptor
 				.get(eventName.toLowerCase());
 		if (disruptor != null)
-			disruptor.publishEvent(new EventTranslator<Event<T>>() {
-				@Override
-				public void translateTo(Event<T> event, long sequence) {
-					event.setValue(value);
-				}
-			});
+			disruptor.publishEvent(value);
 		else
 			throw new IllegalArgumentException(String.format(
 					"Not found any listener of event name [%s]", eventName));
@@ -237,16 +247,10 @@ public class EventBus {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> void dispatch(final String eventName, final T[] values) {
-		Disruptor<Event<T>> disruptor = (Disruptor<Event<T>>) mapDisruptor
+		DisruptorExt<T> disruptor = (DisruptorExt<T>) mapDisruptor
 				.get(eventName.toLowerCase());
 		if (disruptor != null)
-			disruptor.publishEvents(new EventTranslatorOneArg<Event<T>, T>() {
-				@Override
-				public void translateTo(Event<T> event, long sequence,
-						T value) {
-					event.setValue(value);
-				}
-			}, values);
+			disruptor.publishEvents(values);
 		else
 			throw new IllegalArgumentException(String.format(
 					"Not found any listener of event name [%s]", eventName));
@@ -259,7 +263,7 @@ public class EventBus {
 	 *            事件名
 	 */
 	public static void stop(String eventName) {
-		Disruptor<?> value = mapDisruptor.get(eventName);
+		DisruptorExt<?> value = mapDisruptor.get(eventName);
 		if (value != null) {
 			value.shutdown();
 			mapDisruptor.remove(eventName);
@@ -280,7 +284,7 @@ public class EventBus {
 	 * 关闭事件引擎
 	 */
 	public static void close() {
-		for (Disruptor<?> value : mapDisruptor.values()) {
+		for (DisruptorExt<?> value : mapDisruptor.values()) {
 			value.shutdown();
 		}
 	}
