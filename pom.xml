@@ -19,8 +19,6 @@
 		<module>haetae-manager</module>
 		<module>haetae-client</module>
 		<module>haetae-assembly</module>
-		<module>haetae-orm</module>
-		<module>haetae-tiny</module>
 		<module>haetae-hsr</module>
 	</modules>
 	<properties>
@@ -33,6 +31,7 @@
 		<zookeeper.version>3.4.9</zookeeper.version>
 		<guava.version>20.0</guava.version>
 		<netty.version>4.1.6.Final</netty.version>
+		<thrift.version>0.9.3</thrift.version>
 		<asynchttpclient.version>2.0.24</asynchttpclient.version>
 		<disruptor.version>3.3.6</disruptor.version>
 		<common-cli.version>1.3.1</common-cli.version>
@@ -116,6 +115,12 @@
 				<artifactId>netty-all</artifactId>
 				<version>${netty.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.thrift</groupId>
+				<artifactId>libthrift</artifactId>
+				<version>${thrift.version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>commons-cli</groupId>
 				<artifactId>commons-cli</artifactId>
@@ -234,28 +239,13 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-<!--  
-	<repositories>
-		<repository>
-			<id>nexus</id>
-			<name>local private nexus</name>
-			<url>http://192.168.153.129:8081/repository/maven-public</url>
-		</repository>
-	</repositories>
-	<distributionManagement>
-		<repository>
-			<id>releases</id>
-			<name>Internal 
-		Releases</name>
-			<url>http://192.168.153.129:8081/repository/maven-releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<name>Internal Snapshots</name>
-			<url>http://192.168.153.129:8081/repository/maven-snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-	-->
+	<!-- <repositories> <repository> <id>nexus</id> <name>local private nexus</name> 
+		<url>http://192.168.153.129:8081/repository/maven-public</url> </repository> 
+		</repositories> <distributionManagement> <repository> <id>releases</id> <name>Internal 
+		Releases</name> <url>http://192.168.153.129:8081/repository/maven-releases</url> 
+		</repository> <snapshotRepository> <id>snapshots</id> <name>Internal Snapshots</name> 
+		<url>http://192.168.153.129:8081/repository/maven-snapshots</url> </snapshotRepository> 
+		</distributionManagement> -->
 	<build>
 		<pluginManagement>
 			<plugins>
