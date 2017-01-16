@@ -17,6 +17,7 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.SslContext;
@@ -50,8 +51,7 @@ public class HTTPServer implements Server {
 
 	public InetSocketAddress getInetSocketAddress() {
 		try {
-			return new InetSocketAddress(InetAddress.getLocalHost(),
-					socketAddress.getPort());
+			return new InetSocketAddress(InetAddress.getLocalHost(), socketAddress.getPort());
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -62,40 +62,29 @@ public class HTTPServer implements Server {
 
 		if (channel == null || !channel.isActive()) {
 			SslContext sslCtx = null;
-			boolean ssl = ConfigClient.getBoolean(Constant.K_SERVER_SSL_ENABLED,
-					Constant.V_SERVER_SSL_ENABLED);
-			boolean ws = ConfigClient.config().getBoolean(
-					Constant.K_SERVER_WS_ENABLED, Constant.V_SERVER_WS_ENABLED);
+			boolean ssl = ConfigClient.getBoolean(Constant.K_SERVER_SSL_ENABLED, Constant.V_SERVER_SSL_ENABLED);
+			boolean ws = ConfigClient.config().getBoolean(Constant.K_SERVER_WS_ENABLED, Constant.V_SERVER_WS_ENABLED);
 			if (ssl) {
-				SelfSignedCertificate ssc = new SelfSignedCertificate(
-						"on36.com");
-				sslCtx = SslContextBuilder
-						.forServer(ssc.certificate(), ssc.privateKey()).build();
+				SelfSignedCertificate ssc = new SelfSignedCertificate("on36.com");
+				sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
 			}
 			// Configure the server.
 			EventLoopGroup bossGroup = new NioEventLoopGroup(8);
-			EventLoopGroup workerGroup = new NioEventLoopGroup(
-					threadPoolSize > 0 ? threadPoolSize
-							: ConfigClient.getInt(
-									Constant.K_SERVER_THREADPOOL_SIZE,
-									Constant.V_SERVER_THREADPOOL_SIZE));
+			EventLoopGroup workerGroup = new NioEventLoopGroup(threadPoolSize > 0 ? threadPoolSize
+					: ConfigClient.getInt(Constant.K_SERVER_THREADPOOL_SIZE, Constant.V_SERVER_THREADPOOL_SIZE));
 			try {
 				ServerBootstrap b = new ServerBootstrap();
 				b.option(ChannelOption.SO_BACKLOG,
-						ConfigClient.getInt(Constant.K_SERVER_SOBACKLOG,
-								Constant.V_SERVER_SOBACKLOG));
+						ConfigClient.getInt(Constant.K_SERVER_SOBACKLOG, Constant.V_SERVER_SOBACKLOG));
 				b.option(ChannelOption.SO_REUSEADDR, true);
-				b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS,
-						Constant.V_SERVER_CONNECTTIMEOUT_MILLIS);
-				b.option(ChannelOption.ALLOCATOR,
-						PooledByteBufAllocator.DEFAULT);
-				b.childOption(ChannelOption.ALLOCATOR,
-						PooledByteBufAllocator.DEFAULT);
-//				b.childOption(ChannelOption.AUTO_READ, false);
-				b.group(bossGroup, workerGroup)
-						.channel(NioServerSocketChannel.class)
-						.childHandler(new HttpServerInitializer(sslCtx,
-								container, ws));
+				b.option(ChannelOption.TCP_NODELAY, true);
+				b.option(EpollChannelOption.SO_REUSEPORT, true);
+				b.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Constant.V_SERVER_CONNECTTIMEOUT_MILLIS);
+				b.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+				b.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
+				// b.childOption(ChannelOption.AUTO_READ, false);
+				b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+						.childHandler(new HttpServerInitializer(sslCtx, container, ws));
 
 				channel = b.bind(socketAddress).sync().channel();
 				RUNNING = true;
@@ -105,28 +94,22 @@ public class HTTPServer implements Server {
 				Banner.print(socketAddress.getPort());
 				Environment.logEnv();
 
-				System.out
-						.println("Server is now ready to accept connection on ["
-								+ socketAddress + RouteHelper.PATH_ELEMENT_ROOT
-								+ "]");
-				container.getScheduler().trace(this.getClass(),
-						com.on36.haetae.common.log.LogLevel.INFO,
-						"Server is now ready to accept connection on ["
-								+ socketAddress + RouteHelper.PATH_ELEMENT_ROOT
+				System.out.println("Server is now ready to accept connection on [" + socketAddress
+						+ RouteHelper.PATH_ELEMENT_ROOT + "]");
+				container.getScheduler().trace(this.getClass(), com.on36.haetae.common.log.LogLevel.INFO,
+						"Server is now ready to accept connection on [" + socketAddress + RouteHelper.PATH_ELEMENT_ROOT
 								+ "]");
 				System.out.close();
 				System.err.close();
 				channel.closeFuture().sync();
 			} catch (Exception e) {
-				throw new Exception(
-						"Address[" + socketAddress + "] already in use: bind");
+				throw new Exception("Address[" + socketAddress + "] already in use: bind");
 			} finally {
 				bossGroup.shutdownGracefully();
 				workerGroup.shutdownGracefully();
 			}
 		} else {
-			System.out.println("Server is already running on [" + socketAddress
-					+ "], startup abort!");
+			System.out.println("Server is already running on [" + socketAddress + "], startup abort!");
 		}
 	}
 
