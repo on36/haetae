@@ -1,12 +1,6 @@
 package com.on36.haetae.test;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-
-import com.on36.haetae.api.JSONObject;
-import com.on36.haetae.api.http.MediaType;
-import com.on36.haetae.config.client.HttpClient;
 
 /**
  * @author zhanghr
@@ -56,7 +50,6 @@ public class Test {
 		Thread current = Thread.currentThread();
 		System.out.println(current.getPriority());
 		System.out.println(current.getName());
-		System.out.println(current.activeCount());
 		System.out.println(current.getId());
 		System.out.println(current.getThreadGroup());
 		System.out.println(current.getStackTrace());
