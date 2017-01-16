@@ -111,7 +111,7 @@ public class HaetaeServer {
 		EventBus.addListener(LogEvent.class, new LogEventListener());
 		EventBus.addListener(EndpointEvent.class, new EndpointEventListener());
 		EventBus.addListener(HttpRequestEvent.class,
-				new HttpRequestEventListener(), 2048, false);
+				new HttpRequestEventListener(), 1024*32, false);
 
 		if (excp != null)
 			scheduler.trace(Configuration.class, LogLevel.WARN,
