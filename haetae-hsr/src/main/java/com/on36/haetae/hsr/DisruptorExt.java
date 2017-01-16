@@ -13,6 +13,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.EventProcessorFactory;
 import com.lmax.disruptor.dsl.ProducerType;
+import com.on36.haetae.rpc.thrift.Result;
 
 /**
  * @author zhanghr
@@ -21,6 +22,8 @@ import com.lmax.disruptor.dsl.ProducerType;
 public class DisruptorExt<T> extends Disruptor<Event<T>> {
 
 	private String connUrl = null;
+	private ServiceProvider<T> sp = new ServiceProvider<T>(this);
+	private boolean hasRemote = false;
 
 	public DisruptorExt(EventFactory<T> eventFactory, int ringBufferSize,
 			ThreadFactory threadFactory, ProducerType producerType,
@@ -35,6 +38,15 @@ public class DisruptorExt<T> extends Disruptor<Event<T>> {
 		super(eventFactory, ringBufferSize, threadFactory, producerType,
 				waitStrategy);
 		this.connUrl = connUrl;
+	}
+
+	public DisruptorExt(int port, EventFactory<T> eventFactory,
+			int ringBufferSize, ThreadFactory threadFactory,
+			ProducerType producerType, WaitStrategy waitStrategy) {
+		super(eventFactory, ringBufferSize, threadFactory, producerType,
+				waitStrategy);
+		sp.publishService(port);
+		this.hasRemote = true;
 	}
 
 	public void publishEvent(final T value) {
@@ -56,12 +68,13 @@ public class DisruptorExt<T> extends Disruptor<Event<T>> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void handleEventsWith(final EventListener<T>... listeners) {
-		int size = listeners.length;
-		EventListenerHandler<T>[] handlers = new EventListenerHandler[size];
-		while (size-- > 0)
-			handlers[size] = new EventListenerHandler<T>(listeners[size],
-					connUrl == null);
+	public void handleEventsWith(final EventListener<?> listener) {
+		EventListenerHandler<T> handlers = null;
+		if (hasRemote || connUrl==null)
+			handlers = new EventListenerHandler<T>((EventListener<T>) listener);
+		else
+			handlers = new EventListenerHandler<T>(
+					(EventListener<Result>) listener, connUrl);
 		super.handleEventsWith(handlers);
 	}
 
@@ -126,12 +139,23 @@ public class DisruptorExt<T> extends Disruptor<Event<T>> {
 
 	@Override
 	public RingBuffer<Event<T>> start() {
+		if (this.hasRemote) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					sp.start();
+				}
+			}).start();
+			;
+		}
 		return super.start();
 	}
 
 	@Override
 	public void shutdown() {
 		super.shutdown();
+		if (hasRemote)
+			sp.shutdown();
 	}
 
 }

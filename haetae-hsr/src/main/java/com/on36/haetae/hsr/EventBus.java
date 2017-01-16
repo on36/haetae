@@ -8,6 +8,8 @@ import java.util.concurrent.ThreadFactory;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
 import com.lmax.disruptor.dsl.ProducerType;
+import com.on36.haetae.rpc.thrift.Message;
+import com.on36.haetae.rpc.thrift.Result;
 
 /**
  * @author zhanghr
@@ -142,9 +144,33 @@ public class EventBus {
 	 * @param isBlocking
 	 *            是否加锁，影响延时和吞吐量
 	 */
+	@SuppressWarnings({ "unchecked" })
 	public static <T> void addListener(String eventName,
 			EventListener<T> listener, int ringSize, boolean isBlocking) {
-		addListener(null, eventName, listener, ringSize, isBlocking);
+		if (eventName == null || listener == null)
+			throw new IllegalArgumentException(
+					"EventName or listener should not be null");
+		DisruptorExt<T> eventDisruptor = (DisruptorExt<T>) mapDisruptor
+				.get(eventName.toLowerCase());
+		if (eventDisruptor == null) {
+			if (isBlocking)
+				eventDisruptor = new DisruptorExt<T>(new EventFactory<T>(),
+						ringSize, DEFAULT_THREADFACTORY, ProducerType.MULTI,
+						new BlockingWaitStrategy());
+			else
+				eventDisruptor = new DisruptorExt<T>(new EventFactory<T>(),
+						ringSize, DEFAULT_THREADFACTORY, ProducerType.MULTI,
+						new YieldingWaitStrategy());
+
+			eventDisruptor.handleEventsWith(listener);
+			eventDisruptor.start();
+
+			mapDisruptor.put(eventName.toLowerCase(), eventDisruptor);
+		} else {
+			throw new IllegalArgumentException(String.format(
+					"These is already a listener of event name [%s]",
+					eventName));
+		}
 	}
 
 	/**
@@ -162,22 +188,65 @@ public class EventBus {
 	 *            是否加锁，影响延时和吞吐量
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public static <T> void addListener(String connUrl, String eventName,
-			EventListener<T> listener, int ringSize, boolean isBlocking) {
-		if (eventName == null || listener == null)
-			throw new IllegalArgumentException(
-					"EventName or listener should not be null");
-		DisruptorExt<T> eventDisruptor = (DisruptorExt<T>) mapDisruptor
+	public static void register(String connUrl,
+			EventListener<Result> listener, int ringSize, boolean isBlocking) {
+		String eventName = Message.class.getName().toLowerCase();
+		DisruptorExt<Message> eventDisruptor = (DisruptorExt<Message>) mapDisruptor
 				.get(eventName.toLowerCase());
 		if (eventDisruptor == null) {
 			if (isBlocking)
-				eventDisruptor = new DisruptorExt<T>(connUrl,
-						new EventFactory<T>(), ringSize, DEFAULT_THREADFACTORY,
-						ProducerType.MULTI, new BlockingWaitStrategy());
+				eventDisruptor = new DisruptorExt<Message>(connUrl,
+						new EventFactory<Message>(), ringSize,
+						DEFAULT_THREADFACTORY, ProducerType.MULTI,
+						new BlockingWaitStrategy());
 			else
-				eventDisruptor = new DisruptorExt<T>(connUrl,
-						new EventFactory<T>(), ringSize, DEFAULT_THREADFACTORY,
-						ProducerType.MULTI, new YieldingWaitStrategy());
+				eventDisruptor = new DisruptorExt<Message>(connUrl,
+						new EventFactory<Message>(), ringSize,
+						DEFAULT_THREADFACTORY, ProducerType.MULTI,
+						new YieldingWaitStrategy());
+
+			eventDisruptor.handleEventsWith(listener);
+			eventDisruptor.start();
+
+			mapDisruptor.put(eventName.toLowerCase(), eventDisruptor);
+		} else {
+			throw new IllegalArgumentException(String.format(
+					"These is already a listener of event name [%s]",
+					eventName));
+		}
+	}
+
+	/**
+	 * 注册事件监听器.
+	 * 
+	 * @param port
+	 *            监听端口
+	 * @param eventName
+	 *            事件名
+	 * @param listener
+	 *            事件监听器执行类
+	 * @param ringSize
+	 *            队列大小
+	 * @param isBlocking
+	 *            是否加锁，影响延时和吞吐量
+	 */
+	@SuppressWarnings({ "unchecked" })
+	public static void addListener(int port, EventListener<Message> listener,
+			int ringSize, boolean isBlocking) {
+		String eventName = Message.class.getName().toLowerCase();
+		DisruptorExt<Message> eventDisruptor = (DisruptorExt<Message>) mapDisruptor
+				.get(eventName.toLowerCase());
+		if (eventDisruptor == null) {
+			if (isBlocking)
+				eventDisruptor = new DisruptorExt<Message>(port,
+						new EventFactory<Message>(), ringSize,
+						DEFAULT_THREADFACTORY, ProducerType.MULTI,
+						new BlockingWaitStrategy());
+			else
+				eventDisruptor = new DisruptorExt<Message>(port,
+						new EventFactory<Message>(), ringSize,
+						DEFAULT_THREADFACTORY, ProducerType.MULTI,
+						new YieldingWaitStrategy());
 
 			eventDisruptor.handleEventsWith(listener);
 			eventDisruptor.start();

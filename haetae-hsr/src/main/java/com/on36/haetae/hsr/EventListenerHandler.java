@@ -1,6 +1,8 @@
 package com.on36.haetae.hsr;
 
 import com.lmax.disruptor.EventHandler;
+import com.on36.haetae.rpc.thrift.Message;
+import com.on36.haetae.rpc.thrift.Result;
 
 /**
  * @author zhanghr
@@ -10,25 +12,29 @@ import com.lmax.disruptor.EventHandler;
 public class EventListenerHandler<T> implements EventHandler<Event<T>> {
 
 	private EventListener<T> listener;
-	private boolean isLocal;
+	private EventListener<Result> resultListener;
+	private String conURL;
+	private ServiceConsumer consumer;
 
 	public EventListenerHandler(EventListener<T> listener) {
-		this(listener, false);
+		this.listener = listener;
 	}
 
-	public EventListenerHandler(EventListener<T> listener, boolean isLocal) {
-		this.listener = listener;
-		this.isLocal = isLocal;
+	public EventListenerHandler(EventListener<Result> listener, String conURL) {
+		this.resultListener = listener;
+		this.conURL = conURL;
+		if (this.conURL != null) {
+			consumer = new ServiceConsumer(conURL);
+		}
 	}
 
 	@Override
-	public void onEvent(Event<T> event, long sequence, boolean endOfBatch)
-			throws Exception {
-		if (isLocal)
+	public void onEvent(Event<T> event, long sequence, boolean endOfBatch) throws Exception {
+		if (this.listener != null)
 			listener.doHandler(event.getValue());
 		else {
-			//TODO 调用远端接口
-			System.out.println("hello remote");
+			Result result = consumer.publish((Message) event.getValue());
+			resultListener.doHandler(result);
 		}
 	}
 

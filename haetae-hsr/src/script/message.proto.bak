@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option java_package = "com.on36.haetae.rpc.protobuf";
+option java_outer_classname = "MessageBuilder";
+option java_multiple_files = false;
+
+message Message {
+  string id=1;
+  string topic=2;
+  bytes content=3;  
+  int32 createdTime=4;
+  string source=5;
+}
+message Result {
+ string id=1;
+ ResultType type=2;
+ bytes data=3; 
+}
+
+
+enum ResultType {
+ FAILURE = 0;
+ SUCCESS = 1;
+}
