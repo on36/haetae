@@ -24,8 +24,8 @@ public class ProcessUtil {
 	private static long PROCCESS_TIMEOUT_SECONDS = 10;
 	private static String COMMAND_EXIT = "exit\n";
 	private static String COMMAND_LINE = "\n";
-	private static int startingHeapSizeInMegabytes = 48;
-	private static int maximumHeapSizeInMegabytes = 128;
+	private static int startingHeapSizeInMegabytes = 128;
+	private static int maximumHeapSizeInMegabytes = 512;
 
 	private static ExecutorService es = Executors.newCachedThreadPool();
 
